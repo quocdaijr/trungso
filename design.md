@@ -84,9 +84,25 @@ verbatim, and string-parsing that as RGB produces confident nonsense.
 
 ## Motion
 
-Three primitives, all `transform` / `opacity`: `stamp-press`, `ball-in` (staggered),
-`reveal` (on scroll). Named easings only. `prefers-reduced-motion: reduce` collapses
-everything to a 150ms opacity fade.
+Four primitives, all `transform` / `opacity`: `stamp-press`, `ball-in` (staggered),
+`reveal` (on scroll), and `thay-idle`. Named easings only. `prefers-reduced-motion: reduce`
+collapses everything to a 150ms opacity fade.
+
+`thay-idle` is the one infinite loop on the page, and it was added on an explicit request
+for a real looping animation rather than a one-shot. It cross-fades two frames of the
+hand-drawn fortune-teller over 4s using `opacity` only, so it stays GPU-composited and
+never touches layout. It exists in exactly one place - the head of stage 02 - and it ships
+with two conditions that are part of the primitive, not options attached to it:
+
+1. **It pauses when it is not on screen.** `render.js` observes the figure and toggles
+   `.is-paused`, which sets `animation-play-state: paused`. An infinite animation running
+   behind the fold is battery cost with nothing to show for it. Verified by reading
+   `animation-play-state`, not by trusting the class.
+2. **`prefers-reduced-motion: reduce` removes it entirely** - `animation: none`, second
+   frame hidden. Not slowed, not shortened. Removed. This is an accessibility requirement,
+   so it is not subject to taste.
+
+A fifth primitive would need the same treatment, or it does not get added.
 
 ## Exports
 

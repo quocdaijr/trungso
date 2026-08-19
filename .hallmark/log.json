@@ -7,7 +7,19 @@
     "vibe": "vé số vỉa hè, thầy bói ban số",
     "enrichment": "none (Tier A CSS art: grain, torn edge, stamps)",
     "nav": "N7 brutal slab",
-    "footer": "Ft5 statement",
+    "footer": "Ft4 colophon",
     "brief": "trungso - lottery oracle, four switchable skins, street fortune-teller voice"
+  },
+  {
+    "date": "2026-08-19",
+    "macrostructure": "Narrative Workflow (unchanged - design.md governs this project)",
+    "theme": "custom x4 (veso, thantai, viahe, y2k) - unchanged",
+    "vibe": "vé số vỉa hè, thầy bói ban số",
+    "enrichment": "hand-drawn SVG fortune-teller (7 poses, in-repo), one PD Dong Ho woodblock, self-hosted Twemoji",
+    "nav": "N7 brutal slab (unchanged)",
+    "footer": "Ft4 colophon (was Ft5 statement)",
+    "motion": "4 primitives - thay-idle added, with offscreen-pause and reduced-motion removal as conditions",
+    "brief": "mobile-first pass + memes + thanks footer",
+    "notes": "Diversification rule is inverted here: design.md exists, so the page keeps the locked system rather than differing from it. Only the footer archetype changed, because the brief asked for thanks rather than a statement."
   }
 ]

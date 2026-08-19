@@ -164,9 +164,27 @@ nguồn nào** bác bỏ được giả thuyết ngẫu nhiên. Con số nào tr
 - **Mega 6/45** — 18h thứ 4, thứ 6, chủ nhật
 - **XSMB** — 18h15 hàng ngày
 
+## Tài nguyên hình ảnh
+
+Toàn bộ **tự host trong repo** — trang không gọi một request nào ra ngoài để lấy ảnh hay emoji.
+Chi tiết từng file, kèm ngày tải và cả danh sách nguồn *đã cân nhắc rồi loại*, ở
+[`site/img/CREDITS.md`](site/img/CREDITS.md).
+
+| Thứ | Nguồn | Giấy phép |
+|---|---|---|
+| Tranh khắc gỗ Đông Hồ *Đại Cát* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dong_Ho_painting_-_Dai_cat.jpg) | Public domain |
+| 13 emoji | [jdecked/twemoji](https://github.com/jdecked/twemoji) — © Twitter/X | đồ hoạ **CC-BY 4.0**, code MIT |
+| Hình thầy bói (7 dáng) | vẽ tay trong repo này, `site/thay.js` | MIT, cùng repo |
+
+Repo này là MIT, tức là ai clone cũng được cấp lại quyền phát hành. Nên nó **không thể** chứa
+thứ nó không sở hữu: meme nhân vật có bản quyền, ảnh chụp phim, hay ảnh lấy từ mạng xã hội đều
+bị loại — không phải vì khó tìm, mà vì không có giấy phép. Cũng đã loại **OpenMoji**: nó là
+CC-BY-**SA**, copyleft, xung đột với MIT.
+
 ## Giấy phép & miễn trừ trách nhiệm
 
 [MIT](LICENSE) — phần mềm cung cấp **NGUYÊN TRẠNG**, không bảo đảm dưới bất kỳ hình thức nào.
+Giấy phép MIT áp cho **code**; tài nguyên bên thứ ba giữ giấy phép riêng, xem bảng trên.
 
 Bản miễn trừ đầy đủ (song ngữ): [**DISCLAIMER.md**](DISCLAIMER.md)
 

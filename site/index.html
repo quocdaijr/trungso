@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>trungso — Thầy phán số, toán học phán thầy</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%AE%3C/text%3E%3C/svg%3E">
 
@@ -25,13 +25,40 @@
 
 *,*::before,*::after{box-sizing:border-box}
 html,body{overflow-x:clip;margin:0}
-html{scroll-behavior:smooth}
+/* iOS inflates text in landscape without this. */
+html{scroll-behavior:smooth; -webkit-text-size-adjust:100%; text-size-adjust:100%}
 body{
   background:var(--color-paper); color:var(--color-ink);
   font-family:var(--font-body); font-size:var(--text-base); line-height:1.6;
   -webkit-font-smoothing:antialiased;
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* There was no global link rule, so every unstyled link fell back to the browser's
+   #0000EE - measured at 1.11:1 on the viahe paper, i.e. invisible. Accent was the
+   obvious candidate and it failed too: 1.63:1 inside the warnstrip on thantai.
+   currentColor inherits the surrounding text colour, which every zone has already
+   had measured to AA, and the underline carries the affordance so a link never
+   depends on hue at all (WCAG 1.4.1). */
+a{
+  color:currentColor;
+  text-decoration:underline; text-underline-offset:2px;
+  text-decoration-thickness:from-font;
+}
+a:hover{text-decoration-thickness:2px}
+/* One focus ring for the whole page, deliberately two-tone. --color-focus is accent-2
+   on three of the four skins, and the warning strip is filled with accent-2 as well, so
+   a single themed ring measured 1:1 on that surface and vanished. The outer ring is
+   currentColor, which every surface has already had measured to AA, so one of the two
+   bands always clears the 3:1 WCAG 1.4.11 asks of a focus indicator. */
+a:focus-visible,
+.stamp:focus-visible,.stamp.is-focus,
+.btn:focus-visible,
+.cell:focus-visible,
+form.khai input:focus-visible,form.khai select:focus-visible{
+  outline:var(--rule-mid) solid var(--color-focus); outline-offset:1px;
+  box-shadow:0 0 0 calc(var(--rule-mid) + 3px) currentColor;
+}
 
 /* --- grain: the page should feel printed, not rendered --- */
 .grain{
@@ -43,7 +70,7 @@ body{
 /* ---------------- warning: always-on strip + first-visit gate ---------------- */
 /* The strip and the nav share one sticky wrapper. Making the nav sticky on its own
    would let it slide under the strip on scroll. */
-.topbar{position:sticky; top:0; z-index:100}
+.topbar{position:sticky; top:0; z-index:100; padding-top:env(safe-area-inset-top, 0)}
 .warnstrip{
   background:var(--color-accent-2); color:var(--color-on-accent-2);
   font-size:var(--text-xs); font-weight:700; line-height:1.35;
@@ -61,6 +88,8 @@ html.is-gated,html.is-gated body{overflow:hidden}
 }
 .gate__panel{
   max-width:60ch; width:100%;
+  /* dvh, not vh: mobile address bars resize the viewport mid-scroll. */
+  max-height:calc(100dvh - 2*var(--space-md)); overflow-y:auto;
   background:var(--color-paper-2); color:var(--color-ink);
   border:var(--rule-slab) solid var(--color-rule); border-radius:var(--radius);
   padding:var(--space-lg) var(--space-md);
@@ -94,6 +123,10 @@ html.is-gated,html.is-gated body{overflow:hidden}
 .slab__mark{
   font-family:var(--font-display); font-size:var(--text-xl);
   color:var(--color-ink); text-decoration:none; letter-spacing:.02em;
+  /* The wordmark is the link home, so it is a real navigation target and owes the
+     full 44px. Flex, not padding: padding would also widen the slab's left edge. */
+  display:inline-flex; align-items:center; min-height:var(--tap);
+  touch-action:manipulation;
 }
 .slab__themes{display:flex; gap:var(--space-2xs); flex-wrap:nowrap}
 
@@ -104,12 +137,13 @@ html.is-gated,html.is-gated body{overflow:hidden}
   background:transparent; color:var(--color-ink);
   border:var(--rule-mid) solid var(--color-rule); border-radius:var(--radius);
   cursor:pointer; white-space:nowrap;
+  min-height:var(--tap); touch-action:manipulation;
   transform:rotate(-2deg);
   transition:transform var(--dur-fast) var(--ease-out),
              background-color var(--dur-fast) var(--ease-out);
 }
 .stamp:hover,.stamp.is-hover{background:var(--color-paper-2); transform:rotate(0deg)}
-.stamp:focus-visible,.stamp.is-focus{outline:var(--rule-mid) solid var(--color-focus); outline-offset:2px}
+
 .stamp:active,.stamp.is-active{transform:translateY(2px) rotate(-2deg)}
 /* Selected stamp fills with accent-2 and takes the dark on-fill colour. Accent on
    paper only reaches 3.53:1 in veso, which is short of AA at this 12px size. */
@@ -120,19 +154,26 @@ html.is-gated,html.is-gated body{overflow:hidden}
 @media (max-width:640px){
   .stamp__full{display:none}
   .stamp__short{display:inline}
-  .stamp{padding:var(--space-2xs) var(--space-sm)}
+  /* The label shrinks to one letter, so width has to be forced or the target collapses. */
+  .stamp{padding:var(--space-2xs) var(--space-sm); min-width:var(--tap)}
 }
 
 /* ---------------- stages: Narrative Workflow ---------------- */
-.wrap{max-width:1060px; margin:0 auto; padding:0 var(--space-md)}
+/* viewport-fit=cover means content can slide under a notch, so the insets are not
+   optional once that meta is set. */
+.wrap{max-width:1060px; margin:0 auto;
+  padding-inline:max(var(--space-md), env(safe-area-inset-left), env(safe-area-inset-right))}
 main.wrap{padding-bottom:var(--space-2xl)}
 .masthead{padding-top:var(--space-xl)}
 .masthead__title{font-family:var(--font-display); font-weight:400; font-style:normal;
-  font-size:var(--text-display); line-height:.95; margin:0 0 var(--space-sm);
+  font-size:var(--text-display); line-height:var(--lh-display); margin:0 0 var(--space-sm);
   overflow-wrap:anywhere; min-width:0; color:var(--color-ink)}
 .masthead__lede{font-family:var(--font-hand); font-size:var(--text-lg);
   color:var(--color-ink-dim); max-width:44ch; margin:0 0 var(--space-md)}
-.stage{padding-top:var(--space-2xl); scroll-margin-top:96px}
+.stage{padding-top:var(--space-2xl);
+  /* --topbar-h is measured at runtime by warning.js; the fallback is the tallest
+     the sticky wrapper gets, so a missed measurement over-clears rather than hides. */
+  scroll-margin-top:calc(var(--topbar-h, 204px) + var(--space-xs))}
 /* Stage number ABOVE the title, same column. Never number-left / title-right. */
 .stage__mark{
   font-family:var(--font-num); font-size:var(--text-sm); font-weight:700;
@@ -142,7 +183,7 @@ main.wrap{padding-bottom:var(--space-2xl)}
 }
 .stage__title{
   font-family:var(--font-display); font-weight:400; font-style:normal;
-  font-size:var(--text-display-s); line-height:.98; margin:var(--space-sm) 0 var(--space-xs);
+  font-size:var(--text-display-s); line-height:var(--lh-display); margin:var(--space-sm) 0 var(--space-xs);
   overflow-wrap:anywhere; min-width:0; color:var(--color-ink);
 }
 .stage__lede{color:var(--color-ink-dim); max-width:58ch; margin:0 0 var(--space-md)}
@@ -248,15 +289,25 @@ form.khai label{display:flex; flex-direction:column; gap:var(--space-2xs);
   font-size:var(--text-xs); color:var(--color-ink-dim)}
 form.khai input,form.khai select{
   background:var(--color-paper); color:var(--color-ink); font:inherit;
-  font-size:var(--text-sm); padding:var(--space-xs);
+  /* 16px is the iOS Safari threshold: anything smaller and Safari zooms the whole page
+     on focus, stranding the user zoomed-in on one field. Never --text-sm here. */
+  font-size:var(--text-base); padding:var(--space-xs);
+  line-height:1.25;
+  min-height:var(--tap);
   border:var(--rule-mid) solid var(--color-rule); border-radius:var(--radius);
   min-width:150px; max-width:100%;
 }
-form.khai input:focus-visible,form.khai select:focus-visible,
-.btn:focus-visible{outline:var(--rule-mid) solid var(--color-focus); outline-offset:2px}
+/* Three controls on one form measured 50 / 48 / 44px: input[type=date] and input[type=text]
+   each carry their own intrinsic height from the UA stylesheet, so the row looked misaligned.
+   This is scoped to input on purpose - appearance:none on the select removes its dropdown
+   arrow, which made the gender field indistinguishable from a text box. The select was
+   already 44px and needs no help. */
+form.khai input{appearance:none; -webkit-appearance:none}
+
 .btn{
   font-family:var(--font-display); font-size:var(--text-sm); white-space:nowrap;
   padding:var(--space-xs) var(--space-md); cursor:pointer;
+  min-height:var(--tap); touch-action:manipulation;
   background:var(--color-accent); color:var(--color-paper);
   border:var(--rule-mid) solid var(--color-ink); border-radius:var(--radius);
   transition:transform var(--dur-fast) var(--ease-out);
@@ -268,12 +319,109 @@ form.khai input:focus-visible,form.khai select:focus-visible,
 
 /* ---------------- footer: Ft5 statement ---------------- */
 .ft{border-top:var(--rule-slab) solid var(--color-rule); margin-top:var(--space-2xl);
-  padding:var(--space-xl) var(--space-md); background:var(--color-paper-2)}
+  padding:var(--space-xl) var(--space-md);
+  padding-bottom:calc(var(--space-xl) + env(safe-area-inset-bottom, 0));
+  background:var(--color-paper-2)}
 .ft__statement{font-family:var(--font-display); font-size:var(--text-2xl); line-height:1.1;
   max-width:24ch; margin:0 auto var(--space-md); text-align:center;
   overflow-wrap:anywhere; min-width:0; color:var(--color-ink)}
 .ft__meta{text-align:center; color:var(--color-ink-dim); font-size:var(--text-xs);
   max-width:70ch; margin:0 auto}
+
+/* ---------------- screen-reader only ---------------- */
+.sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0}
+
+/* ---------------- twemoji ---------------- */
+/* Self-hosted so the glyphs look the same everywhere. OS emoji fonts diverge wildly,
+   and a few of these have no glyph at all on some platforms. */
+.tw{width:1em; height:1em; vertical-align:-.15em; display:inline-block}
+
+/* ---------------- the fortune-teller ---------------- */
+.thay{color:var(--color-ink); width:96px; max-width:30vw; line-height:0}
+.thay svg{width:100%; height:auto; display:block; overflow:visible}
+.thay--flip{position:relative}
+.thay--flip .thay__b{position:absolute; inset:0}
+/* Fourth motion primitive. Two conditions travel with it, both below: it pauses when
+   scrolled out of view, and it does not exist under prefers-reduced-motion. */
+@keyframes thay-idle{0%,45%{opacity:1} 55%,100%{opacity:0}}
+.thay--flip .thay__b{animation:thay-idle 4s var(--ease-in-out) infinite}
+.thay--flip.is-paused .thay__b{animation-play-state:paused}
+.thay__say{font-family:var(--font-hand); color:var(--color-ink-dim);
+  font-size:var(--text-sm); max-width:34ch; margin:0}
+.thay-row{display:flex; gap:var(--space-md); align-items:flex-start; flex-wrap:wrap;
+  margin:0 0 var(--space-md)}
+.thay-row > *{min-width:0}
+
+/* ---------------- a real print, pinned to the page ---------------- */
+/* The woodblock has a light paper ground, so on the dark skins it needs a paper-coloured
+   mount or it reads as a rectangle pasted on top. */
+.print{background:var(--color-paper-2); border:var(--rule-mid) solid var(--color-rule);
+  padding:var(--space-xs); max-width:160px; margin:var(--space-sm) 0;
+  transform:rotate(-1.5deg)}
+.print img{display:block; width:100%; height:auto}
+.print figcaption{font-family:var(--font-hand); font-size:var(--text-xs);
+  color:var(--color-ink-dim); margin-top:var(--space-2xs); line-height:1.3}
+
+/* ---------------- heatmap: tappable, not hover-only ---------------- */
+/* `title` does not exist on touch. Every cell is a button and writes to a live readout,
+   so the frequency data is reachable without a mouse. */
+.heat{display:grid; gap:2px; margin-top:var(--space-sm)}
+.heat--pool{grid-template-columns:repeat(auto-fill,minmax(min(44px,100%),1fr))}
+.heat--matrix{grid-template-columns:repeat(10,minmax(0,1fr))}
+.cell{aspect-ratio:1; min-height:var(--tap); touch-action:manipulation;
+  display:grid; place-items:center; font-family:var(--font-num);
+  font-size:var(--text-xs); border:var(--rule-hair) solid var(--color-rule);
+  border-radius:var(--radius); background:transparent; color:var(--color-ink);
+  cursor:pointer; padding:0}
+.cell:hover,.cell.is-hover{outline:var(--rule-mid) solid var(--color-accent); outline-offset:-3px}
+
+.cell:active{transform:translateY(1px)}
+.cell[aria-pressed="true"]{background:var(--color-accent-2); color:var(--color-on-accent-2)}
+.heat__readout{font-family:var(--font-num); font-size:var(--text-sm);
+  color:var(--color-ink); margin:var(--space-xs) 0 0; min-height:1.5em}
+
+/* ---------------- tables: stack instead of scrolling inside a card ---------------- */
+/* Horizontal scroll *inside* a card is one of the worst mobile patterns: nothing tells
+   the reader there is more to the right. Label/value tables become stacked rows. */
+@media (max-width:640px){
+  .stack-sm,.stack-sm tbody,.stack-sm tr,.stack-sm th,.stack-sm td{display:block}
+  .stack-sm tr{border-bottom:var(--rule-hair) solid var(--color-rule);
+    padding:var(--space-xs) 0}
+  .stack-sm tr:last-child{border-bottom:0}
+  /* The matrix variant drops its header row and lets each cell name its own column,
+     because two unlabelled numbers per row is worse than no table at all. */
+  .stack-sm--matrix thead{display:none}
+  .stack-sm--matrix td::before{content:attr(data-label) ": ";
+    font-family:var(--font-body); font-size:var(--text-xs); color:var(--color-ink-dim)}
+  .stack-sm--matrix td{display:flex; gap:var(--space-2xs); align-items:baseline;
+    flex-wrap:wrap}
+  .stack-sm th{color:var(--color-ink-dim); font-size:var(--text-xs); border:0; padding:0}
+  .stack-sm td,.stack-sm td.num{font-family:var(--font-num); font-size:var(--text-lg);
+    text-align:left; border:0; padding:2px 0 0}
+  /* 12px is a label size, not a reading size. */
+  .note,th,.sermon li,.ft__meta{font-size:var(--text-sm)}
+  .scroll{position:relative}
+  .scroll::after{content:"cuộn ngang →"; position:absolute; right:0; top:-1.4em;
+    font-family:var(--font-num); font-size:var(--text-xs); color:var(--color-ink-dim)}
+}
+
+/* ---------------- footer: Ft4 colophon ---------------- */
+.colophon{font-family:var(--font-num); font-size:var(--text-sm); line-height:1.55;
+  max-width:74ch; margin:0 auto}
+.colophon h2{font-family:var(--font-num); font-size:var(--text-xs); font-weight:700;
+  letter-spacing:.18em; margin:0 0 var(--space-xs); color:var(--color-ink)}
+.colophon dl{display:grid; grid-template-columns:minmax(0,22ch) minmax(0,1fr);
+  gap:2px var(--space-md); margin:0 0 var(--space-md)}
+.colophon dt{overflow-wrap:anywhere; color:var(--color-ink)}
+.colophon dd{margin:0; color:var(--color-ink-dim); overflow-wrap:anywhere}
+.colophon__block{margin:0 0 var(--space-md); color:var(--color-ink-dim)}
+.colophon__made{color:var(--color-ink); border-top:var(--rule-hair) solid var(--color-rule);
+  padding-top:var(--space-sm); margin:0}
+@media (max-width:640px){
+  .colophon dl{grid-template-columns:minmax(0,1fr); gap:0}
+  .colophon dt{margin-top:var(--space-xs)}
+}
 
 /* ---------------- reveal ---------------- */
 .reveal{opacity:0; transform:translateY(14px);
@@ -282,7 +430,10 @@ form.khai input:focus-visible,form.khai select:focus-visible,
 @media (prefers-reduced-motion:reduce){
   .reveal,.reveal.is-in{transition:opacity 150ms linear; transform:none}
   .ball--in{animation:none}
-  .stamp,.btn{transition:none}
+  .stamp,.btn,.cell{transition:none}
+  /* Not slowed down — removed. This is an accessibility requirement, not a taste knob. */
+  .thay--flip .thay__b{animation:none; opacity:0}
+  .print{transform:none}
 }
 </style>
 </head>
@@ -327,15 +478,32 @@ form.khai input:focus-visible,form.khai select:focus-visible,
 </main>
 
 <footer class="ft">
-  <p class="ft__statement">Xổ số là biến cố độc lập. Thầy nói gì thì nói, toán học vẫn thắng.</p>
-  <p class="ft__meta">
-    Dữ liệu: thanhnhu/vietlott · vietlott.vn · khiemdoan/vietnam-lottery-xsmb-analysis ·
-    jbaranski/jeffs-lottery-utils — tất cả MIT.
-    Lời tiên tri sinh deterministic và ghi lại <b>trước</b> giờ quay, không sửa hồi tố được.
-    Giấy phép MIT.
-  </p>
+  <div class="colophon">
+    <h2>CẢM ƠN</h2>
+    <dl>
+      <dt>thanhnhu/vietlott</dt><dd>mirror Power 6/55 + Mega 6/45</dd>
+      <dt>khiemdoan/vietnam-lottery-xsmb-analysis</dt><dd>7.526 kỳ XSMB từ 2005</dd>
+      <dt>jbaranski/jeffs-lottery-utils</dt><dd>Powerball + Mega Millions</dd>
+      <dt>CoinGecko · Open-Meteo</dt><dd>tín hiệu vũ trụ</dd>
+      <dt>Đường dây Ngày Mai 096.306.1414</dt><dd>hỗ trợ tâm lý miễn phí</dd>
+    </dl>
+    <p class="colophon__block">Tất cả đều MIT. Không có họ thì không có trang này.</p>
+    <dl>
+      <dt>TRANH</dt><dd>Đông Hồ “Đại Cát” — public domain, Wikimedia Commons</dd>
+      <dt>EMOJI</dt><dd>Twemoji — đồ hoạ CC-BY 4.0, © Twitter/X</dd>
+      <dt>HÌNH THẦY</dt><dd>vẽ tay, thuộc repo này</dd>
+    </dl>
+    <p class="colophon__made">
+      Made with ♡, 5138 dòng code, 462 test, và một lượng token AI không ai muốn nhắc lại.<br>
+      Độ chính xác dự đoán: 0%.<br>
+      <a href="https://github.com/quocdaijr/trungso">MIT</a> · 2026 · không bán gì ·
+      không liên quan Vietlott · 18+ ·
+      <a href="https://github.com/quocdaijr/trungso/blob/main/DISCLAIMER.md">miễn trừ trách nhiệm</a>
+    </p>
+  </div>
 </footer>
 
+<script src="./thay.js"></script>
 <script src="./warning.js"></script>
 <script src="./theme.js"></script>
 <script src="./personal.js"></script>

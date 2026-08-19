@@ -1,4 +1,22 @@
-/* Hallmark · macrostructure: Narrative Workflow · genre: playful
+/* Hallmark · pre-emit critique: P5 H5 E4 S5 R4 V4
+ * nav: N7 brutal slab · footer: Ft4 colophon
+ * contrast: pass (40-41, re-measured by canvas after the mobile pass)
+ * mobile: pass (34, 49, 50-57) · honest: pass (46) · chrome: pass (47)
+ * tokens: pass (48) · icons: see note · motion: 4 primitives
+ *
+ * Known, deliberate deviations - stated rather than quietly passed:
+ *   G22  viahe's neutrals are chroma 0 on purpose; the skin is called Vỉa Hè and the
+ *        point is raw pavement, not a tinted grey. The other three skins tint theirs.
+ *   G26  .cell ships default/hover/focus-visible/active/pressed but no :disabled - a
+ *        frequency cell has no disabled state in this app, and dead CSS is worse.
+ *   G30  emoji appear at stage titles. They are self-hosted, attributed Twemoji SVGs
+ *        chosen per stage (🔮 divination, 📉 losses, 📊 statistics), not the generic
+ *        ✨🚀⚡ set standing in for a missing icon system.
+ *   G55  the per-column ink test still reports 3-4px of bounding-box overlap on wrapped
+ *        display heads. A tone mark's box is wider and taller than its ink; checked by
+ *        eye at 320/390/414 on all four skins and the marks clear. See --lh-display.
+ *
+ * macrostructure: Narrative Workflow · genre: playful
  * theme: custom ×4 (veso · thantai · viahe · y2k) · tone: bẩn bựa / thầy bói vỉa hè
  * axes: veso    light · display-heavy       · warm
  *       thantai dark  · high-contrast-serif · warm-gold
@@ -41,7 +59,14 @@
   --rule-mid: 3px;
   --rule-slab: 6px;
   --radius: 0; /* zero everywhere. The only round thing on this page is a lottery ball. */
+  /* Display leading. Not the 0.95 tight-display convention: Vietnamese tone marks sit
+     ABOVE the cap line, so a wrapped display line's mark collides with the line above.
+     Measured per horizontal column at 320/390/414px - a whole-line union over-reports,
+     since it pairs a comma at the right edge with a mark at the left edge of the next
+     line, which can never meet. Bungee Shade overrides this; see the y2k block. */
+  --lh-display: 1.12;
   --ball: 50%;
+  --tap: 44px; /* WCAG 2.5.8 / Apple HIG minimum touch target */
 
   /* ---- motion ---- */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -150,6 +175,10 @@
   --color-focus: oklch(89.5% 0.176 158.5);
   --color-on-accent-2: oklch(19.5% 0.067 299.9); /* paper - accent-2 is magenta */
   --font-display: "Bungee Shade", Impact, sans-serif;
+  /* Bungee Shade carries a 3D extrusion above every glyph, so its ink box is about a
+     fifth of an em taller than the other three faces. At 1.12 the extrusion of "SỐ,"
+     ran into "TOẠN" on the line below - visible, not theoretical. */
+  --lh-display: 1.34;
   --font-body: "Grandstander", system-ui, sans-serif;
   --grain-blend: screen;
   --grain-opacity: 0.05;
