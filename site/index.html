@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>trungso — Thầy phán số, toán học phán thầy</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%AE%3C/text%3E%3C/svg%3E">
+
+<!-- Skin must be on <html> before the first paint, or the page flashes the default. -->
+<script>
+  try {
+    var t = localStorage.getItem('trungso.theme.v1');
+    document.documentElement.dataset.theme =
+      ['veso','thantai','viahe','y2k'].indexOf(t) >= 0 ? t : 'veso';
+  } catch (e) { document.documentElement.dataset.theme = 'veso'; }
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&family=Anton&family=Playfair+Display:wght@700;900&family=Be+Vietnam+Pro:wght@400;600;800&family=Grandstander:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Sriracha&display=swap">
+<link rel="stylesheet" href="./tokens.css">
+
+<style>
+/* Every colour and face below is a token. No raw values live in this file. */
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{overflow-x:clip;margin:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--color-paper); color:var(--color-ink);
+  font-family:var(--font-body); font-size:var(--text-base); line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* --- grain: the page should feel printed, not rendered --- */
+.grain{
+  position:fixed; inset:0; z-index:9999; pointer-events:none;
+  opacity:var(--grain-opacity); mix-blend-mode:var(--grain-blend);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------------- nav: N7 brutal slab ---------------- */
+.slab{
+  position:sticky; top:0; z-index:100;
+  display:flex; flex-wrap:wrap; gap:var(--space-sm);
+  align-items:center; justify-content:space-between;
+  padding:var(--space-sm) var(--space-md);
+  background:var(--color-paper);
+  border-bottom:var(--rule-slab) solid var(--color-rule);
+}
+.slab__mark{
+  font-family:var(--font-display); font-size:var(--text-xl);
+  color:var(--color-ink); text-decoration:none; letter-spacing:.02em;
+}
+.slab__themes{display:flex; gap:var(--space-2xs); flex-wrap:nowrap}
+
+/* stamps: the theme picker is four rubber stamps, not a dropdown */
+.stamp{
+  font-family:var(--font-display); font-size:var(--text-xs);
+  padding:var(--space-2xs) var(--space-xs);
+  background:transparent; color:var(--color-ink);
+  border:var(--rule-mid) solid var(--color-rule); border-radius:var(--radius);
+  cursor:pointer; white-space:nowrap;
+  transform:rotate(-2deg);
+  transition:transform var(--dur-fast) var(--ease-out),
+             background-color var(--dur-fast) var(--ease-out);
+}
+.stamp:hover,.stamp.is-hover{background:var(--color-paper-2); transform:rotate(0deg)}
+.stamp:focus-visible,.stamp.is-focus{outline:var(--rule-mid) solid var(--color-focus); outline-offset:2px}
+.stamp:active,.stamp.is-active{transform:translateY(2px) rotate(-2deg)}
+/* Selected stamp fills with accent-2 and takes the dark on-fill colour. Accent on
+   paper only reaches 3.53:1 in veso, which is short of AA at this 12px size. */
+.stamp[aria-checked="true"]{background:var(--color-accent-2); color:var(--color-on-accent-2);
+  transform:rotate(0deg)}
+.stamp[disabled]{opacity:.4; cursor:not-allowed}
+.stamp__short{display:none}
+@media (max-width:640px){
+  .stamp__full{display:none}
+  .stamp__short{display:inline}
+  .stamp{padding:var(--space-2xs) var(--space-sm)}
+}
+
+/* ---------------- stages: Narrative Workflow ---------------- */
+.wrap{max-width:1060px; margin:0 auto; padding:0 var(--space-md)}
+main.wrap{padding-bottom:var(--space-2xl)}
+.masthead{padding-top:var(--space-xl)}
+.masthead__title{font-family:var(--font-display); font-weight:400; font-style:normal;
+  font-size:var(--text-display); line-height:.95; margin:0 0 var(--space-sm);
+  overflow-wrap:anywhere; min-width:0; color:var(--color-ink)}
+.masthead__lede{font-family:var(--font-hand); font-size:var(--text-lg);
+  color:var(--color-ink-dim); max-width:44ch; margin:0 0 var(--space-md)}
+.stage{padding-top:var(--space-2xl); scroll-margin-top:96px}
+/* Stage number ABOVE the title, same column. Never number-left / title-right. */
+.stage__mark{
+  font-family:var(--font-num); font-size:var(--text-sm); font-weight:700;
+  color:var(--color-paper); background:var(--color-accent);
+  display:inline-block; padding:var(--space-2xs) var(--space-xs);
+  letter-spacing:.18em;
+}
+.stage__title{
+  font-family:var(--font-display); font-weight:400; font-style:normal;
+  font-size:var(--text-display-s); line-height:.98; margin:var(--space-sm) 0 var(--space-xs);
+  overflow-wrap:anywhere; min-width:0; color:var(--color-ink);
+}
+.stage__lede{color:var(--color-ink-dim); max-width:58ch; margin:0 0 var(--space-md)}
+.stage + .stage{border-top:var(--rule-hair) solid var(--color-rule)}
+
+/* ---------------- blocks: uneven rules, never an even 1px box ---------------- */
+.block{
+  background:var(--color-paper-2);
+  border-left:var(--rule-slab) solid var(--color-rule);
+  border-top:var(--rule-hair) solid var(--color-rule);
+  border-bottom:var(--rule-hair) solid var(--color-rule);
+  border-radius:var(--radius);
+  padding:var(--space-md); margin:0 0 var(--space-md);
+}
+.block--torn{position:relative; padding-bottom:var(--space-lg)}
+/* torn ticket edge, built from a gradient - no image asset */
+.block--torn::after{
+  content:""; position:absolute; left:0; right:0; bottom:0; height:12px;
+  background:repeating-linear-gradient(
+    -45deg, var(--color-paper) 0 6px, transparent 6px 12px);
+}
+.row{display:flex; flex-wrap:wrap; gap:var(--space-md)}
+.row > *{flex:1 1 320px; min-width:0}
+
+/* ---------------- lottery balls ---------------- */
+.balls{display:flex; flex-wrap:wrap; gap:var(--space-xs); margin:var(--space-sm) 0}
+.ball{
+  width:52px; height:52px; border-radius:var(--ball);
+  display:grid; place-items:center;
+  font-family:var(--font-num); font-weight:700; font-size:var(--text-lg);
+  background:var(--color-paper); color:var(--color-ink);
+  border:var(--rule-mid) solid var(--color-rule);
+}
+.ball--pick{background:var(--color-accent); color:var(--color-paper); border-color:var(--color-ink)}
+.ball--bonus{background:var(--color-accent-2); color:var(--color-ink); border-color:var(--color-ink)}
+.ball--in{animation:ball-in var(--dur-base) var(--ease-out) backwards}
+@keyframes ball-in{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
+
+/* ---------------- the fortune-teller's own hand ---------------- */
+.sermon{list-style:none; margin:var(--space-sm) 0 0; padding:0}
+.sermon li{
+  font-family:var(--font-hand); font-size:var(--text-base); line-height:1.45;
+  color:var(--color-ink-dim); padding:var(--space-2xs) 0;
+  border-bottom:var(--rule-hair) dashed var(--color-rule);
+}
+.sermon b{font-family:var(--font-num); color:var(--color-accent)}
+.hand{font-family:var(--font-hand); color:var(--color-ink-dim)}
+
+/* ---------------- data: deliberately plain, this is the cold layer ---------------- */
+table{width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums}
+th,td{text-align:left; padding:var(--space-2xs) var(--space-xs);
+  border-bottom:var(--rule-hair) solid var(--color-rule); font-size:var(--text-sm)}
+th{color:var(--color-ink-dim); font-weight:600}
+td.num,th.num{text-align:right; font-family:var(--font-num)}
+.scroll{overflow-x:auto}
+.kpi{font-family:var(--font-display); font-size:var(--text-3xl); line-height:1;
+  overflow-wrap:anywhere; min-width:0}
+.kpi--bad{color:var(--color-bad)}
+.kpi--good{color:var(--color-good)}
+.note{color:var(--color-ink-dim); font-size:var(--text-sm); margin:var(--space-xs) 0 0}
+.err{color:var(--color-bad)}
+
+/* facts grid - image-free, but minmax(0,1fr) anyway so long words cannot push it wide */
+.facts{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(160px,100%),1fr));
+  gap:var(--space-xs); margin:var(--space-sm) 0}
+.fact{background:var(--color-paper); border:var(--rule-hair) solid var(--color-rule);
+  border-left:var(--rule-mid) solid var(--color-accent); padding:var(--space-xs)}
+.fact__k{font-size:var(--text-xs); color:var(--color-ink-dim)}
+/* Data values use the body face on purpose. A 3D display face (Bungee Shade) turns
+   to mush at 16px, and "ĐẠI LÂM MỘC" has to stay readable in every skin. */
+.fact__v{font-family:var(--font-body); font-weight:800; font-size:var(--text-base);
+  color:var(--color-ink); overflow-wrap:anywhere}
+.block__head{font-family:var(--font-display); font-weight:400; font-style:normal;
+  font-size:var(--text-lg); line-height:1.15; margin:0 0 var(--space-xs);
+  color:var(--color-ink); overflow-wrap:anywhere; min-width:0}
+
+/* heatmap */
+.heat{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(38px,100%),1fr));
+  gap:2px; margin-top:var(--space-sm)}
+.cell{aspect-ratio:1; display:grid; place-items:center; font-family:var(--font-num);
+  font-size:var(--text-xs); border:var(--rule-hair) solid var(--color-rule);
+  color:var(--color-ink)}
+
+/* the one place the fortune-teller touches the numbers */
+.verdict-stamp{
+  display:inline-block; font-family:var(--font-display); font-size:var(--text-xl);
+  color:var(--color-bad); border:var(--rule-mid) solid var(--color-bad);
+  padding:var(--space-2xs) var(--space-sm); transform:rotate(-4deg);
+  margin:var(--space-sm) 0;
+}
+
+/* ---------------- privacy + disclaimer ---------------- */
+.privacy{background:var(--color-paper); border-left:var(--rule-slab) solid var(--color-good);
+  padding:var(--space-sm) var(--space-md); margin:var(--space-sm) 0;
+  color:var(--color-ink); font-size:var(--text-sm)}
+.disclaim{background:var(--color-accent-2); color:var(--color-on-accent-2);
+  padding:var(--space-md); margin:var(--space-md) 0;
+  border:var(--rule-mid) solid var(--color-ink); font-weight:600}
+
+/* ---------------- form ---------------- */
+form.khai{display:flex; flex-wrap:wrap; gap:var(--space-sm); align-items:flex-end}
+form.khai label{display:flex; flex-direction:column; gap:var(--space-2xs);
+  font-size:var(--text-xs); color:var(--color-ink-dim)}
+form.khai input,form.khai select{
+  background:var(--color-paper); color:var(--color-ink); font:inherit;
+  font-size:var(--text-sm); padding:var(--space-xs);
+  border:var(--rule-mid) solid var(--color-rule); border-radius:var(--radius);
+  min-width:150px; max-width:100%;
+}
+form.khai input:focus-visible,form.khai select:focus-visible,
+.btn:focus-visible{outline:var(--rule-mid) solid var(--color-focus); outline-offset:2px}
+.btn{
+  font-family:var(--font-display); font-size:var(--text-sm); white-space:nowrap;
+  padding:var(--space-xs) var(--space-md); cursor:pointer;
+  background:var(--color-accent); color:var(--color-paper);
+  border:var(--rule-mid) solid var(--color-ink); border-radius:var(--radius);
+  transition:transform var(--dur-fast) var(--ease-out);
+}
+.btn:hover,.btn.is-hover{transform:translateY(-2px)}
+.btn:active,.btn.is-active{transform:translateY(2px)}
+.btn[disabled]{opacity:.45; cursor:not-allowed; transform:none}
+.btn--ghost{background:transparent; color:var(--color-ink); border-color:var(--color-rule)}
+
+/* ---------------- footer: Ft5 statement ---------------- */
+.ft{border-top:var(--rule-slab) solid var(--color-rule); margin-top:var(--space-2xl);
+  padding:var(--space-xl) var(--space-md); background:var(--color-paper-2)}
+.ft__statement{font-family:var(--font-display); font-size:var(--text-2xl); line-height:1.1;
+  max-width:24ch; margin:0 auto var(--space-md); text-align:center;
+  overflow-wrap:anywhere; min-width:0; color:var(--color-ink)}
+.ft__meta{text-align:center; color:var(--color-ink-dim); font-size:var(--text-xs);
+  max-width:70ch; margin:0 auto}
+
+/* ---------------- reveal ---------------- */
+.reveal{opacity:0; transform:translateY(14px);
+  transition:opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out)}
+.reveal.is-in{opacity:1; transform:none}
+@media (prefers-reduced-motion:reduce){
+  .reveal,.reveal.is-in{transition:opacity 150ms linear; transform:none}
+  .ball--in{animation:none}
+  .stamp,.btn{transition:none}
+}
+</style>
+</head>
+<body id="top">
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="slab">
+  <a class="slab__mark" href="#top">trungso</a>
+  <div class="slab__themes" role="radiogroup" aria-label="Chọn bộ da">
+    <button class="stamp" role="radio" type="button" data-set-theme="veso" aria-checked="true"><span class="stamp__full">VÉ SỐ</span><span class="stamp__short">V</span></button>
+    <button class="stamp" role="radio" type="button" data-set-theme="thantai" aria-checked="false"><span class="stamp__full">THẦN TÀI</span><span class="stamp__short">T</span></button>
+    <button class="stamp" role="radio" type="button" data-set-theme="viahe" aria-checked="false"><span class="stamp__full">VỈA HÈ</span><span class="stamp__short">H</span></button>
+    <button class="stamp" role="radio" type="button" data-set-theme="y2k" aria-checked="false"><span class="stamp__full">Y2K</span><span class="stamp__short">Y</span></button>
+  </div>
+</nav>
+
+<header class="wrap masthead">
+  <h1 class="masthead__title">Thầy phán số,<br>toán học phán thầy</h1>
+  <p class="masthead__lede">
+    Thầy ngồi đây ban số. Máy ngồi cạnh chấm điểm thầy. Cả hai đều công khai.
+  </p>
+  <p class="disclaim">
+    <b>Đọc trước:</b> xổ số là biến cố độc lập — mỗi kỳ quay reset về 0, không có số nóng,
+    không có số lạnh. Trang này <b>không dự đoán được gì</b>. Nó chỉ tự tin quá mức rồi tự
+    chấm điểm độ sai của mình. Tiền ở đây là <b>tiền giấy</b>.
+  </p>
+</header>
+
+<main class="wrap" id="app">
+  <p class="note" id="boot">Đang mở sổ…</p>
+</main>
+
+<footer class="ft">
+  <p class="ft__statement">Xổ số là biến cố độc lập. Thầy nói gì thì nói, toán học vẫn thắng.</p>
+  <p class="ft__meta">
+    Dữ liệu: thanhnhu/vietlott · vietlott.vn · khiemdoan/vietnam-lottery-xsmb-analysis ·
+    jbaranski/jeffs-lottery-utils — tất cả MIT.
+    Lời tiên tri sinh deterministic và ghi lại <b>trước</b> giờ quay, không sửa hồi tố được.
+    Giấy phép MIT.
+  </p>
+</footer>
+
+<script src="./theme.js"></script>
+<script src="./personal.js"></script>
+<script src="./render.js"></script>
+</body>
+</html>

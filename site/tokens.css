@@ -1,0 +1,156 @@
+/* Hallmark · macrostructure: Narrative Workflow · genre: playful
+ * theme: custom ×4 (veso · thantai · viahe · y2k) · tone: bẩn bựa / thầy bói vỉa hè
+ * axes: veso    light · display-heavy       · warm
+ *       thantai dark  · high-contrast-serif · warm-gold
+ *       viahe   dark  · display-condensed   · chromatic-other
+ *       y2k     dark  · display-3D          · cool
+ *
+ * OKLCH values are computed from the hex anchors in the comments, not eyeballed.
+ * Contrast was measured before these were locked - see the ratio table below.
+ *
+ *   theme    ink/paper  dim/paper  accent/paper  accent-2/paper
+ *   veso        15.01      5.18       4.63          1.34  <- see the veso rules
+ *   thantai      8.79      4.84       4.77          7.78
+ *   viahe       16.16      4.61      14.50         16.05
+ *   y2k         15.74      6.09      12.07          5.36
+ */
+
+:root {
+  /* ---- spacing: 4pt scale ---- */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 20px;
+  --space-lg: 32px;
+  --space-xl: 52px;
+  --space-2xl: 84px;
+
+  /* ---- type scale ---- */
+  --text-xs: 0.78rem;
+  --text-sm: 0.88rem;
+  --text-base: 1rem;
+  --text-lg: 1.15rem;
+  --text-xl: 1.45rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.9rem;
+  --text-display-s: clamp(2.2rem, 7vw, 4rem);
+  --text-display: clamp(2.6rem, 11vw, 6.5rem);
+
+  /* ---- rules & shape ---- */
+  --rule-hair: 1px;
+  --rule-mid: 3px;
+  --rule-slab: 6px;
+  --radius: 0; /* zero everywhere. The only round thing on this page is a lottery ball. */
+  --ball: 50%;
+
+  /* ---- motion ---- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 120ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+
+  /* ---- faces shared across every skin ---- */
+  --font-hand: "Sriracha", "Bradley Hand", cursive; /* the fortune-teller's own hand */
+  --font-num: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* ---- grain ---- */
+  --grain-opacity: 0.055;
+  --grain-blend: multiply;
+}
+
+/* ============================ VÉ SỐ ============================
+ * Street lottery ticket. Yellowed paper, red riso ink, chunky signage type.
+ *
+ * TWO HARD RULES, both measured:
+ *   1. --color-accent-2 (yellow) is 1.34:1 on paper. It may ONLY be a solid fill
+ *      with --color-ink on top. Never text, never a hairline.
+ *   2. --color-accent (red) is 4.63:1 after deepening. Safe for UI text and
+ *      borders at any size. Never needed loosening.
+ */
+[data-theme="veso"] {
+  --color-paper: oklch(93.4% 0.027 83.5); /* #F2E8D5 */
+  --color-paper-2: oklch(89.3% 0.038 83); /* #E8DAC0 */
+  --color-ink: oklch(19.7% 0.013 55.5); /* #1A1410 */
+  --color-ink-dim: oklch(49% 0.03 72.8); /* #6B5E4E */
+  --color-accent: oklch(54% 0.206 29.1); /* #CB1E16 - deepened from 60.4%: cream-on-red
+                                            was 3.53:1, short of AA for 14px bold UI text */
+  --color-accent-2: oklch(84.2% 0.168 90.4); /* #F5C518 - fills only */
+  --color-rule: oklch(19.7% 0.013 55.5);
+  --color-good: oklch(52.4% 0.134 144); /* #2F7D32 */
+  --color-bad: oklch(49.9% 0.181 29.1); /* #B3231A */
+  --color-warn: oklch(67.9% 0.142 76.5); /* #C98A00 */
+  --color-focus: oklch(54% 0.206 29.1);
+  --color-on-accent-2: oklch(19.7% 0.013 55.5); /* ink - accent-2 is bright yellow */
+  --font-display: "Bungee", system-ui, sans-serif;
+  --font-body: "Be Vietnam Pro", system-ui, sans-serif;
+  --grain-blend: multiply;
+  --grain-opacity: 0.07;
+}
+
+/* ============================ THẦN TÀI ============================
+ * Household shrine. Deep lacquer red, gilt lettering, high-contrast serif.
+ */
+[data-theme="thantai"] {
+  --color-paper: oklch(37.7% 0.136 26.8); /* #7A1414 */
+  --color-paper-2: oklch(31.5% 0.112 26.5); /* #5E0F0F */
+  --color-ink: oklch(92.9% 0.043 84.6); /* #F5E6C8 */
+  --color-ink-dim: oklch(75% 0.085 82.1); /* #C9A96E */
+  --color-accent: oklch(74.7% 0.134 84.6); /* #D4A537 */
+  --color-accent-2: oklch(88.9% 0.101 92.3); /* #F2D98B */
+  --color-rule: oklch(74.7% 0.134 84.6);
+  --color-good: oklch(74.1% 0.134 138.3);
+  --color-bad: oklch(73.2% 0.165 28.3);
+  --color-warn: oklch(88.9% 0.101 92.3);
+  --color-focus: oklch(88.9% 0.101 92.3);
+  --color-on-accent-2: oklch(37.7% 0.136 26.8); /* paper - accent-2 is pale gold */
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Be Vietnam Pro", system-ui, sans-serif;
+  --grain-blend: screen;
+  --grain-opacity: 0.05;
+}
+
+/* ============================ VỈA HÈ ============================
+ * Raw pavement brutalism. Near-black, phosphor green, condensed slab type.
+ */
+[data-theme="viahe"] {
+  --color-paper: oklch(14.5% 0 90); /* #0A0A0A */
+  --color-paper-2: oklch(19.1% 0 90); /* #141414 */
+  --color-ink: oklch(93.1% 0 90); /* #E8E8E8 */
+  --color-ink-dim: oklch(64% 0 90); /* raised from 58%: 4.29:1 on paper-2 missed AA */
+  --color-accent: oklch(86.9% 0.278 144.5); /* #00FF41 */
+  --color-accent-2: oklch(92.5% 0.194 102.9); /* #FFEA00 */
+  --color-rule: oklch(86.9% 0.278 144.5);
+  --color-good: oklch(86.9% 0.278 144.5);
+  --color-bad: oklch(65.4% 0.232 28.7);
+  --color-warn: oklch(92.5% 0.194 102.9);
+  --color-focus: oklch(92.5% 0.194 102.9);
+  --color-on-accent-2: oklch(14.5% 0 90); /* paper - accent-2 is bright yellow */
+  --font-display: "Anton", Impact, sans-serif;
+  --font-body: "JetBrains Mono", ui-monospace, monospace;
+  --grain-blend: screen;
+  --grain-opacity: 0.04;
+}
+
+/* ============================ Y2K ============================
+ * Early-2000s Vietnamese forum. Violet night, cyan and magenta, 3D display face.
+ */
+[data-theme="y2k"] {
+  --color-paper: oklch(19.5% 0.067 299.9); /* #1A0B2E */
+  --color-paper-2: oklch(25.7% 0.091 298.7); /* #2A1548 */
+  --color-ink: oklch(94.6% 0.03 300.3); /* #F0E9FF */
+  --color-ink-dim: oklch(67.2% 0.085 297); /* #9B8BC4 */
+  --color-accent: oklch(84.4% 0.146 209.3); /* #00E5FF */
+  --color-accent-2: oklch(66.5% 0.249 357.3); /* #FF2D95 */
+  --color-rule: oklch(84.4% 0.146 209.3);
+  --color-good: oklch(89.5% 0.176 158.5);
+  --color-bad: oklch(66.5% 0.249 357.3);
+  --color-warn: oklch(89.2% 0.157 93);
+  --color-focus: oklch(89.5% 0.176 158.5);
+  --color-on-accent-2: oklch(19.5% 0.067 299.9); /* paper - accent-2 is magenta */
+  --font-display: "Bungee Shade", Impact, sans-serif;
+  --font-body: "Grandstander", system-ui, sans-serif;
+  --grain-blend: screen;
+  --grain-opacity: 0.05;
+}

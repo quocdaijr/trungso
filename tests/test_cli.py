@@ -1,0 +1,211 @@
+"""CLI wiring, and the draw-targeting logic that keeps the oracle honest."""
+
+from __future__ import annotations
+
+from datetime import date, datetime, timedelta
+
+import pytest
+
+from conftest import make_draw
+from trungso import cli, store
+from trungso.games import MEGA645, POWER655
+
+VN = cli.VN_TZ
+
+
+def _mega_history():
+    """Real upstream state on 2026-08-19: last stored draw #1549 on Fri 14 Aug."""
+    return [make_draw(MEGA645, 1549, main=(7, 9, 13, 31, 35, 44), day=date(2026, 8, 14))]
+
+
+def test_next_target_skips_the_draw_upstream_missed():
+    """Upstream lacks Sun 16 Aug (#1550), so Wed 19 Aug must be #1551, not #1550.
+
+    Getting this wrong would make the oracle "predict" a draw that already happened.
+    """
+    now = datetime(2026, 8, 19, 10, 0, tzinfo=VN)
+    draw_id, draw_date = cli.next_target(MEGA645, _mega_history(), now=now)
+
+    assert draw_date == date(2026, 8, 19)
+    assert draw_id == "01551"
+
+
+def test_next_target_moves_on_after_the_draw_time():
+    """After 18:00 the day's draw is gone; target the next draw day."""
+    now = datetime(2026, 8, 19, 19, 30, tzinfo=VN)
+    draw_id, draw_date = cli.next_target(MEGA645, _mega_history(), now=now)
+
+    assert draw_date == date(2026, 8, 21)  # Friday
+    assert draw_id == "01552"
+
+
+def test_next_target_before_draw_time_targets_today():
+    now = datetime(2026, 8, 19, 17, 59, tzinfo=VN)
+    _, draw_date = cli.next_target(MEGA645, _mega_history(), now=now)
+    assert draw_date == date(2026, 8, 19)
+
+
+def test_next_target_on_a_non_draw_day():
+    """Power 6/55 draws Tue/Thu/Sat, so from Wednesday the target is Thursday."""
+    history = [
+        make_draw(
+            POWER655, 1386, main=(3, 15, 18, 38, 41, 48), bonus=30, day=date(2026, 8, 18)
+        )
+    ]
+    now = datetime(2026, 8, 19, 10, 0, tzinfo=VN)
+    draw_id, draw_date = cli.next_target(POWER655, history, now=now)
+
+    assert draw_date == date(2026, 8, 20)
+    assert draw_id == "01387"
+
+
+def test_next_target_requires_history():
+    with pytest.raises(RuntimeError, match="run `trungso ingest`"):
+        cli.next_target(MEGA645, [])
+
+
+def test_next_target_returns_a_zero_padded_id():
+    """Regression: an unpadded '1551' silently fails every == against stored '01551'."""
+    draw_id, _ = cli.next_target(
+        MEGA645, _mega_history(), now=datetime(2026, 8, 19, 10, 0, tzinfo=VN)
+    )
+    assert len(draw_id) == 5
+    assert draw_id.startswith("0")
+
+
+def test_today_shows_the_prophecy_that_oracle_just_wrote(capsys):
+    """Regression: `today` reported "chưa tiên tri" straight after `oracle` wrote one,
+    because the two sides compared a padded id against an unpadded one.
+    """
+    store.write_draws("mega645", _mega_history())
+
+    oracle_args = cli.build_parser().parse_args(["oracle", "--game", "mega645", "--offline"])
+    oracle_args.handler(oracle_args)
+    written = store.read_prophecies("mega645")[0]
+    capsys.readouterr()
+
+    today_args = cli.build_parser().parse_args(["today", "--game", "mega645"])
+    today_args.handler(today_args)
+    out = capsys.readouterr().out
+
+    assert "chưa tiên tri" not in out
+    assert "đã tiên tri" in out
+    assert f"{written.numbers[0]:02d}" in out
+
+
+@pytest.mark.parametrize(
+    "now,expected",
+    [
+        (datetime(2026, 8, 19, 17, 59, tzinfo=VN), False),
+        (datetime(2026, 8, 19, 18, 0, tzinfo=VN), True),
+        (datetime(2026, 8, 20, 1, 0, tzinfo=VN), True),
+    ],
+)
+def test_draw_has_happened(now, expected):
+    assert cli._draw_has_happened(date(2026, 8, 19), now) is expected
+
+
+def test_parser_requires_a_command():
+    with pytest.raises(SystemExit):
+        cli.build_parser().parse_args([])
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["ingest", "--check-gaps"],
+        ["stats", "--game", "mega645"],
+        ["oracle", "--dry-run", "--offline"],
+        ["score"],
+        ["backtest", "--limit", "10"],
+        ["today"],
+    ],
+)
+def test_every_command_parses(argv):
+    args = cli.build_parser().parse_args(argv)
+    assert callable(args.handler)
+
+
+def test_unknown_game_is_rejected():
+    with pytest.raises(SystemExit):
+        cli.build_parser().parse_args(["stats", "--game", "keno"])
+
+
+def test_stats_reports_missing_data_instead_of_crashing(capsys):
+    args = cli.build_parser().parse_args(["stats", "--game", "mega645"])
+    assert args.handler(args) == 1
+    assert "ingest" in capsys.readouterr().out
+
+
+def test_oracle_dry_run_writes_nothing(capsys):
+    store.write_draws("mega645", _mega_history())
+    args = cli.build_parser().parse_args(["oracle", "--game", "mega645", "--dry-run", "--offline"])
+
+    assert args.handler(args) == 0
+    assert store.read_prophecies() == ()
+    assert "dry-run" in capsys.readouterr().out
+
+
+def test_oracle_writes_then_refuses_duplicate(capsys):
+    store.write_draws("mega645", _mega_history())
+    args = cli.build_parser().parse_args(["oracle", "--game", "mega645", "--offline"])
+
+    assert args.handler(args) == 0
+    assert len(store.read_prophecies()) == 1
+    capsys.readouterr()
+
+    assert args.handler(args) == 0
+    assert len(store.read_prophecies()) == 1, "a second run must not append a duplicate"
+    assert "bỏ qua" in capsys.readouterr().out
+
+
+def test_score_writes_scoreboard_file(capsys):
+    history = _mega_history()
+    store.write_draws("mega645", history)
+    oracle_args = cli.build_parser().parse_args(["oracle", "--game", "mega645", "--offline"])
+    oracle_args.handler(oracle_args)
+    capsys.readouterr()
+
+    score_args = cli.build_parser().parse_args(["score", "--game", "mega645"])
+    assert score_args.handler(score_args) == 0
+
+    payload = store.read_scoreboard()
+    assert payload is not None
+    assert "mega645" in payload["per_game"]
+    # The prophecy targets an unfinished draw, so nothing is scorable yet.
+    assert payload["per_game"]["mega645"]["draws_scored"] == 0
+
+
+def test_today_runs_with_history(capsys):
+    store.write_draws("mega645", _mega_history())
+    args = cli.build_parser().parse_args(["today", "--game", "mega645"])
+
+    assert args.handler(args) == 0
+    out = capsys.readouterr().out
+    assert "Mega 6/45" in out
+    assert "01549" in out
+
+
+def test_backtest_scores_history_without_writing(capsys):
+    draws = [
+        make_draw(MEGA645, i, main=(1, 2, 3, 40, 41, 42), day=date(2026, 1, 1) + timedelta(days=i))
+        for i in range(1, 21)
+    ]
+    store.write_draws("mega645", draws)
+    args = cli.build_parser().parse_args(["backtest", "--game", "mega645", "--limit", "10"])
+
+    assert args.handler(args) == 0
+    assert store.read_prophecies() == (), "backtest is counterfactual and must not persist"
+    assert "phản thực" in capsys.readouterr().out
+
+
+def test_every_command_prints_the_disclaimer(capsys):
+    store.write_draws("mega645", _mega_history())
+    commands = (
+        ["today", "--game", "mega645"],
+        ["oracle", "--game", "mega645", "--dry-run", "--offline"],
+    )
+    for argv in commands:
+        args = cli.build_parser().parse_args(argv)
+        args.handler(args)
+        assert "paper-trading" in capsys.readouterr().out

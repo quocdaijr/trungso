@@ -1,0 +1,17 @@
+{
+  "date": "2026-08-19",
+  "framework": "vanilla HTML (no package.json, no bundler)",
+  "font_stack": "system stack only - no real faces were chosen",
+  "palette": "raw hex in :root, not semantically named",
+  "motion": "none installed - motion-cut project",
+  "spacing": "ad-hoc px values, no scale",
+  "tokens": "none (no tokens.css, no design.md, no DTCG file)",
+  "preserved": [],
+  "introduced": [
+    "tokens.css with four custom skins",
+    "Narrative Workflow macrostructure",
+    "N7 brutal slab nav + Ft5 statement footer",
+    "measured contrast floor (AA 4.5 on every surface)",
+    "Vietnamese-capable display faces"
+  ]
+}

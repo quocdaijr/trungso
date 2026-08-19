@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+
+# Atomic-write temp files from store.py
+*.jsonl.tmp
+*.json.tmp
+
+# data/ is deliberately NOT ignored: the committed JSONL is both the database and
+# the audit trail that makes the scoreboard impossible to rewrite after the fact.
+#
+# .scratch/ (the wayfinder map and its tickets) is excluded globally via
+# ~/.config/git/ignore, so it stays local working notes rather than travelling with
+# the repo. Add a negation here if this project ever wants to share them.

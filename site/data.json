@@ -1,0 +1,1683 @@
+{
+ "generated_at": "2026-08-19T04:00:34+00:00",
+ "disclaimer": "Xổ số là biến cố độc lập. Mỗi kỳ quay reset về 0. Không có số nóng, không có số lạnh. Phần mềm này không dự đoán được gì — nó chỉ tự tin quá mức và tự chấm điểm độ sai của chính mình. Bảng Phong Thần là paper-trading: tiền đốt trên giấy.",
+ "games": [
+  {
+   "key": "power655",
+   "display": "Power 6/55",
+   "pool": 55,
+   "pick": 6,
+   "has_bonus": true,
+   "wheel": {
+    "combinations": 924,
+    "cost_vnd": 9240000,
+    "expected_roi": -0.76197,
+    "expected_roi_excluding_jackpot": -0.865456
+   },
+   "draw_count": 1386,
+   "latest": {
+    "game": "power655",
+    "draw_id": "01386",
+    "date": "2026-08-18",
+    "main": [
+     3,
+     15,
+     18,
+     38,
+     41,
+     48
+    ],
+    "bonus": 30,
+    "source": "mirror:thanhnhu/vietlott"
+   },
+   "recent": [
+    {
+     "game": "power655",
+     "draw_id": "01375",
+     "date": "2026-07-23",
+     "main": [
+      1,
+      3,
+      8,
+      38,
+      40,
+      55
+     ],
+     "bonus": 36,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "power655",
+     "draw_id": "01376",
+     "date": "2026-07-25",
+     "main": [
+      5,
+      9,
+      27,
+      33,
+      37,
+      50
+     ],
+     "bonus": 48,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "power655",
+     "draw_id": "01377",
+     "date": "2026-07-28",
+     "main": [
+      7,
+      22,
+      23,
+      27,
+      41,
+      44
+     ],
+     "bonus": 48,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "power655",
+     "draw_id": "01378",
+     "date": "2026-07-30",
+     "main": [
+      2,
+      12,
+      24,
+      28,
+      43,
+      49
+     ],
+     "bonus": 51,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "power655",
+     "draw_id": "01379",
+     "date": "2026-08-01",
+     "main": [
+      11,
+      14,
+      16,
+      44,
+      49,
+      55
+     ],
+     "bonus": 39,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "power655",
+     "draw_id": "01380",
+     "date": "2026-08-04",
+     "main": [
+      14,
+      39,
+      40,
+      42,
+      47,
+      54
+     ],
+     "bonus": 31,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "power655",
+     "draw_id": "01381",
+     "date": "2026-08-06",
+     "main": [
+      14,
+      18,
+      23,
+      35,
+      51,
+      55
+     ],
+     "bonus": 1,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "power655",
+     "draw_id": "01382",
+     "date": "2026-08-08",
+     "main": [
+      5,
+      29,
+      33,
+      38,
+      40,
+      45
+     ],
+     "bonus": 37,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "power655",
+     "draw_id": "01383",
+     "date": "2026-08-11",
+     "main": [
+      2,
+      7,
+      19,
+      20,
+      39,
+      50
+     ],
+     "bonus": 31,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "power655",
+     "draw_id": "01384",
+     "date": "2026-08-13",
+     "main": [
+      5,
+      9,
+      27,
+      29,
+      45,
+      46
+     ],
+     "bonus": 42,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "power655",
+     "draw_id": "01385",
+     "date": "2026-08-15",
+     "main": [
+      16,
+      20,
+      25,
+      27,
+      30,
+      50
+     ],
+     "bonus": 2,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "power655",
+     "draw_id": "01386",
+     "date": "2026-08-18",
+     "main": [
+      3,
+      15,
+      18,
+      38,
+      41,
+      48
+     ],
+     "bonus": 30,
+     "source": "mirror:thanhnhu/vietlott"
+    }
+   ],
+   "frequency": {
+    "1": 156,
+    "2": 135,
+    "3": 160,
+    "4": 123,
+    "5": 153,
+    "6": 131,
+    "7": 135,
+    "8": 167,
+    "9": 159,
+    "10": 143,
+    "11": 159,
+    "12": 156,
+    "13": 151,
+    "14": 144,
+    "15": 133,
+    "16": 147,
+    "17": 141,
+    "18": 156,
+    "19": 147,
+    "20": 156,
+    "21": 149,
+    "22": 178,
+    "23": 161,
+    "24": 156,
+    "25": 139,
+    "26": 146,
+    "27": 140,
+    "28": 127,
+    "29": 168,
+    "30": 145,
+    "31": 150,
+    "32": 167,
+    "33": 160,
+    "34": 168,
+    "35": 140,
+    "36": 140,
+    "37": 131,
+    "38": 149,
+    "39": 152,
+    "40": 158,
+    "41": 175,
+    "42": 157,
+    "43": 165,
+    "44": 158,
+    "45": 146,
+    "46": 153,
+    "47": 157,
+    "48": 161,
+    "49": 150,
+    "50": 142,
+    "51": 170,
+    "52": 149,
+    "53": 162,
+    "54": 140,
+    "55": 155
+   },
+   "chi_square": {
+    "statistic": 52.452,
+    "degrees_of_freedom": 54,
+    "p_value": 0.5343,
+    "observations": 8316,
+    "rejects_uniform": false,
+    "verdict": "p = 0.5343 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn anh và lắc đầu."
+   },
+   "pending_prophecy": {
+    "game": "power655",
+    "draw_id": "01387",
+    "draw_date": "2026-08-20",
+    "numbers": [
+     1,
+     5,
+     7,
+     19,
+     21,
+     28,
+     36,
+     42,
+     48,
+     49,
+     51,
+     53
+    ],
+    "seed": "057d38f5b6a6ad6e62819855a0823a81b8fb1418e5afa085107811297be1d122",
+    "signals": {
+     "btc_usd": 64668,
+     "hanoi_temp_c": 25,
+     "lunar_day": 9,
+     "lunar_month": 7,
+     "zodiac": "Ngọ",
+     "day_can_chi": "Bính Dần"
+    },
+    "sermon": {
+     "1": "Em xem qua rồi, nó có khí.",
+     "5": "Không có lý do nào. Đó chính là lý do.",
+     "7": "Chia hết cho 7 - số gốc của ngày âm hôm nay.",
+     "19": "Vũ trụ không giải thích, vũ trụ chỉ gợi ý.",
+     "21": "Chia hết cho 7 - số gốc của ngày âm hôm nay.",
+     "28": "Chia hết cho 7 - số gốc của ngày âm hôm nay.",
+     "36": "Không có lý do nào. Đó chính là lý do.",
+     "42": "Chia hết cho 7 - số gốc của ngày âm hôm nay.",
+     "48": "Vũ trụ không giải thích, vũ trụ chỉ gợi ý.",
+     "49": "Chia hết cho 7 - số gốc của ngày âm hôm nay.",
+     "51": "Đừng hỏi. Cứ đánh.",
+     "53": "Đừng hỏi. Cứ đánh."
+    },
+    "oracle_version": "1.0.0",
+    "created_at": "2026-08-18T17:57:19+00:00"
+   },
+   "score": {
+    "game": "power655",
+    "display": "Power 6/55",
+    "draws_scored": 0,
+    "hits_total": 0,
+    "hits_per_draw_actual": 0.0,
+    "hits_per_draw_expected": 1.3091,
+    "paper_burned_vnd": 0,
+    "paper_won_vnd": 0,
+    "roi": 0.0,
+    "paper_won_excluding_jackpot_vnd": 0,
+    "roi_excluding_jackpot": 0.0,
+    "prize_counts_total": {},
+    "best_draw": null,
+    "jackpot_hits": 0
+   }
+  },
+  {
+   "key": "mega645",
+   "display": "Mega 6/45",
+   "pool": 45,
+   "pick": 6,
+   "has_bonus": false,
+   "wheel": {
+    "combinations": 924,
+    "cost_vnd": 9240000,
+    "expected_roi": -0.715682,
+    "expected_roi_excluding_jackpot": -0.86301
+   },
+   "draw_count": 1353,
+   "latest": {
+    "game": "mega645",
+    "draw_id": "01550",
+    "date": "2026-08-16",
+    "main": [
+     6,
+     7,
+     15,
+     19,
+     36,
+     41
+    ],
+    "bonus": null,
+    "source": "live:vietlott.vn"
+   },
+   "recent": [
+    {
+     "game": "mega645",
+     "draw_id": "01539",
+     "date": "2026-07-22",
+     "main": [
+      3,
+      32,
+      33,
+      34,
+      39,
+      43
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01540",
+     "date": "2026-07-24",
+     "main": [
+      12,
+      16,
+      36,
+      38,
+      41,
+      45
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01541",
+     "date": "2026-07-26",
+     "main": [
+      13,
+      16,
+      27,
+      33,
+      41,
+      44
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01542",
+     "date": "2026-07-29",
+     "main": [
+      2,
+      6,
+      21,
+      31,
+      36,
+      45
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01543",
+     "date": "2026-07-31",
+     "main": [
+      6,
+      16,
+      24,
+      25,
+      38,
+      43
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01544",
+     "date": "2026-08-02",
+     "main": [
+      3,
+      12,
+      20,
+      25,
+      27,
+      37
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01545",
+     "date": "2026-08-05",
+     "main": [
+      2,
+      6,
+      11,
+      16,
+      28,
+      39
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01546",
+     "date": "2026-08-07",
+     "main": [
+      2,
+      8,
+      19,
+      30,
+      36,
+      43
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01547",
+     "date": "2026-08-09",
+     "main": [
+      3,
+      17,
+      20,
+      27,
+      31,
+      35
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01548",
+     "date": "2026-08-12",
+     "main": [
+      15,
+      17,
+      22,
+      29,
+      33,
+      40
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01549",
+     "date": "2026-08-14",
+     "main": [
+      7,
+      9,
+      13,
+      31,
+      35,
+      44
+     ],
+     "bonus": null,
+     "source": "mirror:thanhnhu/vietlott"
+    },
+    {
+     "game": "mega645",
+     "draw_id": "01550",
+     "date": "2026-08-16",
+     "main": [
+      6,
+      7,
+      15,
+      19,
+      36,
+      41
+     ],
+     "bonus": null,
+     "source": "live:vietlott.vn"
+    }
+   ],
+   "frequency": {
+    "1": 177,
+    "2": 170,
+    "3": 164,
+    "4": 190,
+    "5": 177,
+    "6": 180,
+    "7": 198,
+    "8": 177,
+    "9": 172,
+    "10": 198,
+    "11": 183,
+    "12": 163,
+    "13": 182,
+    "14": 174,
+    "15": 166,
+    "16": 185,
+    "17": 159,
+    "18": 179,
+    "19": 199,
+    "20": 192,
+    "21": 164,
+    "22": 198,
+    "23": 181,
+    "24": 199,
+    "25": 177,
+    "26": 179,
+    "27": 182,
+    "28": 196,
+    "29": 184,
+    "30": 191,
+    "31": 187,
+    "32": 162,
+    "33": 176,
+    "34": 182,
+    "35": 185,
+    "36": 176,
+    "37": 195,
+    "38": 159,
+    "39": 169,
+    "40": 165,
+    "41": 188,
+    "42": 178,
+    "43": 178,
+    "44": 197,
+    "45": 185
+   },
+   "chi_square": {
+    "statistic": 32.565,
+    "degrees_of_freedom": 44,
+    "p_value": 0.8982,
+    "observations": 8118,
+    "rejects_uniform": false,
+    "verdict": "p = 0.8982 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn anh và lắc đầu."
+   },
+   "pending_prophecy": {
+    "game": "mega645",
+    "draw_id": "01551",
+    "draw_date": "2026-08-19",
+    "numbers": [
+     5,
+     7,
+     15,
+     18,
+     19,
+     22,
+     23,
+     33,
+     39,
+     41,
+     43,
+     44
+    ],
+    "seed": "797f017b6487405b83353a2f0c19d11f37d8da4a48c42093d1a7be6a6f0da8b5",
+    "signals": {
+     "btc_usd": 64668,
+     "hanoi_temp_c": 25,
+     "lunar_day": 8,
+     "lunar_month": 7,
+     "zodiac": "Ngọ",
+     "day_can_chi": "Ất Sửu"
+    },
+    "sermon": {
+     "5": "Nằm sát số BTC (4), hưởng khí lây.",
+     "7": "Vũ trụ không giải thích, vũ trụ chỉ gợi ý.",
+     "15": "Con số này im lặng suốt buổi, mà im lặng thường là tự tin.",
+     "18": "Chia hết cho 6 - số gốc của ngày âm hôm nay.",
+     "19": "Không có lý do nào. Đó chính là lý do.",
+     "22": "Vũ trụ không giải thích, vũ trụ chỉ gợi ý.",
+     "23": "Không có lý do nào. Đó chính là lý do.",
+     "33": "Con số này im lặng suốt buổi, mà im lặng thường là tự tin.",
+     "39": "Con số này im lặng suốt buổi, mà im lặng thường là tự tin.",
+     "41": "Vũ trụ không giải thích, vũ trụ chỉ gợi ý.",
+     "43": "Con số này im lặng suốt buổi, mà im lặng thường là tự tin.",
+     "44": "Con số này im lặng suốt buổi, mà im lặng thường là tự tin."
+    },
+    "oracle_version": "1.0.0",
+    "created_at": "2026-08-18T17:57:21+00:00"
+   },
+   "score": {
+    "game": "mega645",
+    "display": "Mega 6/45",
+    "draws_scored": 0,
+    "hits_total": 0,
+    "hits_per_draw_actual": 0.0,
+    "hits_per_draw_expected": 1.6,
+    "paper_burned_vnd": 0,
+    "paper_won_vnd": 0,
+    "roi": 0.0,
+    "paper_won_excluding_jackpot_vnd": 0,
+    "roi_excluding_jackpot": 0.0,
+    "prize_counts_total": {},
+    "best_draw": null,
+    "jackpot_hits": 0
+   }
+  }
+ ],
+ "xsmb": {
+  "display": "XSMB Miền Bắc",
+  "draw_count": 7526,
+  "first_date": "2005-10-01",
+  "last_date": "2026-08-18",
+  "frequency": {
+   "00": 2039,
+   "01": 2056,
+   "02": 2050,
+   "03": 2014,
+   "04": 2020,
+   "05": 2017,
+   "06": 1984,
+   "07": 2004,
+   "08": 2026,
+   "09": 2046,
+   "10": 2103,
+   "11": 2037,
+   "12": 2055,
+   "13": 2009,
+   "14": 2055,
+   "15": 2018,
+   "16": 2052,
+   "17": 2017,
+   "18": 2009,
+   "19": 2072,
+   "20": 2043,
+   "21": 2038,
+   "22": 2085,
+   "23": 2008,
+   "24": 2088,
+   "25": 2001,
+   "26": 2019,
+   "27": 2022,
+   "28": 1907,
+   "29": 2060,
+   "30": 2030,
+   "31": 2053,
+   "32": 2079,
+   "33": 2010,
+   "34": 1953,
+   "35": 1972,
+   "36": 2100,
+   "37": 1978,
+   "38": 2123,
+   "39": 2019,
+   "40": 2026,
+   "41": 2054,
+   "42": 1988,
+   "43": 2084,
+   "44": 2091,
+   "45": 1983,
+   "46": 1994,
+   "47": 2014,
+   "48": 2018,
+   "49": 2067,
+   "50": 1931,
+   "51": 1901,
+   "52": 2117,
+   "53": 2013,
+   "54": 2111,
+   "55": 1978,
+   "56": 2014,
+   "57": 2038,
+   "58": 1961,
+   "59": 2108,
+   "60": 1983,
+   "61": 2025,
+   "62": 2168,
+   "63": 2031,
+   "64": 2095,
+   "65": 2022,
+   "66": 2072,
+   "67": 1986,
+   "68": 2082,
+   "69": 1954,
+   "70": 2053,
+   "71": 2020,
+   "72": 2081,
+   "73": 2048,
+   "74": 2001,
+   "75": 2055,
+   "76": 2081,
+   "77": 1997,
+   "78": 2067,
+   "79": 2099,
+   "80": 1981,
+   "81": 2009,
+   "82": 1997,
+   "83": 2010,
+   "84": 2004,
+   "85": 2023,
+   "86": 2060,
+   "87": 2031,
+   "88": 2069,
+   "89": 1998,
+   "90": 2021,
+   "91": 2011,
+   "92": 2099,
+   "93": 2050,
+   "94": 2066,
+   "95": 2075,
+   "96": 2006,
+   "97": 2044,
+   "98": 1990,
+   "99": 1976
+  },
+  "chi_square": {
+   "statistic": 104.264,
+   "degrees_of_freedom": 99,
+   "p_value": 0.3391,
+   "observations": 203202,
+   "rejects_uniform": false,
+   "verdict": "p = 0.3391 > 0.05. Không có số nào nóng. Không có số nào lạnh. Toàn bộ ngành thống kê vừa nhìn anh và lắc đầu."
+  }
+ },
+ "top_n": 8,
+ "astrology": {
+  "lunar_years": {
+   "1929": {
+    "tet": "1929-02-10",
+    "can_chi": "Kỷ Tỵ",
+    "animal": "Tỵ",
+    "nap_am": "Đại Lâm Mộc",
+    "element": "Mộc"
+   },
+   "1930": {
+    "tet": "1930-01-30",
+    "can_chi": "Canh Ngọ",
+    "animal": "Ngọ",
+    "nap_am": "Lộ Bàng Thổ",
+    "element": "Thổ"
+   },
+   "1931": {
+    "tet": "1931-02-17",
+    "can_chi": "Tân Mùi",
+    "animal": "Mùi",
+    "nap_am": "Lộ Bàng Thổ",
+    "element": "Thổ"
+   },
+   "1932": {
+    "tet": "1932-02-06",
+    "can_chi": "Nhâm Thân",
+    "animal": "Thân",
+    "nap_am": "Kiếm Phong Kim",
+    "element": "Kim"
+   },
+   "1933": {
+    "tet": "1933-01-26",
+    "can_chi": "Quý Dậu",
+    "animal": "Dậu",
+    "nap_am": "Kiếm Phong Kim",
+    "element": "Kim"
+   },
+   "1934": {
+    "tet": "1934-02-14",
+    "can_chi": "Giáp Tuất",
+    "animal": "Tuất",
+    "nap_am": "Sơn Đầu Hỏa",
+    "element": "Hỏa"
+   },
+   "1935": {
+    "tet": "1935-02-03",
+    "can_chi": "Ất Hợi",
+    "animal": "Hợi",
+    "nap_am": "Sơn Đầu Hỏa",
+    "element": "Hỏa"
+   },
+   "1936": {
+    "tet": "1936-01-24",
+    "can_chi": "Bính Tý",
+    "animal": "Tý",
+    "nap_am": "Giản Hạ Thủy",
+    "element": "Thủy"
+   },
+   "1937": {
+    "tet": "1937-02-11",
+    "can_chi": "Đinh Sửu",
+    "animal": "Sửu",
+    "nap_am": "Giản Hạ Thủy",
+    "element": "Thủy"
+   },
+   "1938": {
+    "tet": "1938-01-31",
+    "can_chi": "Mậu Dần",
+    "animal": "Dần",
+    "nap_am": "Thành Đầu Thổ",
+    "element": "Thổ"
+   },
+   "1939": {
+    "tet": "1939-02-19",
+    "can_chi": "Kỷ Mão",
+    "animal": "Mão",
+    "nap_am": "Thành Đầu Thổ",
+    "element": "Thổ"
+   },
+   "1940": {
+    "tet": "1940-02-08",
+    "can_chi": "Canh Thìn",
+    "animal": "Thìn",
+    "nap_am": "Bạch Lạp Kim",
+    "element": "Kim"
+   },
+   "1941": {
+    "tet": "1941-01-27",
+    "can_chi": "Tân Tỵ",
+    "animal": "Tỵ",
+    "nap_am": "Bạch Lạp Kim",
+    "element": "Kim"
+   },
+   "1942": {
+    "tet": "1942-02-15",
+    "can_chi": "Nhâm Ngọ",
+    "animal": "Ngọ",
+    "nap_am": "Dương Liễu Mộc",
+    "element": "Mộc"
+   },
+   "1943": {
+    "tet": "1943-02-05",
+    "can_chi": "Quý Mùi",
+    "animal": "Mùi",
+    "nap_am": "Dương Liễu Mộc",
+    "element": "Mộc"
+   },
+   "1944": {
+    "tet": "1944-01-25",
+    "can_chi": "Giáp Thân",
+    "animal": "Thân",
+    "nap_am": "Tuyền Trung Thủy",
+    "element": "Thủy"
+   },
+   "1945": {
+    "tet": "1945-02-13",
+    "can_chi": "Ất Dậu",
+    "animal": "Dậu",
+    "nap_am": "Tuyền Trung Thủy",
+    "element": "Thủy"
+   },
+   "1946": {
+    "tet": "1946-02-02",
+    "can_chi": "Bính Tuất",
+    "animal": "Tuất",
+    "nap_am": "Ốc Thượng Thổ",
+    "element": "Thổ"
+   },
+   "1947": {
+    "tet": "1947-01-22",
+    "can_chi": "Đinh Hợi",
+    "animal": "Hợi",
+    "nap_am": "Ốc Thượng Thổ",
+    "element": "Thổ"
+   },
+   "1948": {
+    "tet": "1948-02-10",
+    "can_chi": "Mậu Tý",
+    "animal": "Tý",
+    "nap_am": "Tích Lịch Hỏa",
+    "element": "Hỏa"
+   },
+   "1949": {
+    "tet": "1949-01-29",
+    "can_chi": "Kỷ Sửu",
+    "animal": "Sửu",
+    "nap_am": "Tích Lịch Hỏa",
+    "element": "Hỏa"
+   },
+   "1950": {
+    "tet": "1950-02-17",
+    "can_chi": "Canh Dần",
+    "animal": "Dần",
+    "nap_am": "Tùng Bách Mộc",
+    "element": "Mộc"
+   },
+   "1951": {
+    "tet": "1951-02-06",
+    "can_chi": "Tân Mão",
+    "animal": "Mão",
+    "nap_am": "Tùng Bách Mộc",
+    "element": "Mộc"
+   },
+   "1952": {
+    "tet": "1952-01-27",
+    "can_chi": "Nhâm Thìn",
+    "animal": "Thìn",
+    "nap_am": "Trường Lưu Thủy",
+    "element": "Thủy"
+   },
+   "1953": {
+    "tet": "1953-02-14",
+    "can_chi": "Quý Tỵ",
+    "animal": "Tỵ",
+    "nap_am": "Trường Lưu Thủy",
+    "element": "Thủy"
+   },
+   "1954": {
+    "tet": "1954-02-03",
+    "can_chi": "Giáp Ngọ",
+    "animal": "Ngọ",
+    "nap_am": "Sa Trung Kim",
+    "element": "Kim"
+   },
+   "1955": {
+    "tet": "1955-01-24",
+    "can_chi": "Ất Mùi",
+    "animal": "Mùi",
+    "nap_am": "Sa Trung Kim",
+    "element": "Kim"
+   },
+   "1956": {
+    "tet": "1956-02-12",
+    "can_chi": "Bính Thân",
+    "animal": "Thân",
+    "nap_am": "Sơn Hạ Hỏa",
+    "element": "Hỏa"
+   },
+   "1957": {
+    "tet": "1957-01-31",
+    "can_chi": "Đinh Dậu",
+    "animal": "Dậu",
+    "nap_am": "Sơn Hạ Hỏa",
+    "element": "Hỏa"
+   },
+   "1958": {
+    "tet": "1958-02-18",
+    "can_chi": "Mậu Tuất",
+    "animal": "Tuất",
+    "nap_am": "Bình Địa Mộc",
+    "element": "Mộc"
+   },
+   "1959": {
+    "tet": "1959-02-08",
+    "can_chi": "Kỷ Hợi",
+    "animal": "Hợi",
+    "nap_am": "Bình Địa Mộc",
+    "element": "Mộc"
+   },
+   "1960": {
+    "tet": "1960-01-28",
+    "can_chi": "Canh Tý",
+    "animal": "Tý",
+    "nap_am": "Bích Thượng Thổ",
+    "element": "Thổ"
+   },
+   "1961": {
+    "tet": "1961-02-15",
+    "can_chi": "Tân Sửu",
+    "animal": "Sửu",
+    "nap_am": "Bích Thượng Thổ",
+    "element": "Thổ"
+   },
+   "1962": {
+    "tet": "1962-02-05",
+    "can_chi": "Nhâm Dần",
+    "animal": "Dần",
+    "nap_am": "Kim Bạch Kim",
+    "element": "Kim"
+   },
+   "1963": {
+    "tet": "1963-01-25",
+    "can_chi": "Quý Mão",
+    "animal": "Mão",
+    "nap_am": "Kim Bạch Kim",
+    "element": "Kim"
+   },
+   "1964": {
+    "tet": "1964-02-13",
+    "can_chi": "Giáp Thìn",
+    "animal": "Thìn",
+    "nap_am": "Phú Đăng Hỏa",
+    "element": "Hỏa"
+   },
+   "1965": {
+    "tet": "1965-02-01",
+    "can_chi": "Ất Tỵ",
+    "animal": "Tỵ",
+    "nap_am": "Phú Đăng Hỏa",
+    "element": "Hỏa"
+   },
+   "1966": {
+    "tet": "1966-01-21",
+    "can_chi": "Bính Ngọ",
+    "animal": "Ngọ",
+    "nap_am": "Thiên Hà Thủy",
+    "element": "Thủy"
+   },
+   "1967": {
+    "tet": "1967-02-09",
+    "can_chi": "Đinh Mùi",
+    "animal": "Mùi",
+    "nap_am": "Thiên Hà Thủy",
+    "element": "Thủy"
+   },
+   "1968": {
+    "tet": "1968-01-29",
+    "can_chi": "Mậu Thân",
+    "animal": "Thân",
+    "nap_am": "Đại Trạch Thổ",
+    "element": "Thổ"
+   },
+   "1969": {
+    "tet": "1969-02-16",
+    "can_chi": "Kỷ Dậu",
+    "animal": "Dậu",
+    "nap_am": "Đại Trạch Thổ",
+    "element": "Thổ"
+   },
+   "1970": {
+    "tet": "1970-02-06",
+    "can_chi": "Canh Tuất",
+    "animal": "Tuất",
+    "nap_am": "Thoa Xuyến Kim",
+    "element": "Kim"
+   },
+   "1971": {
+    "tet": "1971-01-27",
+    "can_chi": "Tân Hợi",
+    "animal": "Hợi",
+    "nap_am": "Thoa Xuyến Kim",
+    "element": "Kim"
+   },
+   "1972": {
+    "tet": "1972-02-15",
+    "can_chi": "Nhâm Tý",
+    "animal": "Tý",
+    "nap_am": "Tang Đố Mộc",
+    "element": "Mộc"
+   },
+   "1973": {
+    "tet": "1973-02-03",
+    "can_chi": "Quý Sửu",
+    "animal": "Sửu",
+    "nap_am": "Tang Đố Mộc",
+    "element": "Mộc"
+   },
+   "1974": {
+    "tet": "1974-01-23",
+    "can_chi": "Giáp Dần",
+    "animal": "Dần",
+    "nap_am": "Đại Khê Thủy",
+    "element": "Thủy"
+   },
+   "1975": {
+    "tet": "1975-02-11",
+    "can_chi": "Ất Mão",
+    "animal": "Mão",
+    "nap_am": "Đại Khê Thủy",
+    "element": "Thủy"
+   },
+   "1976": {
+    "tet": "1976-01-31",
+    "can_chi": "Bính Thìn",
+    "animal": "Thìn",
+    "nap_am": "Sa Trung Thổ",
+    "element": "Thổ"
+   },
+   "1977": {
+    "tet": "1977-02-18",
+    "can_chi": "Đinh Tỵ",
+    "animal": "Tỵ",
+    "nap_am": "Sa Trung Thổ",
+    "element": "Thổ"
+   },
+   "1978": {
+    "tet": "1978-02-07",
+    "can_chi": "Mậu Ngọ",
+    "animal": "Ngọ",
+    "nap_am": "Thiên Thượng Hỏa",
+    "element": "Hỏa"
+   },
+   "1979": {
+    "tet": "1979-01-28",
+    "can_chi": "Kỷ Mùi",
+    "animal": "Mùi",
+    "nap_am": "Thiên Thượng Hỏa",
+    "element": "Hỏa"
+   },
+   "1980": {
+    "tet": "1980-02-16",
+    "can_chi": "Canh Thân",
+    "animal": "Thân",
+    "nap_am": "Thạch Lựu Mộc",
+    "element": "Mộc"
+   },
+   "1981": {
+    "tet": "1981-02-05",
+    "can_chi": "Tân Dậu",
+    "animal": "Dậu",
+    "nap_am": "Thạch Lựu Mộc",
+    "element": "Mộc"
+   },
+   "1982": {
+    "tet": "1982-01-25",
+    "can_chi": "Nhâm Tuất",
+    "animal": "Tuất",
+    "nap_am": "Đại Hải Thủy",
+    "element": "Thủy"
+   },
+   "1983": {
+    "tet": "1983-02-13",
+    "can_chi": "Quý Hợi",
+    "animal": "Hợi",
+    "nap_am": "Đại Hải Thủy",
+    "element": "Thủy"
+   },
+   "1984": {
+    "tet": "1984-02-02",
+    "can_chi": "Giáp Tý",
+    "animal": "Tý",
+    "nap_am": "Hải Trung Kim",
+    "element": "Kim"
+   },
+   "1985": {
+    "tet": "1985-01-21",
+    "can_chi": "Ất Sửu",
+    "animal": "Sửu",
+    "nap_am": "Hải Trung Kim",
+    "element": "Kim"
+   },
+   "1986": {
+    "tet": "1986-02-09",
+    "can_chi": "Bính Dần",
+    "animal": "Dần",
+    "nap_am": "Lư Trung Hỏa",
+    "element": "Hỏa"
+   },
+   "1987": {
+    "tet": "1987-01-29",
+    "can_chi": "Đinh Mão",
+    "animal": "Mão",
+    "nap_am": "Lư Trung Hỏa",
+    "element": "Hỏa"
+   },
+   "1988": {
+    "tet": "1988-02-17",
+    "can_chi": "Mậu Thìn",
+    "animal": "Thìn",
+    "nap_am": "Đại Lâm Mộc",
+    "element": "Mộc"
+   },
+   "1989": {
+    "tet": "1989-02-06",
+    "can_chi": "Kỷ Tỵ",
+    "animal": "Tỵ",
+    "nap_am": "Đại Lâm Mộc",
+    "element": "Mộc"
+   },
+   "1990": {
+    "tet": "1990-01-27",
+    "can_chi": "Canh Ngọ",
+    "animal": "Ngọ",
+    "nap_am": "Lộ Bàng Thổ",
+    "element": "Thổ"
+   },
+   "1991": {
+    "tet": "1991-02-14",
+    "can_chi": "Tân Mùi",
+    "animal": "Mùi",
+    "nap_am": "Lộ Bàng Thổ",
+    "element": "Thổ"
+   },
+   "1992": {
+    "tet": "1992-02-04",
+    "can_chi": "Nhâm Thân",
+    "animal": "Thân",
+    "nap_am": "Kiếm Phong Kim",
+    "element": "Kim"
+   },
+   "1993": {
+    "tet": "1993-01-23",
+    "can_chi": "Quý Dậu",
+    "animal": "Dậu",
+    "nap_am": "Kiếm Phong Kim",
+    "element": "Kim"
+   },
+   "1994": {
+    "tet": "1994-02-10",
+    "can_chi": "Giáp Tuất",
+    "animal": "Tuất",
+    "nap_am": "Sơn Đầu Hỏa",
+    "element": "Hỏa"
+   },
+   "1995": {
+    "tet": "1995-01-31",
+    "can_chi": "Ất Hợi",
+    "animal": "Hợi",
+    "nap_am": "Sơn Đầu Hỏa",
+    "element": "Hỏa"
+   },
+   "1996": {
+    "tet": "1996-02-19",
+    "can_chi": "Bính Tý",
+    "animal": "Tý",
+    "nap_am": "Giản Hạ Thủy",
+    "element": "Thủy"
+   },
+   "1997": {
+    "tet": "1997-02-07",
+    "can_chi": "Đinh Sửu",
+    "animal": "Sửu",
+    "nap_am": "Giản Hạ Thủy",
+    "element": "Thủy"
+   },
+   "1998": {
+    "tet": "1998-01-28",
+    "can_chi": "Mậu Dần",
+    "animal": "Dần",
+    "nap_am": "Thành Đầu Thổ",
+    "element": "Thổ"
+   },
+   "1999": {
+    "tet": "1999-02-16",
+    "can_chi": "Kỷ Mão",
+    "animal": "Mão",
+    "nap_am": "Thành Đầu Thổ",
+    "element": "Thổ"
+   },
+   "2000": {
+    "tet": "2000-02-05",
+    "can_chi": "Canh Thìn",
+    "animal": "Thìn",
+    "nap_am": "Bạch Lạp Kim",
+    "element": "Kim"
+   },
+   "2001": {
+    "tet": "2001-01-24",
+    "can_chi": "Tân Tỵ",
+    "animal": "Tỵ",
+    "nap_am": "Bạch Lạp Kim",
+    "element": "Kim"
+   },
+   "2002": {
+    "tet": "2002-02-12",
+    "can_chi": "Nhâm Ngọ",
+    "animal": "Ngọ",
+    "nap_am": "Dương Liễu Mộc",
+    "element": "Mộc"
+   },
+   "2003": {
+    "tet": "2003-02-01",
+    "can_chi": "Quý Mùi",
+    "animal": "Mùi",
+    "nap_am": "Dương Liễu Mộc",
+    "element": "Mộc"
+   },
+   "2004": {
+    "tet": "2004-01-22",
+    "can_chi": "Giáp Thân",
+    "animal": "Thân",
+    "nap_am": "Tuyền Trung Thủy",
+    "element": "Thủy"
+   },
+   "2005": {
+    "tet": "2005-02-09",
+    "can_chi": "Ất Dậu",
+    "animal": "Dậu",
+    "nap_am": "Tuyền Trung Thủy",
+    "element": "Thủy"
+   },
+   "2006": {
+    "tet": "2006-01-29",
+    "can_chi": "Bính Tuất",
+    "animal": "Tuất",
+    "nap_am": "Ốc Thượng Thổ",
+    "element": "Thổ"
+   },
+   "2007": {
+    "tet": "2007-02-17",
+    "can_chi": "Đinh Hợi",
+    "animal": "Hợi",
+    "nap_am": "Ốc Thượng Thổ",
+    "element": "Thổ"
+   },
+   "2008": {
+    "tet": "2008-02-07",
+    "can_chi": "Mậu Tý",
+    "animal": "Tý",
+    "nap_am": "Tích Lịch Hỏa",
+    "element": "Hỏa"
+   },
+   "2009": {
+    "tet": "2009-01-26",
+    "can_chi": "Kỷ Sửu",
+    "animal": "Sửu",
+    "nap_am": "Tích Lịch Hỏa",
+    "element": "Hỏa"
+   },
+   "2010": {
+    "tet": "2010-02-14",
+    "can_chi": "Canh Dần",
+    "animal": "Dần",
+    "nap_am": "Tùng Bách Mộc",
+    "element": "Mộc"
+   },
+   "2011": {
+    "tet": "2011-02-03",
+    "can_chi": "Tân Mão",
+    "animal": "Mão",
+    "nap_am": "Tùng Bách Mộc",
+    "element": "Mộc"
+   },
+   "2012": {
+    "tet": "2012-01-23",
+    "can_chi": "Nhâm Thìn",
+    "animal": "Thìn",
+    "nap_am": "Trường Lưu Thủy",
+    "element": "Thủy"
+   },
+   "2013": {
+    "tet": "2013-02-10",
+    "can_chi": "Quý Tỵ",
+    "animal": "Tỵ",
+    "nap_am": "Trường Lưu Thủy",
+    "element": "Thủy"
+   },
+   "2014": {
+    "tet": "2014-01-31",
+    "can_chi": "Giáp Ngọ",
+    "animal": "Ngọ",
+    "nap_am": "Sa Trung Kim",
+    "element": "Kim"
+   },
+   "2015": {
+    "tet": "2015-02-19",
+    "can_chi": "Ất Mùi",
+    "animal": "Mùi",
+    "nap_am": "Sa Trung Kim",
+    "element": "Kim"
+   },
+   "2016": {
+    "tet": "2016-02-08",
+    "can_chi": "Bính Thân",
+    "animal": "Thân",
+    "nap_am": "Sơn Hạ Hỏa",
+    "element": "Hỏa"
+   },
+   "2017": {
+    "tet": "2017-01-28",
+    "can_chi": "Đinh Dậu",
+    "animal": "Dậu",
+    "nap_am": "Sơn Hạ Hỏa",
+    "element": "Hỏa"
+   },
+   "2018": {
+    "tet": "2018-02-16",
+    "can_chi": "Mậu Tuất",
+    "animal": "Tuất",
+    "nap_am": "Bình Địa Mộc",
+    "element": "Mộc"
+   },
+   "2019": {
+    "tet": "2019-02-05",
+    "can_chi": "Kỷ Hợi",
+    "animal": "Hợi",
+    "nap_am": "Bình Địa Mộc",
+    "element": "Mộc"
+   },
+   "2020": {
+    "tet": "2020-01-25",
+    "can_chi": "Canh Tý",
+    "animal": "Tý",
+    "nap_am": "Bích Thượng Thổ",
+    "element": "Thổ"
+   },
+   "2021": {
+    "tet": "2021-02-12",
+    "can_chi": "Tân Sửu",
+    "animal": "Sửu",
+    "nap_am": "Bích Thượng Thổ",
+    "element": "Thổ"
+   },
+   "2022": {
+    "tet": "2022-02-01",
+    "can_chi": "Nhâm Dần",
+    "animal": "Dần",
+    "nap_am": "Kim Bạch Kim",
+    "element": "Kim"
+   },
+   "2023": {
+    "tet": "2023-01-22",
+    "can_chi": "Quý Mão",
+    "animal": "Mão",
+    "nap_am": "Kim Bạch Kim",
+    "element": "Kim"
+   },
+   "2024": {
+    "tet": "2024-02-10",
+    "can_chi": "Giáp Thìn",
+    "animal": "Thìn",
+    "nap_am": "Phú Đăng Hỏa",
+    "element": "Hỏa"
+   },
+   "2025": {
+    "tet": "2025-01-29",
+    "can_chi": "Ất Tỵ",
+    "animal": "Tỵ",
+    "nap_am": "Phú Đăng Hỏa",
+    "element": "Hỏa"
+   },
+   "2026": {
+    "tet": "2026-02-17",
+    "can_chi": "Bính Ngọ",
+    "animal": "Ngọ",
+    "nap_am": "Thiên Hà Thủy",
+    "element": "Thủy"
+   },
+   "2027": {
+    "tet": "2027-02-06",
+    "can_chi": "Đinh Mùi",
+    "animal": "Mùi",
+    "nap_am": "Thiên Hà Thủy",
+    "element": "Thủy"
+   },
+   "2028": {
+    "tet": "2028-01-26",
+    "can_chi": "Mậu Thân",
+    "animal": "Thân",
+    "nap_am": "Đại Trạch Thổ",
+    "element": "Thổ"
+   },
+   "2029": {
+    "tet": "2029-02-13",
+    "can_chi": "Kỷ Dậu",
+    "animal": "Dậu",
+    "nap_am": "Đại Trạch Thổ",
+    "element": "Thổ"
+   },
+   "2030": {
+    "tet": "2030-02-02",
+    "can_chi": "Canh Tuất",
+    "animal": "Tuất",
+    "nap_am": "Thoa Xuyến Kim",
+    "element": "Kim"
+   },
+   "2031": {
+    "tet": "2031-01-23",
+    "can_chi": "Tân Hợi",
+    "animal": "Hợi",
+    "nap_am": "Thoa Xuyến Kim",
+    "element": "Kim"
+   },
+   "2032": {
+    "tet": "2032-02-11",
+    "can_chi": "Nhâm Tý",
+    "animal": "Tý",
+    "nap_am": "Tang Đố Mộc",
+    "element": "Mộc"
+   },
+   "2033": {
+    "tet": "2033-01-31",
+    "can_chi": "Quý Sửu",
+    "animal": "Sửu",
+    "nap_am": "Tang Đố Mộc",
+    "element": "Mộc"
+   },
+   "2034": {
+    "tet": "2034-02-19",
+    "can_chi": "Giáp Dần",
+    "animal": "Dần",
+    "nap_am": "Đại Khê Thủy",
+    "element": "Thủy"
+   },
+   "2035": {
+    "tet": "2035-02-08",
+    "can_chi": "Ất Mão",
+    "animal": "Mão",
+    "nap_am": "Đại Khê Thủy",
+    "element": "Thủy"
+   }
+  },
+  "zodiac_bounds": [
+   {
+    "month": 1,
+    "day": 20,
+    "name": "Bảo Bình"
+   },
+   {
+    "month": 2,
+    "day": 19,
+    "name": "Song Ngư"
+   },
+   {
+    "month": 3,
+    "day": 21,
+    "name": "Bạch Dương"
+   },
+   {
+    "month": 4,
+    "day": 20,
+    "name": "Kim Ngưu"
+   },
+   {
+    "month": 5,
+    "day": 21,
+    "name": "Song Tử"
+   },
+   {
+    "month": 6,
+    "day": 22,
+    "name": "Cự Giải"
+   },
+   {
+    "month": 7,
+    "day": 23,
+    "name": "Sư Tử"
+   },
+   {
+    "month": 8,
+    "day": 23,
+    "name": "Xử Nữ"
+   },
+   {
+    "month": 9,
+    "day": 23,
+    "name": "Thiên Bình"
+   },
+   {
+    "month": 10,
+    "day": 24,
+    "name": "Bọ Cạp"
+   },
+   {
+    "month": 11,
+    "day": 22,
+    "name": "Nhân Mã"
+   },
+   {
+    "month": 12,
+    "day": 22,
+    "name": "Ma Kết"
+   }
+  ],
+  "stars_male": [
+   "La Hầu",
+   "Thổ Tú",
+   "Thủy Diệu",
+   "Thái Bạch",
+   "Thái Dương",
+   "Vân Hán",
+   "Kế Đô",
+   "Thái Âm",
+   "Mộc Đức"
+  ],
+  "stars_female": [
+   "Kế Đô",
+   "Vân Hán",
+   "Mộc Đức",
+   "Thái Âm",
+   "Thổ Tú",
+   "La Hầu",
+   "Thái Dương",
+   "Thái Bạch",
+   "Thủy Diệu"
+  ],
+  "star_base_age": 10,
+  "tam_hop": [
+   [
+    "Thân",
+    "Tý",
+    "Thìn"
+   ],
+   [
+    "Dần",
+    "Ngọ",
+    "Tuất"
+   ],
+   [
+    "Hợi",
+    "Mão",
+    "Mùi"
+   ],
+   [
+    "Tỵ",
+    "Dậu",
+    "Sửu"
+   ]
+  ],
+  "tu_hanh_xung": [
+   [
+    "Dần",
+    "Thân",
+    "Tỵ",
+    "Hợi"
+   ],
+   [
+    "Tý",
+    "Ngọ",
+    "Mão",
+    "Dậu"
+   ],
+   [
+    "Thìn",
+    "Tuất",
+    "Sửu",
+    "Mùi"
+   ]
+  ],
+  "pythagorean_rows": [
+   "ABCDEFGHI",
+   "JKLMNOPQR",
+   "STUVWXYZ"
+  ],
+  "master_numbers": [
+   11,
+   22,
+   33
+  ],
+  "elements": [
+   "Kim",
+   "Mộc",
+   "Thủy",
+   "Hỏa",
+   "Thổ"
+  ]
+ },
+ "privacy": "Ngày sinh, tên và giới tính chỉ nằm trong trình duyệt của bạn (localStorage). Không có server, không có tài khoản, không request nào mang dữ liệu đó đi. Xoá lúc nào cũng được."
+}
