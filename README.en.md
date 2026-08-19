@@ -1,6 +1,6 @@
 # 🔮 trungso
 
-*The fortune-teller calls the numbers. Mathematics calls the fortune-teller.*
+*The fortune-teller calls the numbers for you. Then mathematics calls the fortune-teller.*
 
 [![Oracle](https://github.com/quocdaijr/trungso/actions/workflows/oracle.yml/badge.svg)](https://github.com/quocdaijr/trungso/actions/workflows/oracle.yml)
 [![CI](https://github.com/quocdaijr/trungso/actions/workflows/ci.yml/badge.svg)](https://github.com/quocdaijr/trungso/actions/workflows/ci.yml)
@@ -46,8 +46,21 @@ The only genuine value here is **The Honest Layer** — the statistics showing t
 random, measured on real data from five lotteries across two countries. Everything else is a
 pavement fortune-teller implemented in code.
 
-If you came looking for numbers to play: the numbers here are exactly as random as numbers you
-pick yourself. The only difference is that this site **admits it**.
+If you came looking for numbers to play, the fortune-teller will tell you straight: the numbers
+here are **exactly** as random as numbers you pick yourself. The only difference is that this
+site **admits it**.
+
+### A note on voice
+
+The Vietnamese original is written in the register of a pavement fortune-teller: he calls himself
+**thầy** ("master", "teacher") and calls the reader **con** ("child"). It is deliberately
+presumptuous — the register of someone who has decided he is the authority in the room.
+
+English has no equivalent pronoun pair, so this translation uses plain "you". The hierarchy is
+lost; the presumption survives in the phrasing.
+
+He is silent in three places, in both languages: the disclaimer, the statistics, and the
+gambling-support note. That gap is the joke, and it is also what keeps the project honest.
 
 ## Two layers
 
@@ -204,9 +217,12 @@ and **not one source** rejects the randomness hypothesis. Any number that looks 
 
 Full disclaimer (bilingual): [**DISCLAIMER.md**](DISCLAIMER.md)
 
-If you use this to gamble and lose, that was your decision, not the repository's.
+If you use this to gamble and lose, that was your decision — not the fortune-teller's, and
+certainly not the repository's.
 
 ### If gambling has become a problem
+
+*The fortune-teller does not speak here. This part is real.*
 
 Vietnam has **no** dedicated gambling-addiction helpline. The nearest real free resource is the
 [Ngày Mai hotline](https://duongdaynongngaymai.vn/hotline/) — **+84 96 306 1414**, 13:00–20:30

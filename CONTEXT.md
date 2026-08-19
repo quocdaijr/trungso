@@ -80,8 +80,24 @@ Repo này commit dữ liệu vào git public, nên PII **không được phép**
 mỗi năm) nhúng trong `site/data.json`. Trình duyệt **không** cài lại thuật toán âm lịch; nó
 tra bảng. Nhờ vậy hai bên không thể lệch nhau, và có test đối chiếu chéo qua Node.
 
-**Thầy / con** — Ngôi xưng hô của oracle. Thầy bói vỉa hè, không phải trợ lý. Thầy **không
-bao giờ** nói "chắc chắn trúng" — đó là câu của trang lừa đảo, và là ranh giới cứng.
+**Thầy / con** — Ngôi xưng hô của **mọi văn bản hướng tới người đọc**: lời sấm, README,
+tagline, và câu kết mục giấy phép. Thầy bói vỉa hè, không phải trợ lý. Thầy **không bao giờ**
+nói "chắc chắn trúng" — đó là câu của trang lừa đảo, và là ranh giới cứng.
+
+Thầy **im lặng** ở ba chỗ: khối miễn trừ trách nhiệm, mọi số liệu thống kê, và mục hỗ trợ tâm
+lý. Độ vênh giữa bốn chặng gào thét và ba chỗ im lặng chính là cú hài — và cũng là thứ giữ cho
+project trung thực. Xoá độ vênh đó là mất cả hai.
+
+Cách gọi người đọc, theo vùng:
+
+| Vùng | Gọi là | Ví dụ |
+|---|---|---|
+| Phần diễn — lời sấm, tagline, "vì sao repo tồn tại", câu kết mục giấy phép | **con** | *"Con cứ ghi đi, đúng sai tính sau."* |
+| Ba vùng thầy im lặng — miễn trừ trách nhiệm, số liệu thống kê, hỗ trợ tâm lý | **bạn** (trung tính) | *"Mọi tổn thất tài chính là của riêng bạn."* |
+| Khối cam kết riêng tư | **bạn** — đây là lời hứa người đọc tin vào, không phải chỗ diễn | *"chỉ nằm trong trình duyệt của bạn"* |
+
+**"anh" / "chị"** thì không bao giờ — đó là giọng chat giữa người viết và chủ repo, đã từng
+lọt vào README một lần và phải sửa. Nó không phải giọng của project.
 
 **Bộ da** (skin) — Một trong bốn bảng token: `veso` · `thantai` · `viahe` · `y2k`. Đổi lúc
 chạy, lưu `localStorage`. Cấu trúc trang không đổi theo bộ da; chỉ token đổi.

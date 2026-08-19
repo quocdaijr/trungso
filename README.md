@@ -1,6 +1,6 @@
 # 🔮 trungso
 
-*Thầy phán số, toán học phán thầy.*
+*Thầy phán số cho con. Rồi toán học phán thầy.*
 
 [![Oracle](https://github.com/quocdaijr/trungso/actions/workflows/oracle.yml/badge.svg)](https://github.com/quocdaijr/trungso/actions/workflows/oracle.yml)
 [![CI](https://github.com/quocdaijr/trungso/actions/workflows/ci.yml/badge.svg)](https://github.com/quocdaijr/trungso/actions/workflows/ci.yml)
@@ -46,8 +46,8 @@ Giá trị thật duy nhất của repo nằm ở **Tầng Thật** — phần t
 nhiên, trên dữ liệu thật của 5 xổ số và 2 quốc gia. Phần còn lại là một ông thầy bói vỉa hè
 bằng code.
 
-Nếu anh vào đây tìm số để đánh: số ở đây ngẫu nhiên đúng bằng số anh tự bốc. Khác biệt duy
-nhất là trang này **thừa nhận điều đó**.
+Con vào đây tìm số để đánh thì thầy nói luôn: số ở đây ngẫu nhiên **đúng bằng** số con tự
+bốc. Khác biệt duy nhất là trang này **thừa nhận điều đó**.
 
 ## Hai tầng
 
@@ -170,9 +170,12 @@ nguồn nào** bác bỏ được giả thuyết ngẫu nhiên. Con số nào tr
 
 Bản miễn trừ đầy đủ (song ngữ): [**DISCLAIMER.md**](DISCLAIMER.md)
 
-Nếu anh dùng cái này để đánh xổ số và thua, đó là quyết định của anh, không phải của repo.
+Con dùng cái này để đánh xổ số rồi thua thì đó là quyết định của con, không phải của thầy,
+và càng không phải của repo.
 
 ### Nếu cờ bạc đang là vấn đề
+
+*Phần này thầy không nói. Đây là chuyện thật.*
 
 Việt Nam **không có** đường dây nóng riêng cho nghiện cờ bạc. Nguồn miễn phí có thật gần nhất
 là [Đường dây nóng Ngày Mai](https://duongdaynongngaymai.vn/hotline/) — **096.306.1414**,
