@@ -119,3 +119,41 @@ def test_scoreboard_round_trip():
 def test_data_dir_honours_env_override(tmp_path, monkeypatch):
     monkeypatch.setenv(store.ENV_DATA_DIR, str(tmp_path / "elsewhere"))
     assert store.data_dir() == tmp_path / "elsewhere"
+
+
+def test_write_json_if_changed_skips_timestamp_only_diff():
+    """Regression: every scheduled run regenerated these files, and `generated_at`
+    alone made them differ - turning the commit history into two junk commits a day.
+    """
+    path = store.data_dir() / "probe.json"
+    first = {"generated_at": "2026-08-19T00:00:00Z", "per_game": {"mega645": {"roi": -0.86}}}
+    later = {"generated_at": "2026-08-19T11:00:00Z", "per_game": {"mega645": {"roi": -0.86}}}
+
+    assert store.write_json_if_changed(path, first) is True
+    written = path.read_text(encoding="utf-8")
+
+    assert store.write_json_if_changed(path, later) is False
+    assert path.read_text(encoding="utf-8") == written, "file must not be rewritten"
+
+
+def test_write_json_if_changed_writes_on_real_diff():
+    path = store.data_dir() / "probe.json"
+    store.write_json_if_changed(path, {"generated_at": "t1", "roi": -0.86})
+
+    assert store.write_json_if_changed(path, {"generated_at": "t2", "roi": -0.71}) is True
+    assert '"roi": -0.71' in path.read_text(encoding="utf-8")
+
+
+def test_write_json_if_changed_recovers_from_corrupt_file():
+    """A half-written file must not make the next run silently skip its write."""
+    path = store.data_dir() / "probe.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("{ not json", encoding="utf-8")
+
+    assert store.write_json_if_changed(path, {"generated_at": "t", "roi": -0.86}) is True
+
+
+def test_scoreboard_write_is_skipped_when_only_time_moved():
+    payload = {"generated_at": "2026-08-19T00:00:00Z", "per_game": {}}
+    assert store.write_scoreboard(payload) is True
+    assert store.write_scoreboard({**payload, "generated_at": "2026-08-19T18:45:00Z"}) is False

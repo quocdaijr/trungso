@@ -156,11 +156,8 @@ def build_bundle() -> dict[str, Any]:
 
 
 def write_bundle(bundle: Mapping[str, Any], *, site_dir: Path | None = None) -> Path:
-    import json
-
+    """Write the bundle, skipping the write when only the timestamp would change."""
     target = (site_dir or SITE_DIR) / BUNDLE_NAME
     target.parent.mkdir(parents=True, exist_ok=True)
-    tmp = target.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(bundle, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    tmp.replace(target)
+    store.write_json_if_changed(target, dict(bundle), indent=1)
     return target

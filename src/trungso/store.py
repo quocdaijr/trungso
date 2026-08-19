@@ -134,8 +134,34 @@ def append_prophecy(prophecy: Prophecy) -> None:
         handle.write(json.dumps(prophecy.to_dict(), ensure_ascii=False) + "\n")
 
 
-def write_scoreboard(payload: dict) -> None:
-    _write_atomic(scoreboard_path(), json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
+TIMESTAMP_KEYS = ("generated_at",)
+
+
+def write_json_if_changed(
+    path: Path, payload: dict, *, ignore: Sequence[str] = TIMESTAMP_KEYS, indent: int = 2
+) -> bool:
+    """Write JSON only when something other than the timestamps actually changed.
+
+    Every scheduled run regenerates these files, and `generated_at` alone would make
+    them differ every time - which turns the commit history from an audit trail into
+    two junk commits a day. Returns whether the file was written.
+    """
+    body = json.dumps(payload, ensure_ascii=False, indent=indent) + "\n"
+    if path.exists():
+        try:
+            existing = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            existing = None
+        if existing is not None:
+            strip = lambda d: {k: v for k, v in d.items() if k not in ignore}  # noqa: E731
+            if strip(existing) == strip(payload):
+                return False
+    _write_atomic(path, body)
+    return True
+
+
+def write_scoreboard(payload: dict) -> bool:
+    return write_json_if_changed(scoreboard_path(), payload)
 
 
 def read_scoreboard() -> dict | None:
