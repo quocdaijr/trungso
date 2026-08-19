@@ -89,9 +89,14 @@ jobs:
         with:
           path: site
 
+  # GitHub Pages is unavailable on a private repo under the free plan, so this job
+  # cannot succeed until the repo is public (or the account is on Pro). It is marked
+  # continue-on-error so the data pipeline above still reports green in the meantime,
+  # and it starts working on its own the moment Pages is enabled - no edit needed.
   deploy-pages:
     needs: run
     runs-on: ubuntu-latest
+    continue-on-error: true
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
