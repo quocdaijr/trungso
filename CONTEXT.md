@@ -116,6 +116,21 @@ tính trung thực mà project dựng lên.
 phải** chia hết. Chia hết với số gốc 1 sẽ trúng toàn bộ dải số — một luật kích hoạt với mọi
 số thì không còn là luật.
 
+**Hình thầy** — Ông thầy bói vẽ bằng nét que, bảy dáng, sống trong repo này. Dáng được
+chọn theo **số trúng thật** của kỳ chấm được cao nhất, nên nó là một cách đọc số liệu chứ
+không phải đồ trang trí. Vẽ lệch có chủ ý: nét hoàn hảo là dấu hiệu máy làm.
+
+**Bản in Đại Cát** — Tranh khắc gỗ Đông Hồ, public domain, đặt cạnh ROI âm. *Đại Cát* nghĩa
+là **vận may lớn**; đó là toàn bộ câu đùa. Hiện đúng **một chỗ** trên trang, và chỉ khi kỳ tốt
+nhất đạt từ 5 số trở lên.
+
+**Tự host** — Mọi ảnh và emoji nằm trong repo. Trang không gọi request ra ngoài để lấy tài
+nguyên hình ảnh. Ngoại lệ duy nhất có từ trước là Google Fonts.
+
+**Cấp lại quyền** (sublicense) — Repo MIT cấp cho người clone quyền phát hành lại. Nên repo
+không được chứa thứ nó không sở hữu. Đây là lý do loại meme nhân vật có bản quyền, ảnh phim,
+và ảnh lấy từ mạng xã hội — thiếu giấy phép, không phải thiếu chỗ tìm.
+
 ## Từ tránh dùng
 
 - **"số nóng" / "số lạnh" / "cầu" / "soi cầu"** — chỉ dùng khi đang trích dẫn để bóc phốt,
@@ -132,3 +147,5 @@ số thì không còn là luật.
   này và sẽ không tồn tại. Cá nhân hoá đạt được **không cần** lưu gì của ai.
 - **"chắc chắn trúng" / "số chuẩn" / "cam kết"** — thầy bựa tới đâu cũng dừng trước câu này.
 - **"em"** khi oracle nói — oracle xưng **thầy**, gọi **con**. Không phải trợ lý.
+- **"thấy trên Facebook"** như một nguồn tài nguyên — mạng xã hội không phải giấy
+  phép. Ảnh không có nguồn và licence xác minh được thì không vào repo.

@@ -103,10 +103,31 @@ function initWarningGate() {
   return openGate();
 }
 
-window.TrungsoWarning = { ACK_KEY, hasAcknowledged, initWarningGate, openGate, closeGate };
+/* The warning strip and the nav share one sticky wrapper, so the wrapper's height is
+   whatever the strip's text wraps to: 114px on a laptop, 131px at 375px, 204px once the
+   strip needs three lines at 280px. Any hardcoded scroll-margin is therefore wrong at
+   most widths, and it was - it said 96px. Measure it instead and let CSS read it. */
+function trackTopbarHeight() {
+  const bar = document.querySelector('.topbar');
+  if (!bar) return;
+  const publish = () => document.documentElement.style
+    .setProperty('--topbar-h', Math.round(bar.getBoundingClientRect().height) + 'px');
+  publish();
+  if ('ResizeObserver' in window) new ResizeObserver(publish).observe(bar);
+  else window.addEventListener('resize', publish);
+}
+
+window.TrungsoWarning = {
+  ACK_KEY, hasAcknowledged, initWarningGate, openGate, closeGate, trackTopbarHeight,
+};
+
+function boot() {
+  initWarningGate();
+  trackTopbarHeight();
+}
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initWarningGate);
+  document.addEventListener('DOMContentLoaded', boot);
 } else {
-  initWarningGate();
+  boot();
 }

@@ -9,6 +9,26 @@
 
 const P = window.TrungsoPersonal;
 const T = window.TrungsoTheme;
+const THAY = window.TrungsoThay;
+
+/** Self-hosted Twemoji. Explicit beats a runtime DOM walk: no reflow, no library. */
+const tw = (cp, alt) =>
+  `<img class="tw" src="./img/emoji/${cp}.svg" alt="${alt}" width="20" height="20" loading="lazy">`;
+
+/**
+ * What the fortune-teller says about a real hit count. The number drives the line, so
+ * the joke can never contradict the data — and line 3 quotes the actual prize maths.
+ */
+const HIT_LINES = {
+  0: 'Mong Tôn Hoa Sen thấy.',
+  1: 'Một số. Thầy gọi đó là khởi đầu.',
+  2: 'Hai số. Đại đại đi.',
+  3: 'Ba số — giải ba! Được 30 nghìn trên 9,24 triệu đã đốt.',
+  4: 'Bốn số. Thầy đã nói rồi mà!',
+  5: 'Năm số. Thầy cũng sốc.',
+  6: 'Sáu số. Con còn ngồi đây đọc cái này làm gì nữa?',
+};
+const hitLine = (h) => HIT_LINES[Math.min(h, 6)] ?? HIT_LINES[0];
 
 const GENDERS = [['', 'không muốn nói'], ['nam', 'Nam'], ['nữ', 'Nữ']];
 const CAN_PHUOC_ROI = -0.8;
@@ -56,7 +76,7 @@ function sermonList(numbers, sermon) {
 /* ============================ 00 · KHAI ============================ */
 
 function stageKhai(data, onSubmit) {
-  const section = stage('00', 'Khai báo', 'Thầy cần ngày sinh. Chỉ ngày sinh thôi.');
+  const section = stage('00', `${tw('1fa84','🪄')} Khai báo`, 'Thầy cần ngày sinh. Chỉ ngày sinh thôi.');
   const block = el('div', 'block');
   const profile = P.loadProfile();
 
@@ -106,7 +126,7 @@ function stageKhai(data, onSubmit) {
 /* ============================ 01 · TƯỚNG ============================ */
 
 function stageTuong(fortune, error) {
-  const section = stage('01', 'Xem tướng', 'Lá số dựng từ ngày sinh, tính ngay trong máy con.');
+  const section = stage('01', `${tw('262f','☯')} Xem tướng`, 'Lá số dựng từ ngày sinh, tính ngay trong máy con.');
   const block = el('div', 'block');
 
   if (error) {
@@ -115,7 +135,7 @@ function stageTuong(fortune, error) {
     return section;
   }
   if (!fortune) {
-    block.appendChild(el('p', 'hand', 'Chưa có ngày sinh thì thầy chịu. Con quay lên trên đi.'));
+    block.appendChild(el('p', 'hand', 'Thầy không phải thần. Thầy cần ngày sinh — con quay lên trên đi.'));
     section.appendChild(block);
     return section;
   }
@@ -146,7 +166,14 @@ function stageTuong(fortune, error) {
 /* ============================ 02 · PHÁN ============================ */
 
 function stagePhan(data, profile, fortune) {
-  const section = stage('02', 'Thầy phán', 'Mười hai số mỗi kỳ. Ghi trước giờ quay, không sửa được.');
+  const section = stage('02', `${tw('1f52e','🔮')} Thầy phán`,
+    'Mười hai số mỗi kỳ. Ghi trước giờ quay, không sửa được.');
+
+  const intro = el('div', 'thay-row');
+  intro.innerHTML = THAY.flip('idle', 'blink')
+    + '<p class="thay__say">Cảm ơn vũ trụ đã cho con công việc. Nhưng thầy thấy con thích '
+    + 'trúng số hơn.<br>Vũ trụ ơi, cho con trúng số đi. Thầy xin hộ nó một câu.</p>';
+  section.appendChild(intro);
 
   data.games.forEach((game) => {
     const row = el('div', 'row');
@@ -196,7 +223,8 @@ function stagePhan(data, profile, fortune) {
 /* ============================ 03 · SỔ NỢ ============================ */
 
 function stageSoNo(data, fortune) {
-  const section = stage('03', 'Sổ nợ', 'Thầy phán xong thì phải chịu chấm điểm. Tiền ở đây là tiền giấy.');
+  const section = stage('03', `${tw('1f4c9','📉')} Sổ nợ`,
+    'Thầy phán xong thì phải chịu chấm điểm. Tiền ở đây là tiền giấy.');
 
   data.games.forEach((game) => {
     const score = game.score;
@@ -205,13 +233,13 @@ function stageSoNo(data, fortune) {
 
     if (!score.draws_scored) {
       block.appendChild(el('p', 'hand',
-        'Chưa kỳ nào có cả lời phán lẫn kết quả. Chưa chấm được — thầy chưa nợ con gì.'));
+        'Chưa kỳ nào chấm được. Thầy tạm thời vô tội.'));
     } else {
       const delta = score.hits_per_draw_actual - score.hits_per_draw_expected;
       block.appendChild(el('div', 'kpi ' + (score.roi > 0 ? 'kpi--good' : 'kpi--bad'), pct(score.roi)));
       block.appendChild(el('div', 'note', 'ROI cộng dồn'));
 
-      const table = el('table');
+      const table = el('table', 'stack-sm');
       table.innerHTML = `<tbody>
         <tr><th>kỳ đã chấm</th><td class="num">${score.draws_scored}</td></tr>
         <tr><th>trúng / kỳ</th><td class="num">${score.hits_per_draw_actual}</td></tr>
@@ -222,6 +250,22 @@ function stageSoNo(data, fortune) {
         <tr><th>ROI bỏ jackpot</th><td class="num">${pct(score.roi_excluding_jackpot)}</td></tr>
       </tbody>`;
       block.appendChild(table);
+
+      /* The drawing is chosen by the real hit count, so it can never flatter the data. */
+      if (score.best_draw) {
+        const hits = score.best_draw.hits;
+        const row = el('div', 'thay-row');
+        row.innerHTML = THAY.still(THAY.poseForHits(hits))
+          + `<div><p class="thay__say">Kỳ đỉnh nhất #${score.best_draw.draw_id}: `
+          + `trúng ${hits}/12 số.<br>${hitLine(hits)}</p>`
+          + (hits >= 5
+            ? '<figure class="print"><img src="./img/dong-ho-dai-cat.webp" alt="Tranh Đông Hồ Đại Cát" '
+              + 'width="240" height="329" loading="lazy">'
+              + '<figcaption>“Đại Cát” — vận may lớn. Tranh Đông Hồ, public domain.</figcaption></figure>'
+            : '')
+          + '</div>';
+        block.appendChild(row);
+      }
 
       if (score.roi_excluding_jackpot < CAN_PHUOC_ROI) {
         block.appendChild(el('div', 'verdict-stamp', 'CẠN PHƯỚC'));
@@ -241,15 +285,23 @@ function stageSoNo(data, fortune) {
     if (fortune) {
       const mine = P.scorePicks(P.loadPicks(),
         { key: game.key, pool: game.pool, pick: game.pick }, game.recent);
-      const versus = el('table');
-      versus.innerHTML = `<thead><tr><th></th><th class="num">kỳ đã chấm</th>
-        <th class="num">trúng / kỳ</th></tr></thead><tbody>
-        <tr><th>Số tử vi của con</th><td class="num">${mine.scored}</td>
-            <td class="num">${mine.scored ? mine.hitsPerDraw.toFixed(3) : '—'}</td></tr>
-        <tr><th>Oracle nhà cái</th><td class="num">${score.draws_scored}</td>
-            <td class="num">${score.draws_scored ? score.hits_per_draw_actual : '—'}</td></tr>
-        <tr><th>Ngẫu nhiên thuần</th><td class="num">∞</td>
-            <td class="num">${mine.expected.toFixed(3)}</td></tr>
+      /* Two measures across three contenders, so this one is a real matrix. It cannot
+         just stack like the label/value tables: drop the header row on a narrow screen
+         and each row becomes two bare numbers with nothing saying what they measure.
+         Every cell carries its own column name instead, which the mobile rule reveals. */
+      const versus = el('table', 'stack-sm stack-sm--matrix');
+      const KY = 'kỳ đã chấm', TR = 'trúng / kỳ';
+      versus.innerHTML = `<thead><tr><th></th><th class="num">${KY}</th>
+        <th class="num">${TR}</th></tr></thead><tbody>
+        <tr><th>Số tử vi của con</th>
+            <td class="num" data-label="${KY}">${mine.scored}</td>
+            <td class="num" data-label="${TR}">${mine.scored ? mine.hitsPerDraw.toFixed(3) : '—'}</td></tr>
+        <tr><th>Oracle nhà cái</th>
+            <td class="num" data-label="${KY}">${score.draws_scored}</td>
+            <td class="num" data-label="${TR}">${score.draws_scored ? score.hits_per_draw_actual : '—'}</td></tr>
+        <tr><th>Ngẫu nhiên thuần</th>
+            <td class="num" data-label="${KY}">∞</td>
+            <td class="num" data-label="${TR}">${mine.expected.toFixed(3)}</td></tr>
       </tbody>`;
       block.appendChild(el('p', 'note', 'So kè'));
       block.appendChild(versus);
@@ -270,7 +322,7 @@ function stageSoNo(data, fortune) {
 function chiSquareTable(chi, label) {
   const block = el('div', 'block');
   block.appendChild(el('h3', 'block__head', label));
-  const table = el('table');
+  const table = el('table', 'stack-sm');
   table.innerHTML = `<tbody>
     <tr><th>lượt số quan sát</th><td class="num">${chi.observations.toLocaleString('vi-VN')}</td></tr>
     <tr><th>chi-square</th><td class="num">${chi.statistic}</td></tr>
@@ -282,26 +334,49 @@ function chiSquareTable(chi, label) {
   return block;
 }
 
+/**
+ * Tappable heatmap. `title` tooltips do not exist on touch, so every cell is a button
+ * that writes into a live readout — otherwise the frequency data is desktop-only.
+ */
 function heatmap(freq, pool, offset = 1) {
-  const wrap = el('div', 'heat');
+  const box = el('div');
+  const matrix = pool === 100; // 00..99 is a natural 10x10 grid, easier to read than auto-fill
+  const wrap = el('div', 'heat ' + (matrix ? 'heat--matrix' : 'heat--pool'));
+  wrap.setAttribute('role', 'group');
+  wrap.setAttribute('aria-label', 'Tần suất từng số, bấm để xem');
+
   const values = Object.values(freq).map(Number);
   const lo = Math.min(...values);
   const hi = Math.max(...values);
+  const readout = el('p', 'heat__readout', 'Bấm một số để xem tần suất.');
+  readout.setAttribute('role', 'status');
+  readout.setAttribute('aria-live', 'polite');
+
   for (let i = 0; i < pool; i++) {
-    const key = String(i + offset);
-    const count = Number(freq[key] ?? freq[pad(i + offset)] ?? 0);
+    const n = i + offset;
+    const count = Number(freq[String(n)] ?? freq[pad(n)] ?? 0);
     // Deliberately gentle: a strong gradient would imply the spread means something.
     const t = hi === lo ? 0.5 : (count - lo) / (hi - lo);
-    const cell = el('div', 'cell', pad(i + offset));
+    const cell = el('button', 'cell', pad(n));
+    cell.type = 'button';
     cell.style.opacity = String(0.45 + 0.55 * t);
-    cell.title = `số ${i + offset}: ra ${count} lần`;
+    cell.setAttribute('aria-label', `Số ${pad(n)}, ra ${count} lần`);
+    cell.setAttribute('aria-pressed', 'false');
+    cell.addEventListener('click', () => {
+      wrap.querySelectorAll('[aria-pressed="true"]')
+        .forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      cell.setAttribute('aria-pressed', 'true');
+      readout.textContent = `Số ${pad(n)} đã ra ${count} lần.`;
+    });
     wrap.appendChild(cell);
   }
-  return wrap;
+  box.appendChild(wrap);
+  box.appendChild(readout);
+  return box;
 }
 
 function stageSuThat(data) {
-  const section = stage('04', 'Sự thật',
+  const section = stage('04', `${tw('1f4ca','📊')} Sự thật`,
     'Phần này thầy không được nói. Đây là số liệu, và số liệu không nể ai.');
 
   data.games.forEach((game) => {
@@ -378,6 +453,7 @@ function render(data) {
   app.appendChild(stageSuThat(data));
 
   observeReveals();
+  observeFlips();
 }
 
 function observeReveals() {
@@ -395,6 +471,22 @@ function observeReveals() {
     });
   }, { rootMargin: '0px 0px -8% 0px' });
   targets.forEach((t) => io.observe(t));
+}
+
+/**
+ * Pause the looping figure whenever it scrolls out of view.
+ *
+ * This is the condition attached to having a looping animation at all: one that only
+ * runs while somebody is looking costs almost nothing, one that never stops costs
+ * battery on the phones this page was just tuned for.
+ */
+function observeFlips() {
+  const flips = document.querySelectorAll('.thay--flip');
+  if (!('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => e.target.classList.toggle('is-paused', !e.isIntersecting));
+  }, { threshold: 0 });
+  flips.forEach((f) => { f.classList.add('is-paused'); io.observe(f); });
 }
 
 T.initThemeControls();

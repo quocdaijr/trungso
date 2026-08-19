@@ -211,9 +211,28 @@ and **not one source** rejects the randomness hypothesis. Any number that looks 
 - **Mega 6/45** — 18:00 Wed / Fri / Sun
 - **XSMB** — 18:15 daily
 
+## Image assets
+
+Everything is **self-hosted in the repository** — the page makes no outbound request for an
+image or an emoji. Per-file provenance, download dates, and the list of sources that were
+considered and rejected are in [`site/img/CREDITS.md`](site/img/CREDITS.md).
+
+| Asset | Source | Licence |
+|---|---|---|
+| Đông Hồ woodblock print *Đại Cát* | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dong_Ho_painting_-_Dai_cat.jpg) | Public domain |
+| 13 emoji | [jdecked/twemoji](https://github.com/jdecked/twemoji) — © Twitter/X | graphics **CC-BY 4.0**, code MIT |
+| Fortune-teller figures (7 poses) | drawn by hand in this repo, `site/thay.js` | MIT, same repo |
+
+This repository is MIT, which means anyone who clones it is granted the right to redistribute
+it. So it cannot contain anything it does not own: copyrighted meme characters, film stills,
+and images taken from social media were all ruled out — not because they were hard to find,
+but because there was no licence. **OpenMoji** was ruled out too: it is CC-BY-**SA**, and
+copyleft conflicts with MIT.
+
 ## Licence & disclaimer
 
-[MIT](LICENSE) — the software is provided **AS IS**, without warranty of any kind.
+[MIT](LICENSE) — the software is provided **AS IS**, without warranty of any kind. The MIT
+grant covers the **code**; third-party assets keep their own licences, listed above.
 
 Full disclaimer (bilingual): [**DISCLAIMER.md**](DISCLAIMER.md)
 
