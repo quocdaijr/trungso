@@ -1,0 +1,175 @@
+# ⚠️ Miễn trừ trách nhiệm · Disclaimer
+
+*🇻🇳 Tiếng Việt bên dưới · 🇬🇧 [English below](#english)*
+
+---
+
+## 🇻🇳 Tiếng Việt
+
+> **Trang này không dự đoán được xổ số. Không phần mềm nào làm được.**
+> Đây là một thí nghiệm đốt token AI. Mọi con số ở đây là ngẫu nhiên, và trang tự công khai
+> chứng minh điều đó.
+
+### 1. Không dự đoán được, và không thể dự đoán được
+
+Xổ số là **biến cố độc lập**: mỗi kỳ quay reset về 0. Không có "số nóng", không có "số lạnh",
+không có momentum, không có cầu để soi. Kỳ vọng toán học **luôn âm**.
+
+Đây không phải ý kiến — repo này tự đo và tự công bố bằng chứng chống lại chính nó. Kiểm định
+chi-square trên **12.578 kỳ quay · 231.201 lượt số**, 5 xổ số, 2 quốc gia:
+
+| Nguồn | p-value | Bác bỏ tính ngẫu nhiên? |
+|---|---:|---|
+| Power 6/55 | 0,5343 | không |
+| Mega 6/45 | 0,8982 | không |
+| Powerball (US) | 0,1731 | không |
+| Mega Millions (US) | 0,7671 | không |
+| XSMB Miền Bắc | 0,3391 | không |
+
+**Không một nguồn nào** bác bỏ được giả thuyết "mọi số đồng xác suất". ROI kỳ vọng của lối
+chơi bao 12: **−71,6%** (jackpot ở mức sàn) tới **−86,3%** (bỏ jackpot).
+
+### 2. Không phải tư vấn tài chính hay đầu tư
+
+Không có gì trong repo hay trên trang là lời khuyên tài chính, đầu tư, pháp lý hay bất kỳ
+dạng tư vấn chuyên môn nào.
+
+### 3. Không bán gì
+
+Không thu tiền. Không tài khoản. Không thanh toán. Không quảng cáo. Không affiliate. Không
+thu thập dữ liệu cá nhân — ngày sinh nhập vào chỉ nằm trong trình duyệt của bạn.
+
+### 4. Không tổ chức, không môi giới, không tiếp thị cờ bạc
+
+Repo này **không** bán số, **không** nhận cược, **không** liên kết với bất kỳ nhà cái hay
+đại lý nào, và **không** khuyến khích ai đặt cược. Bảng Phong Thần mặc định là *paper-trading*
+— tiền trên giấy, không phải tiền thật.
+
+### 5. Không liên quan tới Vietlott
+
+Dự án này **không liên kết, không được tài trợ, không được uỷ quyền** bởi Công ty Xổ số Điện
+toán Việt Nam (Vietlott) hay bất kỳ đơn vị xổ số nào khác. Tên sản phẩm ("Power 6/55",
+"Mega 6/45", "Vietlott") chỉ được nhắc tới để **tham chiếu**, và thuộc về chủ sở hữu của chúng.
+
+### 6. Dữ liệu từ bên thứ ba, có thể sai
+
+Kết quả lấy từ các mirror cộng đồng trên GitHub, không phải nguồn chính thức. Chúng có thể
+**sai, thiếu, hoặc chậm** — repo này đã từng ghi nhận mirror bỏ sót nguyên một kỳ quay
+(Mega 6/45 kỳ #01550, Chủ nhật 16/08/2026).
+
+**Cần số chính xác thì tra [vietlott.vn](https://vietlott.vn).** Không dùng trang này để đối
+chiếu vé.
+
+### 7. 18+
+
+Vietlott yêu cầu người chơi đủ **18 tuổi**. Trang này không dành cho người dưới 18.
+
+### 8. Tự chịu rủi ro
+
+Phần mềm được cung cấp **NGUYÊN TRẠNG (AS IS)**, không bảo đảm dưới bất kỳ hình thức nào —
+xem [LICENSE](LICENSE). Mọi quyết định và mọi tổn thất tài chính là **của riêng bạn**. Tác giả
+không chịu trách nhiệm với bất kỳ thiệt hại nào phát sinh từ việc dùng hay không dùng phần
+mềm này.
+
+### 9. Nếu cờ bạc đang là vấn đề của bạn
+
+Phải nói thật: **Việt Nam hiện không có đường dây nóng riêng cho nghiện cờ bạc.**
+
+Nguồn miễn phí có thật gần nhất là [**Đường dây nóng Ngày Mai**](https://duongdaynongngaymai.vn/hotline/)
+— **096.306.1414**, 13:00–20:30 các ngày Thứ 4 đến Chủ nhật. Nhưng cần rõ: đây là dịch vụ
+**sơ cứu và hỗ trợ tâm lý** cho người khủng hoảng tinh thần, đặc biệt là trầm cảm — trang của
+họ **không đề cập tới cờ bạc**. Gọi khi bạn cần một người lắng nghe, không phán xét.
+
+Quốc tế: [Gamblers Anonymous](https://www.gamblersanonymous.org/) có danh sách nhóm hỗ trợ
+theo quốc gia.
+
+Nếu bạn đang nghĩ tới việc tự làm hại mình, hãy tìm hỗ trợ y tế khẩn cấp ngay.
+
+---
+
+<a name="english"></a>
+
+## 🇬🇧 English
+
+> **This site cannot predict lottery numbers. No software can.**
+> It is an AI-token-burning experiment. Every number here is random, and the site publishes
+> the proof against itself.
+
+### 1. It cannot predict, and it never could
+
+Lottery draws are **independent events**: every draw resets to zero. There are no "hot"
+numbers, no "cold" numbers, no momentum, no patterns to read. Expected value is **always
+negative**.
+
+This is not an opinion — the repo measures itself and publishes the evidence against itself.
+Chi-square tests across **12,578 draws · 231,201 number observations**, five lotteries, two
+countries:
+
+| Source | p-value | Rejects randomness? |
+|---|---:|---|
+| Power 6/55 | 0.5343 | no |
+| Mega 6/45 | 0.8982 | no |
+| Powerball (US) | 0.1731 | no |
+| Mega Millions (US) | 0.7671 | no |
+| XSMB (Northern Vietnam) | 0.3391 | no |
+
+**Not one source** rejects the hypothesis that every number is equally likely. Expected ROI
+for the wheel-12 bet: **−71.6%** (jackpot at its published floor) to **−86.3%** (jackpot
+excluded).
+
+### 2. Not financial or investment advice
+
+Nothing in this repository or on the site is financial, investment, legal, or any other kind
+of professional advice.
+
+### 3. Nothing is for sale
+
+No payments. No accounts. No checkout. No ads. No affiliate links. No personal data
+collection — a birth date entered on the site never leaves your browser.
+
+### 4. Does not organise, broker, or promote gambling
+
+This project does **not** sell numbers, does **not** accept bets, is **not** affiliated with
+any bookmaker or agent, and does **not** encourage anyone to gamble. The scoreboard is
+*paper-trading* by default — imaginary money, not real stakes.
+
+### 5. Not affiliated with Vietlott
+
+This project is **not affiliated with, sponsored by, or endorsed by** Vietlott (Vietnam
+Lottery Company) or any other lottery operator. Product names ("Power 6/55", "Mega 6/45",
+"Vietlott") are used **for reference only** and belong to their respective owners.
+
+### 6. Third-party data, which can be wrong
+
+Results come from community-maintained GitHub mirrors, not official feeds. They can be
+**wrong, incomplete, or stale** — this repo has already caught a mirror silently missing an
+entire draw (Mega 6/45 draw #01550, Sunday 2026-08-16).
+
+**For authoritative results, check [vietlott.vn](https://vietlott.vn).** Do not use this site
+to verify a ticket.
+
+### 7. 18+
+
+Vietlott requires players to be **18 or older**. This site is not intended for minors.
+
+### 8. Use at your own risk
+
+The software is provided **AS IS**, without warranty of any kind — see [LICENSE](LICENSE).
+Every decision and every financial loss is **yours alone**. The author accepts no liability
+for any damages arising from the use, or inability to use, this software.
+
+### 9. If gambling has become a problem
+
+An honest note: **Vietnam currently has no dedicated gambling-addiction helpline.**
+
+The nearest real free resource is the [**Ngày Mai hotline**](https://duongdaynongngaymai.vn/hotline/)
+— **+84 96 306 1414**, 13:00–20:30 Wednesday to Sunday (Vietnam time). To be precise: it is a
+**psychological first-aid** service for people in emotional crisis, particularly depression —
+their site **does not mention gambling**. Call it when you need someone to listen without
+judgement.
+
+International: [Gamblers Anonymous](https://www.gamblersanonymous.org/) lists support groups
+by country.
+
+If you are having thoughts of harming yourself, please seek emergency medical help
+immediately.

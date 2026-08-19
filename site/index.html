@@ -40,9 +40,51 @@ body{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* ---------------- warning: always-on strip + first-visit gate ---------------- */
+/* The strip and the nav share one sticky wrapper. Making the nav sticky on its own
+   would let it slide under the strip on scroll. */
+.topbar{position:sticky; top:0; z-index:100}
+.warnstrip{
+  background:var(--color-accent-2); color:var(--color-on-accent-2);
+  font-size:var(--text-xs); font-weight:700; line-height:1.35;
+  padding:var(--space-2xs) var(--space-md);
+  border-bottom:var(--rule-mid) solid var(--color-rule);
+  text-align:center; overflow-wrap:anywhere;
+}
+.warnstrip a{color:var(--color-on-accent-2); text-decoration:underline}
+
+html.is-gated,html.is-gated body{overflow:hidden}
+.gate{
+  position:fixed; inset:0; z-index:1000; display:grid; place-items:center;
+  padding:var(--space-md); background:var(--color-paper);
+  overflow-y:auto;
+}
+.gate__panel{
+  max-width:60ch; width:100%;
+  background:var(--color-paper-2); color:var(--color-ink);
+  border:var(--rule-slab) solid var(--color-rule); border-radius:var(--radius);
+  padding:var(--space-lg) var(--space-md);
+}
+.gate__eyebrow{
+  font-family:var(--font-num); font-size:var(--text-xs); font-weight:700;
+  letter-spacing:.16em; margin:0 0 var(--space-sm);
+  background:var(--color-accent-2); color:var(--color-on-accent-2);
+  display:inline-block; padding:var(--space-2xs) var(--space-xs);
+}
+.gate__title{
+  font-family:var(--font-display); font-weight:400; font-style:normal;
+  font-size:var(--text-xl); line-height:1.2; margin:0 0 var(--space-sm);
+  overflow-wrap:anywhere; min-width:0;
+}
+.gate__lede{margin:0 0 var(--space-sm); color:var(--color-ink)}
+.gate__list{margin:0 0 var(--space-md); padding-left:1.1em; color:var(--color-ink-dim);
+  font-size:var(--text-sm)}
+.gate__list li{margin-bottom:var(--space-2xs)}
+.gate__actions{display:flex; flex-wrap:wrap; gap:var(--space-sm); align-items:center}
+.gate__more{color:var(--color-ink-dim); font-size:var(--text-sm)}
+
 /* ---------------- nav: N7 brutal slab ---------------- */
 .slab{
-  position:sticky; top:0; z-index:100;
   display:flex; flex-wrap:wrap; gap:var(--space-sm);
   align-items:center; justify-content:space-between;
   padding:var(--space-sm) var(--space-md);
@@ -247,6 +289,11 @@ form.khai input:focus-visible,form.khai select:focus-visible,
 <body id="top">
 <div class="grain" aria-hidden="true"></div>
 
+<div class="topbar">
+<p class="warnstrip">
+  ⚠ Trò đùa — trang này <b>không dự đoán được xổ số</b>. Mọi số là ngẫu nhiên. 18+ ·
+  <a href="https://github.com/quocdaijr/trungso/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">miễn trừ trách nhiệm</a>
+</p>
 <nav class="slab">
   <a class="slab__mark" href="#top">trungso</a>
   <div class="slab__themes" role="radiogroup" aria-label="Chọn bộ da">
@@ -256,6 +303,7 @@ form.khai input:focus-visible,form.khai select:focus-visible,
     <button class="stamp" role="radio" type="button" data-set-theme="y2k" aria-checked="false"><span class="stamp__full">Y2K</span><span class="stamp__short">Y</span></button>
   </div>
 </nav>
+</div>
 
 <header class="wrap masthead">
   <h1 class="masthead__title">Thầy phán số,<br>toán học phán thầy</h1>
@@ -266,6 +314,11 @@ form.khai input:focus-visible,form.khai select:focus-visible,
     <b>Đọc trước:</b> xổ số là biến cố độc lập — mỗi kỳ quay reset về 0, không có số nóng,
     không có số lạnh. Trang này <b>không dự đoán được gì</b>. Nó chỉ tự tin quá mức rồi tự
     chấm điểm độ sai của mình. Tiền ở đây là <b>tiền giấy</b>.
+    <br><br>
+    Không bán gì · không liên quan Vietlott · dữ liệu từ mirror bên thứ ba có thể sai
+    (cần chính xác thì tra <a href="https://vietlott.vn" target="_blank" rel="noopener">vietlott.vn</a>) ·
+    18+ · tự chịu rủi ro ·
+    <a href="https://github.com/quocdaijr/trungso/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">bản miễn trừ đầy đủ</a>
   </p>
 </header>
 
@@ -283,6 +336,7 @@ form.khai input:focus-visible,form.khai select:focus-visible,
   </p>
 </footer>
 
+<script src="./warning.js"></script>
 <script src="./theme.js"></script>
 <script src="./personal.js"></script>
 <script src="./render.js"></script>

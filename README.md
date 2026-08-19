@@ -1,18 +1,53 @@
-# 🔮 trungso — Máy Tiên Tri Xổ Số Tự Vả Mặt
+# 🔮 trungso
 
-> ## ⚠️ ĐỌC CÁI NÀY TRƯỚC
->
-> **Xổ số là biến cố độc lập.** Mỗi kỳ quay reset về 0. Không có "số nóng", không có
-> "số lạnh", không có momentum, không có cầu để soi. Kỳ vọng toán học luôn **âm**.
->
-> **Phần mềm này không dự đoán được xổ số.** Không có phần mềm nào làm được. Nó là một
-> cái máy tự tin quá mức, có biểu đồ đẹp, và tự công khai chấm điểm độ sai của chính nó.
->
-> Nó **không** khuyến khích anh đánh tiền thật. Bảng Phong Thần mặc định là **paper-trading**
-> — đốt tiền trên giấy.
+*Thầy phán số, toán học phán thầy.*
 
-Một pet project cho vui: cóp nhặt kết quả xổ số nhiều nguồn, rồi phun ra 12 con số
-để đánh Vietlott bao 12 — kèm một bảng điểm công khai chứng minh nó sai tới mức nào.
+[![Oracle](https://github.com/quocdaijr/trungso/actions/workflows/oracle.yml/badge.svg)](https://github.com/quocdaijr/trungso/actions/workflows/oracle.yml)
+[![CI](https://github.com/quocdaijr/trungso/actions/workflows/ci.yml/badge.svg)](https://github.com/quocdaijr/trungso/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
+[![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
+[![tests](https://img.shields.io/badge/tests-459%20passing-brightgreen.svg)](tests/)
+[![draws analysed](https://img.shields.io/badge/draws%20analysed-12%2C578-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
+[![chi-square](https://img.shields.io/badge/chi²%20p--value-0.53%20→%20random-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
+[![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
+[![expected ROI](https://img.shields.io/badge/expected%20ROI-−86%25-critical.svg)](DISCLAIMER.md)
+[![status](https://img.shields.io/badge/status-satire-ff69b4.svg)](DISCLAIMER.md)
+
+**🇬🇧 English → [README.en.md](README.en.md)**
+
+---
+
+> ## ⚠️ ĐỌC CÂU NÀY TRƯỚC
+>
+> ### Trang này không dự đoán được xổ số. Không phần mềm nào làm được.
+>
+> Đây là một **thí nghiệm đốt token AI**. Mọi con số ở đây là ngẫu nhiên, và trang tự công
+> khai chứng minh điều đó bằng chi-square trên 12.578 kỳ quay.
+>
+> - **Không bán gì** — không thu tiền, không tài khoản, không quảng cáo
+> - **Không liên quan Vietlott** — không liên kết, không tài trợ, không uỷ quyền
+> - **Dữ liệu từ mirror bên thứ ba**, có thể sai hoặc thiếu — cần chính xác thì tra [vietlott.vn](https://vietlott.vn)
+> - **18+**
+> - **Tự chịu rủi ro** — phần mềm cung cấp NGUYÊN TRẠNG, mọi tổn thất là của riêng bạn
+>
+> 📄 Đầy đủ: [**DISCLAIMER.md**](DISCLAIMER.md)
+
+---
+
+## Vì sao repo này tồn tại
+
+Nói thật: **để số token AI đã đốt không đi đâu mất.**
+
+Đây là sản phẩm phụ của một cuộc thí nghiệm code bằng AI. Thay vì để hàng triệu token trôi
+vào hư không, chúng biến thành một thứ chạy được, có test, và tự giễu chính nó.
+
+Giá trị thật duy nhất của repo nằm ở **Tầng Thật** — phần thống kê chứng minh xổ số là ngẫu
+nhiên, trên dữ liệu thật của 5 xổ số và 2 quốc gia. Phần còn lại là một ông thầy bói vỉa hè
+bằng code.
+
+Nếu anh vào đây tìm số để đánh: số ở đây ngẫu nhiên đúng bằng số anh tự bốc. Khác biệt duy
+nhất là trang này **thừa nhận điều đó**.
 
 ## Hai tầng
 
@@ -129,6 +164,17 @@ nguồn nào** bác bỏ được giả thuyết ngẫu nhiên. Con số nào tr
 - **Mega 6/45** — 18h thứ 4, thứ 6, chủ nhật
 - **XSMB** — 18h15 hàng ngày
 
-## Giấy phép
+## Giấy phép & miễn trừ trách nhiệm
 
-MIT. Nếu anh dùng cái này để đánh xổ số và thua, đó là quyết định của anh, không phải của repo.
+[MIT](LICENSE) — phần mềm cung cấp **NGUYÊN TRẠNG**, không bảo đảm dưới bất kỳ hình thức nào.
+
+Bản miễn trừ đầy đủ (song ngữ): [**DISCLAIMER.md**](DISCLAIMER.md)
+
+Nếu anh dùng cái này để đánh xổ số và thua, đó là quyết định của anh, không phải của repo.
+
+### Nếu cờ bạc đang là vấn đề
+
+Việt Nam **không có** đường dây nóng riêng cho nghiện cờ bạc. Nguồn miễn phí có thật gần nhất
+là [Đường dây nóng Ngày Mai](https://duongdaynongngaymai.vn/hotline/) — **096.306.1414**,
+13:00–20:30 T4–CN. Đó là hỗ trợ **khủng hoảng tâm lý**, không phải chuyên về cờ bạc, nhưng họ
+lắng nghe và không phán xét.
