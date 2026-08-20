@@ -178,6 +178,17 @@ Con số thật, đã tính bằng code chứ không nhẩm: bao 12 Mega 6/45 tr
 trúng 5 số lãi **+102,76 tr**. Chỗ ROI −71,57% đến từ việc trúng 4 trở lên chỉ khoảng
 **1 trên 28 kỳ**.
 
+**Về tay** (take-home) — Tiền thật đến tay người trúng, sau khi trừ 10% thuế trúng thưởng
+trên **phần vượt** 10 triệu. Công bố 34,9 tỷ → về tay 31,41 tỷ. Trang **bắt buộc** in cả hai:
+nêu con số gộp rồi im về phần bị trừ đúng là cách mấy trang lừa đảo làm.
+
+**Nhận trọn** — Giải ≤ 10 triệu, thuế bằng 0. Giải Nhất của Mega đúng 10.000.000đ nên là giải
+**nhận trọn cao nhất**, dù Giải Nhất của Power to gấp 4 lần. Khác hoàn toàn với "về tay nhiều
+nhất", vốn luôn là jackpot.
+
+**Chưa mô hình hoá** (`tax.py` ghi rõ) — Vé bao tính là 1 vé hay 924 vé cho luật thuế-theo-vé,
+và jackpot chia cho nhiều người trúng. Không biết thì phải nói không biết, không được đoán.
+
 ## Từ tránh dùng
 
 - **"số nóng" / "số lạnh" / "cầu" / "soi cầu"** — chỉ dùng khi đang trích dẫn để bóc phốt,
@@ -193,6 +204,8 @@ trúng 5 số lãi **+102,76 tr**. Chỗ ROI −71,57% đến từ việc trúng
 - **"đăng ký" / "tài khoản" / "thu thập dữ liệu người dùng"** — không tồn tại trong project
   này và sẽ không tồn tại. Cá nhân hoá đạt được **không cần** lưu gì của ai.
 - **"chắc chắn trúng" / "số chuẩn" / "cam kết"** — thầy bựa tới đâu cũng dừng trước câu này.
+- **"giải X tỷ"** đứng một mình — nêu số công bố thì phải nêu số về tay. Thiếu một nửa
+  là quảng cáo, không phải số liệu.
 - **"giải đang X tỷ"** — trang không biết con số đó. Nó biết nồi của kỳ đã quay,
   nên chỉ được nói **"ít nhất X"** khi cộng dồn, và phải kèm số kỳ.
 - **"em"** khi oracle nói — oracle xưng **thầy**, gọi **con**. Không phải trợ lý.

@@ -66,6 +66,13 @@ function jackpotLine(game) {
   }
 
   const node = el('p', 'note jackpot', text);
+  // The announced pot is the number people repeat; the take-home is the number they get.
+  // Printing the first without the second is how a lottery advert reads, so both go in.
+  if (p.top_jackpot_take_home_vnd && p.top_jackpot_tax_vnd) {
+    node.appendChild(el('span', 'jackpot__net',
+      `Về tay <b>${billions(p.top_jackpot_take_home_vnd)}</b> — thuế trúng thưởng `
+      + `giữ lại ${billions(p.top_jackpot_tax_vnd)} (10% phần vượt 10 triệu).`));
+  }
   // The ratio is arithmetic, not theatre, so it says itself plainly.
   const odds = Math.round(1 / (game.wheel.combinations / totalCombos(game)));
   node.appendChild(el('span', 'jackpot__odds',

@@ -12,7 +12,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from . import astrology, scoreboard, stats, store, wheel
+from . import astrology, scoreboard, stats, store, tax, wheel
 from .games import PROPHECY_GAMES, GameSpec
 from .models import Draw, Prophecy, utc_now
 from .sources import xsmb
@@ -46,10 +46,15 @@ def _prizes_payload(spec: GameSpec, draws: Sequence[Draw]) -> dict[str, Any] | N
     if not stored:
         return None
     latest_id = draws[-1].draw_id if draws else None
+    top = int(stored.get("top_jackpot_vnd") or 0)
     return {
         **stored,
         "matches_latest_draw": bool(latest_id and stored.get("draw_id") == latest_id),
         "latest_draw_id": latest_id,
+        # The announced figure is not what a winner receives. Printing one without the
+        # other is the shape of an advert, and this page is not one.
+        "top_jackpot_tax_vnd": tax.withheld_vnd(top),
+        "top_jackpot_take_home_vnd": tax.take_home_vnd(top),
     }
 
 
