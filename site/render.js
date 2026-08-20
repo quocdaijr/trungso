@@ -75,6 +75,46 @@ function jackpotLine(game) {
 }
 
 /**
+ * Six numbers, for the ticket most people actually buy.
+ *
+ * "Cách chơi: Cơ bản" in the Vietlott app is one row of six at 10,000d. Bao 12 is a real
+ * product - Vietlott sells eleven bao sizes - but the page was handing over twelve numbers
+ * for a six-number slip and leaving the reader to guess which six, which is not an answer.
+ *
+ * The split is the honest part. A typical field boosts three of the twelve and leaves the
+ * other nine at exactly the same weight, so only the first `basic_reasoned` of these six
+ * were chosen for a reason; the rest come out of a tie. Saying so is the point - a page
+ * that presented all six as conviction would be inventing a ranking that does not exist.
+ */
+function basicPick(p) {
+  if (!p.basic_pick || !p.basic_pick.length) return null;
+
+  const block = el('div', 'basic');
+  block.appendChild(el('p', 'basic__head', 'Chỉ mua một vé Cơ bản? Sáu số này.'));
+  block.appendChild(ballRow(p.basic_pick, null));
+
+  const reasoned = p.basic_reasoned || 0;
+  const rest = p.basic_pick.length - reasoned;
+  const ordered = (p.ranked || []).slice(0, p.basic_pick.length);
+  const withReason = ordered.slice(0, reasoned).map(pad).join(' ');
+
+  let text;
+  if (reasoned === 0) {
+    text = 'Kỳ này không số nào có lý do riêng. Cả sáu thầy bốc — thầy nói thẳng.';
+  } else if (rest === 0) {
+    text = 'Cả sáu số đều có lý do riêng. Hiếm lắm.';
+  } else {
+    text = `Có lý do riêng: <b>${withReason}</b>. `
+      + `${rest} số còn lại cùng một mức, thầy bốc cho đủ sáu — thầy nói thẳng.`;
+  }
+  block.appendChild(el('p', 'basic__note', text));
+  block.appendChild(el('p', 'note',
+    `Vé Cơ bản = 6 số = <b>${vnd(10000)}</b>. Bao 12 ở trên = 924 tổ hợp = `
+    + `<b>${vnd(9240000)}</b>. Cùng một bộ số, hai cách mua.`));
+  return block;
+}
+
+/**
  * "So what do I get if it comes in tonight?"
  *
  * The next draw's estimated pot is not published anywhere a plain request can reach, but
@@ -91,7 +131,13 @@ function payoutTable(game) {
   if (!rows || !rows.length) return null;
 
   const table = el('table', 'stack-sm stack-sm--matrix');
-  const H = ['1 trên', 'thực nhận', 'lãi/lỗ'];
+  /* "tiền thưởng", not "thực nhận". Vietnam withholds 10% of whatever a prize exceeds
+     10 million dong, so take-home is lower than the announced figure - Mega's four-hit
+     row alone grosses 15.12 million. The column used to say "thực nhận" while showing the
+     gross, which is the one thing this page must never do. Naming it gross costs nothing;
+     computing net would mean guessing whether a bao ticket counts as one vé or 924 for
+     tax, and that is not a number to invent. */
+  const H = ['1 trên', 'tiền thưởng', 'lãi/lỗ (gộp)'];
   table.innerHTML = '<thead><tr><th>trúng</th>'
     + H.map((h) => `<th class="num">${h}</th>`).join('') + '</tr></thead><tbody>'
     + rows.map((r) => {
@@ -267,12 +313,17 @@ function stagePhan(data, profile, fortune) {
       house.appendChild(ballRow(p.numbers, null));
       house.appendChild(el('p', 'note',
         `bao 12 = ${game.wheel.combinations} tổ hợp = <b>${vnd(game.wheel.cost_vnd)}</b>`));
+      const basic = basicPick(p);
+      if (basic) house.appendChild(basic);
       const jackpot = jackpotLine(game);
       if (jackpot) house.appendChild(jackpot);
       const payout = payoutTable(game);
       if (payout) {
         house.appendChild(el('p', 'note', 'Hôm nay trúng thì thực nhận bao nhiêu:'));
         house.appendChild(payout);
+        house.appendChild(el('p', 'note',
+          'Số gộp, chưa trừ thuế. Trúng thưởng bị 10% trên phần vượt 10 triệu, '
+          + 'nên trên 10 triệu là về tay ít hơn con số ghi ở đây.'));
         const six = game.payout_if_hit[game.payout_if_hit.length - 1];
         if (!six.uses_live_jackpot) {
           house.appendChild(el('p', 'note',

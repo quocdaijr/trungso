@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import random
 from datetime import date
 
 import pytest
@@ -220,3 +221,105 @@ def test_a_root_of_one_does_not_boost_every_number():
 def test_digit_root_rule_selects_a_proper_subset(root):
     selected = [n for n in POWER655.numbers if oracle.digit_root(n) == root]
     assert 0 < len(selected) < POWER655.pool
+
+
+# ------------------------------------------------- the basic ticket: six numbers, not twelve
+
+
+def test_rank_numbers_puts_the_boosted_ones_first(loud_signals):
+    field = oracle.cursed_weights(POWER655, loud_signals)
+    numbers = tuple(sorted(field.weights, key=lambda n: (-field.weights[n], n))[:12])
+
+    ordered, reasoned = oracle.rank_numbers(numbers, field, random.Random(7))
+
+    assert set(ordered) == set(numbers), "ranking must be a permutation, not a filter"
+    weights = [field.weights[n] for n in ordered]
+    assert weights == sorted(weights, reverse=True)
+    assert all(field.weights[n] > 1.0 for n in ordered[:reasoned])
+
+
+def test_reasoned_count_stops_where_the_tie_starts(quiet_signals):
+    """The honest half of this feature. Most of the wheel sits at exactly 1.0, so any
+    order past that point is a tie broken by number - arbitrary, not conviction. The
+    count is what stops a caller presenting the tail as though the oracle meant it."""
+    field = oracle.cursed_weights(MEGA645, quiet_signals)
+    numbers = tuple(range(1, 13))
+
+    _ordered, reasoned = oracle.rank_numbers(numbers, field, random.Random(7))
+
+    assert reasoned == sum(1 for n in numbers if field.weights[n] > 1.0)
+    assert reasoned < len(numbers), "if everything were boosted the count would be meaningless"
+
+
+def test_rank_numbers_is_deterministic():
+    field = oracle.cursed_weights(MEGA645, CosmicSignals(
+        btc_usd=64_213, hanoi_temp_c=38, lunar_day=26, lunar_month=6,
+        zodiac="Ngọ", day_can_chi="Giáp Tý"))
+    numbers = tuple(range(1, 13))
+
+    assert (oracle.rank_numbers(numbers, field, random.Random(7))
+            == oracle.rank_numbers(numbers, field, random.Random(7)))
+
+
+def test_the_basic_pick_is_not_skewed_toward_low_numbers():
+    """This test exists because the first implementation failed it. Breaking weight ties
+    by ascending number made the six-number pick average 20.79 against the wheel's 28.52
+    over 300 draws - a 7.7 skew toward low numbers invented entirely by the tie-break.
+    Shipping a spurious pattern is the exact thing this project mocks."""
+    import statistics
+    from datetime import timedelta
+
+    basic, wheel = [], []
+    for i in range(200):
+        signals = CosmicSignals(
+            btc_usd=60_000 + i * 37, hanoi_temp_c=25 + i % 14,
+            lunar_day=1 + i % 30, lunar_month=1 + i % 12,
+            zodiac="Ngọ", day_can_chi="Giáp Tý",
+        )
+        p = oracle.prophesy(
+            POWER655, str(2000 + i), date(2026, 1, 1) + timedelta(days=i), signals
+        )
+        wheel.append(statistics.mean(p.numbers))
+        basic.append(statistics.mean(p.basic_pick))
+
+    drift = statistics.mean(basic) - statistics.mean(wheel)
+    assert abs(drift) < 2.0, f"basic pick drifts {drift:+.2f} from the wheel it came from"
+
+
+def test_ties_are_broken_by_the_seed_so_the_order_is_still_reproducible(quiet_signals):
+    """Unbiased, but not random per render: the same prophecy must rank the same way
+    forever, because it is committed before the draw like everything else here."""
+    first = oracle.prophesy(MEGA645, "01700", date(2026, 10, 1), quiet_signals)
+    again = oracle.prophesy(MEGA645, "01700", date(2026, 10, 1), quiet_signals)
+
+    assert first.ranked == again.ranked
+    assert first.basic_pick == again.basic_pick
+
+
+def test_prophecy_records_the_ranking_and_the_reasoned_count(loud_signals):
+    prophecy = oracle.prophesy(
+        MEGA645, "01600", date(2026, 9, 1), loud_signals
+    )
+
+    assert sorted(prophecy.ranked) == sorted(prophecy.numbers)
+    assert 0 <= prophecy.reasoned <= len(prophecy.numbers)
+    assert prophecy.basic_pick == tuple(sorted(prophecy.ranked[:6]))
+    assert len(prophecy.basic_pick) == 6, "a plain Vietlott ticket is six numbers"
+
+
+def test_basic_pick_is_a_subset_of_the_wheel(loud_signals):
+    """Whatever six the page shows, they must be six of the twelve it committed - not a
+    fresh draw. Otherwise the basic ticket and the wheel are two different prophecies."""
+    prophecy = oracle.prophesy(MEGA645, "01601", date(2026, 9, 3), loud_signals)
+
+    assert set(prophecy.basic_pick) <= set(prophecy.numbers)
+
+
+def test_the_numbers_themselves_did_not_change_when_ranking_was_added(loud_signals):
+    """The committed twelve are the audit trail. Adding a ranking is allowed to describe
+    them; it is not allowed to alter them, and the seed is unchanged so it cannot."""
+    prophecy = oracle.prophesy(MEGA645, "01602", date(2026, 9, 5), loud_signals)
+    again = oracle.prophesy(MEGA645, "01602", date(2026, 9, 5), loud_signals)
+
+    assert prophecy.numbers == again.numbers
+    assert prophecy.seed == again.seed

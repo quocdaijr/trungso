@@ -429,6 +429,15 @@ form.khai input{appearance:none; -webkit-appearance:none}
   border-top:var(--rule-hair) solid currentColor;
 }
 
+/* The basic ticket. Set apart with a rule rather than a fill, because it is an
+   alternative reading of the same twelve numbers, not a second product. */
+.basic{border-top:var(--rule-mid) solid var(--color-rule);
+  margin-top:var(--space-sm); padding-top:var(--space-sm)}
+.basic__head{font-family:var(--font-display); font-size:var(--text-sm);
+  margin:0 0 var(--space-xs); color:var(--color-ink)}
+.basic__note{font-family:var(--font-hand); font-size:var(--text-sm);
+  color:var(--color-ink); margin:var(--space-xs) 0}
+
 /* A winning row. --color-good is the only place on the page that says something went
    right, and it stays a text colour rather than a fill so it cannot be mistaken for a
    call to action. */
@@ -522,7 +531,7 @@ form.khai input{appearance:none; -webkit-appearance:none}
       <dt>HÌNH THẦY</dt><dd>vẽ tay, thuộc repo này</dd>
     </dl>
     <p class="colophon__made">
-      Made with ♡, 5624 dòng code, 512 test, và một lượng token AI không ai muốn nhắc lại.<br>
+      Made with ♡, 5766 dòng code, 520 test, và một lượng token AI không ai muốn nhắc lại.<br>
       Độ chính xác dự đoán: 0%.<br>
       <a href="https://github.com/quocdaijr/trungso">MIT</a> · 2026 · không bán gì ·
       không liên quan Vietlott · 18+ ·

@@ -13,8 +13,25 @@ không phải spec, không phải scratch pad.
 **Số phụ** (Bonus) — Số thứ 7, **chỉ** Power 6/55 có. Không thuộc bộ số chính và không
 bao giờ trùng với số chính. Chỉ dùng để xác định Jackpot 2.
 
+**Vé Cơ bản** — Một vé Vietlott thường: **6 số, 10.000đ**. Đây là "Cách chơi: Cơ bản"
+trong app, và là cách phần lớn người chơi mua. Trang **phải** phục vụ chế độ này, không chỉ
+bao 12 — thiếu nó thì trang đưa 12 số cho một tờ vé 6 ô rồi bỏ người đọc tự đoán.
+
+**Sáu số cơ bản** (`basic_pick`) — 6 trong 12 số, xếp theo weight của chính oracle. Kèm
+`basic_reasoned`: **bao nhiêu số trong đó thật sự có lý do**. Con số này bắt buộc phải hiện,
+vì một kỳ điển hình chỉ boost 1–3 số trong 12, phần còn lại đứng đúng cùng một mức. Trình
+bày cả sáu như thể đều có căn là bịa ra thứ tự không tồn tại.
+
+Hoà thì **phá bằng seed**, không phải theo số tăng dần. Đo ra chứ không phải chọn cho đẹp:
+xếp hoà tăng dần làm 6 số cơ bản có trung bình 20,79 so với 28,52 của bộ 12 — **lệch 7,7 về
+số nhỏ**, sinh ra hoàn toàn bởi cách phá hoà. Ship một quy luật giả là đúng thứ project này
+dựng ra để bóc.
+
 **Bao 12** (Wheel-12) — Cách chơi chọn 12 số rồi đánh toàn bộ `C(12,6) = 924` tổ hợp.
-Một kỳ bao 12 cho một game = 9.240.000đ.
+Một kỳ bao 12 cho một game = 9.240.000đ. Đây là **sản phẩm thật**: trang giới thiệu sản phẩm
+của Vietlott liệt kê 11 mức bao — 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18 — và giá một bộ số
+là 10.000đ. Mấy trang tổng hợp ngoài thường ghi thiếu (liệt kê 7 mức rồi lại nói "11 loại"),
+nên nguồn duy nhất được tin là trang gốc.
 
 **Lời tiên tri** (Prophecy) — 12 số mà oracle cam kết cho một kỳ **chưa quay**, được ghi
 lại **trước** thời điểm quay. Sinh deterministic từ seed. Append-only, không sửa được.
