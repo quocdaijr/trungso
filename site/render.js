@@ -272,7 +272,7 @@ function stageTuong(fortune, error) {
 
 function stagePhan(data, profile, fortune) {
   const section = stage('02', `${tw('1f52e','🔮')} Thầy phán`,
-    'Mười hai số mỗi kỳ. Ghi trước giờ quay, không sửa được.');
+    'Mười hai số cho bao 12, sáu số cho vé Cơ bản. Ghi trước giờ quay, không sửa được.');
 
   const intro = el('div', 'thay-row');
   intro.innerHTML = THAY.flip('idle', 'blink')

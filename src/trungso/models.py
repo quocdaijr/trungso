@@ -105,7 +105,12 @@ class Draw:
 
 @dataclass(frozen=True, slots=True)
 class Prophecy:
-    """Twelve numbers committed to a specific unfinished draw, before it happens."""
+    """Twelve numbers committed to a specific unfinished draw, before it happens.
+
+    Twelve is the record; six is a reading of it. `basic_pick` names the six a plain
+    ticket would carry, ordered by the oracle's own weight - it is not a second prophecy
+    and never draws a number the twelve do not already contain.
+    """
 
     game: str
     draw_id: str
