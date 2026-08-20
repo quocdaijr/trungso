@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-20T10:32:41+00:00",
+ "generated_at": "2026-08-20T10:40:41+00:00",
  "disclaimer": "Xổ số là biến cố độc lập. Mỗi kỳ quay reset về 0. Không có số nóng, không có số lạnh. Phần mềm này không dự đoán được gì — nó chỉ tự tin quá mức và tự chấm điểm độ sai của chính mình. Bảng Phong Thần là paper-trading: tiền đốt trên giấy.",
  "games": [
   {
@@ -462,7 +462,13 @@
      "net_vnd": 36460991150,
      "uses_live_jackpot": true
     }
-   ]
+   ],
+   "payout_summary": {
+    "nothing_probability": 0.889719875,
+    "profit_probability": 0.016625401,
+    "profit_one_in": 60,
+    "jackpot_one_in": 31374
+   }
   },
   {
    "key": "mega645",
@@ -923,7 +929,13 @@
      "net_vnd": 24937370500,
      "uses_live_jackpot": true
     }
-   ]
+   ],
+   "payout_summary": {
+    "nothing_probability": 0.817221728,
+    "profit_probability": 0.03541042,
+    "profit_one_in": 28,
+    "jackpot_one_in": 8815
+   }
   }
  ],
  "xsmb": {

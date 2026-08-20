@@ -267,3 +267,70 @@ def test_probabilities_sum_to_one():
     total = sum(r["probability"] for r in game["payout_if_hit"])
 
     assert abs(total - 1.0) < 1e-6
+
+
+# ------------------------------------------- the compact summary that replaced the table
+
+
+def test_summary_reports_how_often_the_wheel_pays_nothing():
+    store.write_draws("mega645", [make_draw(MEGA645, 1551)])
+    _store_prizes("mega645", "01551")
+
+    game = next(g for g in site.build_bundle()["games"] if g["key"] == "mega645")
+    s = game["payout_summary"]
+
+    rows = game["payout_if_hit"]
+    expected = sum(r["probability"] for r in rows if r["payout_vnd"] == 0)
+    assert abs(s["nothing_probability"] - expected) < 1e-9
+    assert 0.5 < s["nothing_probability"] < 1.0
+
+
+def test_summary_reports_how_rarely_the_wheel_turns_a_profit():
+    """The counterweight to a jackpot figure. Without it the block is an advert."""
+    store.write_draws("mega645", [make_draw(MEGA645, 1551)])
+    _store_prizes("mega645", "01551")
+
+    s = next(g for g in site.build_bundle()["games"] if g["key"] == "mega645")["payout_summary"]
+
+    assert s["profit_one_in"] > 1
+    assert s["jackpot_one_in"] > s["profit_one_in"], "the jackpot is the rarest outcome"
+
+
+def test_summary_probabilities_come_from_the_rows_not_a_second_calculation():
+    """One source of truth. A summary that drifts from the table it summarises is worse
+    than no summary, and this is exactly where that drift would hide."""
+    store.write_draws("power655", [make_draw(POWER655, 1386)])
+    _store_prizes("power655", "01386")
+
+    game = next(g for g in site.build_bundle()["games"] if g["key"] == "power655")
+    rows, s = game["payout_if_hit"], game["payout_summary"]
+
+    assert abs(s["profit_probability"] - sum(
+        r["probability"] for r in rows if r["net_vnd"] > 0)) < 1e-9
+
+
+def test_the_full_table_stays_in_the_bundle_even_though_the_page_stopped_drawing_it():
+    """The page was trimmed on request; the data was not deleted. Anyone reading
+    data.json still gets every row."""
+    store.write_draws("mega645", [make_draw(MEGA645, 1551)])
+
+    game = next(g for g in site.build_bundle()["games"] if g["key"] == "mega645")
+
+    assert len(game["payout_if_hit"]) == MEGA645.pick + 1
+
+
+def test_jackpot_odds_are_not_recomputed_from_a_rounded_probability():
+    """A real off-by-one, caught on the rendered page. P(6 hits) on Power is 3.187e-5;
+    rounding it to nine decimals and then inverting gives 1-in-31,375 instead of 31,374.
+    The summary must read the row's own figure, which was computed before rounding."""
+    from math import comb
+
+    from trungso import wheel
+
+    store.write_draws("power655", [make_draw(POWER655, 1386)])
+    game = next(g for g in site.build_bundle()["games"] if g["key"] == "power655")
+
+    exact = round(1 / wheel.hit_probability(POWER655, POWER655.pick))
+    assert game["payout_summary"]["jackpot_one_in"] == exact
+    # and the exact value is just the ratio of combination counts
+    assert exact == round(comb(POWER655.pool, POWER655.pick) / comb(12, POWER655.pick))

@@ -166,8 +166,17 @@ của kỳ nào.
 để bắt lỗi bóc dữ liệu: một "jackpot" thấp hơn mức sàn không phải jackpot nhỏ, nó là regex
 bắt sai dòng — parser phải văng lỗi thay vì công bố.
 
+**Khối nồi** (`pot`) — Thứ trang **hiện**: số về tay nếu trúng cả 6, kèm ba con số đối
+trọng — chi phí mỗi kỳ, tỷ lệ trúng cả 6, tỷ lệ không được gì, tỷ lệ có lãi. Thay cho bảng
+7 hàng: với một trò đùa về jackpot thì sổ sách giải nhỏ là nhiễu, và nó chôn mất con số duy
+nhất người ta vào xem.
+
+Ba con số đối trọng **không được bỏ**. Một cái nồi kèm đúng tỷ lệ trúng của nó là chính xác
+cách xổ số tự quảng cáo. Có chúng thì nó là số liệu; thiếu chúng thì nó là tờ rơi.
+
 **Bảng thực nhận** (`payout_if_hit`) — Với mỗi số lượng trúng k = 0..6, bao 12 thực nhận
-bao nhiêu. Suy ra được hoàn toàn: `wheel.prize_counts` đã biết trong 924 vé có bao nhiêu vé
+bao nhiêu. **Vẫn nằm trong `data.json`** dù trang không còn vẽ ra: bị cắt khỏi giao diện theo
+yêu cầu, không phải bị xoá khỏi dữ liệu. Suy ra được hoàn toàn: `wheel.prize_counts` đã biết trong 924 vé có bao nhiêu vé
 ăn hạng nào khi k trong 12 số về, còn giá mỗi hạng thì lấy từ trang thật.
 
 Bảng **phải có cả hai nửa** — tiền và xác suất. Riêng cột tiền đọc ra thành lời khuyên nên

@@ -54,6 +54,10 @@
   --text-xl: 1.45rem;
   --text-2xl: 2rem;
   --text-3xl: 2.9rem;
+  /* The pot figure. Fluid, because it is the one number on the page somebody actually
+     came for and a fixed 2.9rem broke "31,41 tỷ" across two lines at 280px and 320px -
+     measured, not guessed. The cap keeps it identical to --text-3xl on a laptop. */
+  --text-figure: clamp(1.9rem, 10vw, 2.9rem);
   --text-display-s: clamp(2.2rem, 7vw, 4rem);
   --text-display: clamp(2.6rem, 11vw, 6.5rem);
 
