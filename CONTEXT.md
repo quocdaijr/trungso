@@ -13,8 +13,25 @@ không phải spec, không phải scratch pad.
 **Số phụ** (Bonus) — Số thứ 7, **chỉ** Power 6/55 có. Không thuộc bộ số chính và không
 bao giờ trùng với số chính. Chỉ dùng để xác định Jackpot 2.
 
+**Vé Cơ bản** — Một vé Vietlott thường: **6 số, 10.000đ**. Đây là "Cách chơi: Cơ bản"
+trong app, và là cách phần lớn người chơi mua. Trang **phải** phục vụ chế độ này, không chỉ
+bao 12 — thiếu nó thì trang đưa 12 số cho một tờ vé 6 ô rồi bỏ người đọc tự đoán.
+
+**Sáu số cơ bản** (`basic_pick`) — 6 trong 12 số, xếp theo weight của chính oracle. Kèm
+`basic_reasoned`: **bao nhiêu số trong đó thật sự có lý do**. Con số này bắt buộc phải hiện,
+vì một kỳ điển hình chỉ boost 1–3 số trong 12, phần còn lại đứng đúng cùng một mức. Trình
+bày cả sáu như thể đều có căn là bịa ra thứ tự không tồn tại.
+
+Hoà thì **phá bằng seed**, không phải theo số tăng dần. Đo ra chứ không phải chọn cho đẹp:
+xếp hoà tăng dần làm 6 số cơ bản có trung bình 20,79 so với 28,52 của bộ 12 — **lệch 7,7 về
+số nhỏ**, sinh ra hoàn toàn bởi cách phá hoà. Ship một quy luật giả là đúng thứ project này
+dựng ra để bóc.
+
 **Bao 12** (Wheel-12) — Cách chơi chọn 12 số rồi đánh toàn bộ `C(12,6) = 924` tổ hợp.
-Một kỳ bao 12 cho một game = 9.240.000đ.
+Một kỳ bao 12 cho một game = 9.240.000đ. Đây là **sản phẩm thật**: trang giới thiệu sản phẩm
+của Vietlott liệt kê 11 mức bao — 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18 — và giá một bộ số
+là 10.000đ. Mấy trang tổng hợp ngoài thường ghi thiếu (liệt kê 7 mức rồi lại nói "11 loại"),
+nên nguồn duy nhất được tin là trang gốc.
 
 **Lời tiên tri** (Prophecy) — 12 số mà oracle cam kết cho một kỳ **chưa quay**, được ghi
 lại **trước** thời điểm quay. Sinh deterministic từ seed. Append-only, không sửa được.
@@ -149,8 +166,17 @@ của kỳ nào.
 để bắt lỗi bóc dữ liệu: một "jackpot" thấp hơn mức sàn không phải jackpot nhỏ, nó là regex
 bắt sai dòng — parser phải văng lỗi thay vì công bố.
 
+**Khối nồi** (`pot`) — Thứ trang **hiện**: số về tay nếu trúng cả 6, kèm ba con số đối
+trọng — chi phí mỗi kỳ, tỷ lệ trúng cả 6, tỷ lệ không được gì, tỷ lệ có lãi. Thay cho bảng
+7 hàng: với một trò đùa về jackpot thì sổ sách giải nhỏ là nhiễu, và nó chôn mất con số duy
+nhất người ta vào xem.
+
+Ba con số đối trọng **không được bỏ**. Một cái nồi kèm đúng tỷ lệ trúng của nó là chính xác
+cách xổ số tự quảng cáo. Có chúng thì nó là số liệu; thiếu chúng thì nó là tờ rơi.
+
 **Bảng thực nhận** (`payout_if_hit`) — Với mỗi số lượng trúng k = 0..6, bao 12 thực nhận
-bao nhiêu. Suy ra được hoàn toàn: `wheel.prize_counts` đã biết trong 924 vé có bao nhiêu vé
+bao nhiêu. **Vẫn nằm trong `data.json`** dù trang không còn vẽ ra: bị cắt khỏi giao diện theo
+yêu cầu, không phải bị xoá khỏi dữ liệu. Suy ra được hoàn toàn: `wheel.prize_counts` đã biết trong 924 vé có bao nhiêu vé
 ăn hạng nào khi k trong 12 số về, còn giá mỗi hạng thì lấy từ trang thật.
 
 Bảng **phải có cả hai nửa** — tiền và xác suất. Riêng cột tiền đọc ra thành lời khuyên nên
@@ -160,6 +186,17 @@ Chỉ khi đứng cạnh nhau chúng mới nói đúng sự thật: tiền là t
 Con số thật, đã tính bằng code chứ không nhẩm: bao 12 Mega 6/45 trúng 4 số lãi **+5,88 tr**,
 trúng 5 số lãi **+102,76 tr**. Chỗ ROI −71,57% đến từ việc trúng 4 trở lên chỉ khoảng
 **1 trên 28 kỳ**.
+
+**Về tay** (take-home) — Tiền thật đến tay người trúng, sau khi trừ 10% thuế trúng thưởng
+trên **phần vượt** 10 triệu. Công bố 34,9 tỷ → về tay 31,41 tỷ. Trang **bắt buộc** in cả hai:
+nêu con số gộp rồi im về phần bị trừ đúng là cách mấy trang lừa đảo làm.
+
+**Nhận trọn** — Giải ≤ 10 triệu, thuế bằng 0. Giải Nhất của Mega đúng 10.000.000đ nên là giải
+**nhận trọn cao nhất**, dù Giải Nhất của Power to gấp 4 lần. Khác hoàn toàn với "về tay nhiều
+nhất", vốn luôn là jackpot.
+
+**Chưa mô hình hoá** (`tax.py` ghi rõ) — Vé bao tính là 1 vé hay 924 vé cho luật thuế-theo-vé,
+và jackpot chia cho nhiều người trúng. Không biết thì phải nói không biết, không được đoán.
 
 ## Từ tránh dùng
 
@@ -176,6 +213,8 @@ trúng 5 số lãi **+102,76 tr**. Chỗ ROI −71,57% đến từ việc trúng
 - **"đăng ký" / "tài khoản" / "thu thập dữ liệu người dùng"** — không tồn tại trong project
   này và sẽ không tồn tại. Cá nhân hoá đạt được **không cần** lưu gì của ai.
 - **"chắc chắn trúng" / "số chuẩn" / "cam kết"** — thầy bựa tới đâu cũng dừng trước câu này.
+- **"giải X tỷ"** đứng một mình — nêu số công bố thì phải nêu số về tay. Thiếu một nửa
+  là quảng cáo, không phải số liệu.
 - **"giải đang X tỷ"** — trang không biết con số đó. Nó biết nồi của kỳ đã quay,
   nên chỉ được nói **"ít nhất X"** khi cộng dồn, và phải kèm số kỳ.
 - **"em"** khi oracle nói — oracle xưng **thầy**, gọi **con**. Không phải trợ lý.

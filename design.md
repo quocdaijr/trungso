@@ -23,7 +23,7 @@ A fortune-telling session is an ordered thing, so the page is too:
 |---|---|
 | `00 · KHAI` | birth-date form, local-only, with the privacy block |
 | `01 · TƯỚNG` | the fortune: can chi, nạp âm, cung, số chủ đạo, sao, tam hợp / tứ hành xung |
-| `02 · PHÁN` | twelve numbers, house oracle and personal oracle side by side |
+| `02 · PHÁN` | twelve numbers for the wheel and six for a plain ticket, house oracle and personal oracle side by side, then the pot |
 | `03 · SỔ NỢ` | scoreboard, ROI, ROI-excluding-jackpot, head-to-head, "cạn phước" |
 | `04 · SỰ THẬT` | chi-square across five lotteries, heatmaps, recent draws, XSMB |
 

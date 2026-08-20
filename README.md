@@ -160,6 +160,24 @@ xác nhận 40.000.000 / 500.000 / 50.000 cho Power, khớp `games.py` — và n
 khỏi `roi_excluding_jackpot` chính vì nó biến động. Giờ có test bắt bảng tĩnh phải khớp bảng
 live, nên upstream đổi giá là nó văng lỗi chứ không im.
 
+### Sáu số hay mười hai? Cả hai — và giờ trang nói rõ số nào là số nào
+
+Vé Vietlott thường — "Cách chơi: **Cơ bản**" trong app — là **6 số, 10.000đ**. Bao 12 là
+lựa chọn thật, không phải em nghĩ ra: trang giới thiệu sản phẩm của Vietlott liệt kê **11 mức
+bao** (5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18) và ghi giá một bộ số là 10.000đ, nên
+`C(12,6) = 924` tổ hợp = 9.240.000đ là đúng. Các trang tổng hợp bên ngoài hay ghi sai — có bài
+liệt kê 7 mức rồi lại nói "11 loại" ngay trong cùng bài — nên chỉ trang gốc được tin.
+
+Trước đây trang chỉ đưa 12 số, tức là ai mua vé Cơ bản phải **tự đoán đánh 6 số nào**. Giờ có
+cả hai, và có luôn **ranh giới**: một kỳ điển hình chỉ boost 1–3 số trong 12, phần còn lại
+đứng đúng cùng một mức — nên chỉ đúng bấy nhiêu số là có lý do, số còn lại lấy từ thế hoà, và
+trang nói thẳng ra.
+
+Hoà thì phá bằng seed của lời tiên tri, **không** theo số tăng dần. Đo ra chứ không chọn cho
+đẹp: xếp hoà tăng dần làm 6 số cơ bản có trung bình **20,79** so với **28,52** của bộ 12 —
+lệch **7,7** về số nhỏ, sinh ra hoàn toàn bởi cách phá hoà. Ship một quy luật giả thì phá sạch
+lý do tồn tại của repo này.
+
 ### Hôm nay trúng thì thực nhận bao nhiêu?
 
 Con số ước tính nồi **kỳ tới** không có ở bất kỳ trang nào một request thuần lấy được.

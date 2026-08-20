@@ -208,6 +208,25 @@ confirms 40.000.000 / 500.000 / 50.000 for Power, matching `games.py` — and th
 already excluded from `roi_excluding_jackpot` precisely because it varies. A test now asserts
 the static table still matches the live one, so a silent upstream change would fail loudly.
 
+### Six numbers or twelve? Both, and the page now says which
+
+A plain Vietlott ticket - "Cách chơi: Cơ bản" in the app - is **six numbers for 10,000d**.
+Bao 12 is a real alternative, not an invention: Vietlott's own product pages list eleven bao
+sizes (5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18) and price a single combination at 10,000d, so
+`C(12,6) = 924` combinations for 9,240,000d is correct. Third-party summaries routinely get
+this wrong - one lists seven sizes and then says "eleven types" in the same article - so the
+official page is the only source used here.
+
+The page used to show only the twelve, which meant anyone buying the basic ticket had to guess
+which six. It now shows both, and shows the **split**: a typical draw boosts one to three of
+the twelve and leaves the rest at exactly the same weight, so only that many of the six were
+chosen for a reason. The rest come out of a tie, and the page says so.
+
+Ties break on the prophecy's seed, not by ascending number. That was measured, not styled:
+sorting ties ascending made the six-number pick average 20.79 against the wheel's 28.52 over
+300 draws - a 7.7 skew toward low numbers created entirely by the tie-break. Shipping a
+spurious pattern would defeat the whole point of the repository.
+
 ### If it comes in tonight, what do you actually get?
 
 The estimated pot for the *next* draw is not published anywhere a plain request can reach.

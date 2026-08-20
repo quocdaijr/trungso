@@ -13,6 +13,13 @@ from datetime import date, timedelta
 from types import MappingProxyType
 
 WHEEL_SIZE = 12
+BASIC_PICK = 6
+"""A plain Vietlott ticket - "Cơ bản" in the app - is six numbers for 10,000d.
+
+Bao 12 is a real product: Vietlott sells eleven bao sizes (5, 7, 8, 9, 10, 11, 12, 13, 14,
+15, 18), so the wheel arithmetic elsewhere is correct for it. But most people buy the basic
+ticket, and handing somebody twelve numbers for a six-number slip is not an answer.
+"""
 """How many numbers a prophecy commits to (bao 12)."""
 
 DAYS_IN_WEEK = 7

@@ -12,7 +12,7 @@ from datetime import UTC, date, datetime
 from types import MappingProxyType
 from typing import Any
 
-from .games import WHEEL_SIZE, GameSpec, get_game
+from .games import BASIC_PICK, WHEEL_SIZE, GameSpec, get_game
 
 DRAW_ID_WIDTH = 5
 
@@ -105,7 +105,12 @@ class Draw:
 
 @dataclass(frozen=True, slots=True)
 class Prophecy:
-    """Twelve numbers committed to a specific unfinished draw, before it happens."""
+    """Twelve numbers committed to a specific unfinished draw, before it happens.
+
+    Twelve is the record; six is a reading of it. `basic_pick` names the six a plain
+    ticket would carry, ordered by the oracle's own weight - it is not a second prophecy
+    and never draws a number the twelve do not already contain.
+    """
 
     game: str
     draw_id: str
@@ -116,11 +121,18 @@ class Prophecy:
     sermon: Mapping[str, str]
     oracle_version: str
     created_at: datetime
+    # The same numbers ordered by the oracle's own weight, and how many of them actually
+    # earned that place. Optional, because prophecies committed before this existed do not
+    # have it and rewriting them is exactly what append-only forbids. A caller that finds
+    # it empty must say so rather than invent an order.
+    ranked: tuple[int, ...] = ()
+    reasoned: int = 0
 
     def __post_init__(self) -> None:
         spec = get_game(self.game)
         object.__setattr__(self, "draw_id", normalise_draw_id(self.draw_id))
         object.__setattr__(self, "numbers", tuple(self.numbers))
+        object.__setattr__(self, "ranked", tuple(self.ranked))
         object.__setattr__(self, "signals", MappingProxyType(dict(self.signals)))
         object.__setattr__(self, "sermon", MappingProxyType(dict(self.sermon)))
 
@@ -132,6 +144,19 @@ class Prophecy:
         if not self.seed:
             raise ValueError("prophecy seed must not be empty - it is the audit trail")
 
+        if self.ranked:
+            if sorted(self.ranked) != sorted(self.numbers):
+                raise ValueError(
+                    "ranked must be a permutation of numbers - a ranking that adds or "
+                    "drops a number is describing a different prophecy"
+                )
+            if not 0 <= self.reasoned <= len(self.numbers):
+                raise ValueError(
+                    f"reasoned must be 0..{len(self.numbers)}, got {self.reasoned}"
+                )
+        elif self.reasoned:
+            raise ValueError("reasoned is meaningless without a ranking")
+
     @property
     def spec(self) -> GameSpec:
         return get_game(self.game)
@@ -139,6 +164,23 @@ class Prophecy:
     @property
     def key(self) -> tuple[str, str]:
         return (self.game, self.draw_id)
+
+    @property
+    def basic_pick(self) -> tuple[int, ...]:
+        """Six of the twelve, for the plain ticket most people actually buy.
+
+        Sorted for reading; the order that decided them is `ranked`. Empty when there is
+        no ranking, because picking six of twelve at that point would be a coin toss the
+        page would then have to pass off as a choice.
+        """
+        if not self.ranked:
+            return ()
+        return tuple(sorted(self.ranked[:BASIC_PICK]))
+
+    @property
+    def basic_reasoned(self) -> int:
+        """How many of `basic_pick` had an actual reason. The rest are the tie."""
+        return min(self.reasoned, BASIC_PICK) if self.ranked else 0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -151,6 +193,10 @@ class Prophecy:
             "sermon": dict(self.sermon),
             "oracle_version": self.oracle_version,
             "created_at": self.created_at.isoformat(),
+            "ranked": list(self.ranked),
+            "reasoned": self.reasoned,
+            "basic_pick": list(self.basic_pick),
+            "basic_reasoned": self.basic_reasoned,
         }
 
     @classmethod
@@ -163,6 +209,8 @@ class Prophecy:
             seed=payload["seed"],
             signals=payload.get("signals", {}),
             sermon=payload.get("sermon", {}),
+            ranked=tuple(payload.get("ranked", ())),
+            reasoned=payload.get("reasoned", 0),
             oracle_version=payload["oracle_version"],
             created_at=datetime.fromisoformat(payload["created_at"]),
         )

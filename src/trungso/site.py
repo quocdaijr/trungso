@@ -12,7 +12,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from . import astrology, scoreboard, stats, store, wheel
+from . import astrology, scoreboard, stats, store, tax, wheel
 from .games import PROPHECY_GAMES, GameSpec
 from .models import Draw, Prophecy, utc_now
 from .sources import xsmb
@@ -46,10 +46,15 @@ def _prizes_payload(spec: GameSpec, draws: Sequence[Draw]) -> dict[str, Any] | N
     if not stored:
         return None
     latest_id = draws[-1].draw_id if draws else None
+    top = int(stored.get("top_jackpot_vnd") or 0)
     return {
         **stored,
         "matches_latest_draw": bool(latest_id and stored.get("draw_id") == latest_id),
         "latest_draw_id": latest_id,
+        # The announced figure is not what a winner receives. Printing one without the
+        # other is the shape of an advert, and this page is not one.
+        "top_jackpot_tax_vnd": tax.withheld_vnd(top),
+        "top_jackpot_take_home_vnd": tax.take_home_vnd(top),
     }
 
 
@@ -103,6 +108,30 @@ def _payout_if_hit(
     return rows
 
 
+def _payout_summary(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """The four facts the page actually shows, derived from the rows it no longer draws.
+
+    The full seven-row table was cut on request - for a joke about a jackpot, a ledger of
+    small prizes is noise. But a jackpot figure with only its odds beside it reads exactly
+    like a lottery advert, so what stays is the counterweight: how often the wheel pays
+    nothing at all, and how rarely it clears its own stake.
+
+    Derived from the same rows rather than recomputed, because a summary that drifts from
+    the table it summarises is worse than no summary, and this is where that would hide.
+    """
+    nothing = sum(r["probability"] for r in rows if r["payout_vnd"] == 0)
+    profit = sum(r["probability"] for r in rows if r["net_vnd"] > 0)
+    return {
+        "nothing_probability": round(nothing, 9),
+        "profit_probability": round(profit, 9),
+        "profit_one_in": round(1 / profit) if profit else None,
+        # Read off the row, never recomputed from the rounded probability beside it. At
+        # 3.19e-5 the nine-decimal rounding is enough to move 1-in-31,374 to 31,375, and a
+        # figure that is wrong by one is still a figure that is wrong.
+        "jackpot_one_in": rows[-1]["one_in"] if rows else None,
+    }
+
+
 def _game_payload(
     spec: GameSpec,
     draws: Sequence[Draw],
@@ -114,6 +143,7 @@ def _game_payload(
     settled = {d.draw_id for d in draws}
     pending = [p for p in prophecies if p.game == spec.key and p.draw_id not in settled]
     prizes = _prizes_payload(spec, draws)
+    payout_rows = _payout_if_hit(spec, prizes)
 
     return {
         "key": spec.key,
@@ -148,7 +178,8 @@ def _game_payload(
         "pending_prophecy": pending[0].to_dict() if pending else None,
         "score": score.to_dict(),
         "prizes": prizes,
-        "payout_if_hit": _payout_if_hit(spec, prizes),
+        "payout_if_hit": payout_rows,
+        "payout_summary": _payout_summary(payout_rows),
     }
 
 

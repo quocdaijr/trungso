@@ -35,76 +35,102 @@ const CAN_PHUOC_ROI = -0.8;
 
 const vnd = (n) => (n || 0).toLocaleString('vi-VN') + 'đ';
 /** Billions, because 34.897.731.150 is a number nobody reads and "34,90 tỷ" is one they do. */
-const billions = (n) => (n / 1e9).toLocaleString('vi-VN', {maximumFractionDigits: 2}) + ' tỷ';
+const billionsNum = (n) => (n / 1e9).toLocaleString('vi-VN', {maximumFractionDigits: 2});
+const billions = (n) => billionsNum(n) + ' tỷ';
 
 /**
- * The jackpot line.
+ * Six numbers, for the ticket most people actually buy.
  *
- * Three things this must never do, in order of how badly they would break the page's
- * one promise:
- *   1. Call the figure the current jackpot. It is the pot as at a completed draw. When
- *      nobody won, the next draw's pot is that plus new ticket sales, so the only true
- *      word is "ít nhất".
- *   2. Show a figure from an older draw as though it described the newest one. If the
- *      prize fetch failed, `matches_latest_draw` is false and the draw id is stated.
- *   3. Put the number anywhere near a suggestion that it is winnable. It sits beside the
- *      cost of chasing it on purpose.
+ * "Cách chơi: Cơ bản" in the Vietlott app is one row of six at 10,000d. Bao 12 is a real
+ * product - Vietlott sells eleven bao sizes - but the page was handing over twelve numbers
+ * for a six-number slip and leaving the reader to guess which six, which is not an answer.
+ *
+ * The split is the honest part. A typical field boosts three of the twelve and leaves the
+ * other nine at exactly the same weight, so only the first `basic_reasoned` of these six
+ * were chosen for a reason; the rest come out of a tie. Saying so is the point - a page
+ * that presented all six as conviction would be inventing a ranking that does not exist.
  */
-function jackpotLine(game) {
-  const p = game.prizes;
-  if (!p) return null;
+function basicPick(p) {
+  if (!p.basic_pick || !p.basic_pick.length) return null;
 
-  const pot = billions(p.top_jackpot_vnd);
-  const stale = !p.matches_latest_draw;
+  const block = el('div', 'basic');
+  block.appendChild(el('p', 'basic__head', 'Chỉ mua một vé Cơ bản? Sáu số này.'));
+  block.appendChild(ballRow(p.basic_pick, null));
+
+  const reasoned = p.basic_reasoned || 0;
+  const rest = p.basic_pick.length - reasoned;
+  const ordered = (p.ranked || []).slice(0, p.basic_pick.length);
+  const withReason = ordered.slice(0, reasoned).map(pad).join(' ');
+
   let text;
-  if (stale) {
-    text = `Nồi kỳ #${p.draw_id}: <b>${pot}</b>. Kỳ #${p.latest_draw_id} thầy chưa đọc được.`;
-  } else if (p.rolled_over) {
-    text = `Nồi đang cộng dồn: <b>ít nhất ${pot}</b> — kỳ #${p.draw_id} không ai lấy.`;
+  if (reasoned === 0) {
+    text = 'Kỳ này không số nào có lý do riêng. Cả sáu thầy bốc — thầy nói thẳng.';
+  } else if (rest === 0) {
+    text = 'Cả sáu số đều có lý do riêng. Hiếm lắm.';
   } else {
-    text = `Kỳ #${p.draw_id} đã có người trúng <b>${pot}</b>. Nồi về mức sàn.`;
+    text = `Có lý do riêng: <b>${withReason}</b>. `
+      + `${rest} số còn lại cùng một mức, thầy bốc cho đủ sáu — thầy nói thẳng.`;
   }
-
-  const node = el('p', 'note jackpot', text);
-  // The ratio is arithmetic, not theatre, so it says itself plainly.
-  const odds = Math.round(1 / (game.wheel.combinations / totalCombos(game)));
-  node.appendChild(el('span', 'jackpot__odds',
-    `bao 12 mua ${game.wheel.combinations} trên ${totalCombos(game).toLocaleString('vi-VN')} `
-    + `tổ hợp — 1 phần ${odds.toLocaleString('vi-VN')}`));
-  return node;
+  block.appendChild(el('p', 'basic__note', text));
+  block.appendChild(el('p', 'note',
+    `Vé Cơ bản = 6 số = <b>${vnd(10000)}</b>. Bao 12 ở trên = 924 tổ hợp = `
+    + `<b>${vnd(9240000)}</b>. Cùng một bộ số, hai cách mua.`));
+  return block;
 }
 
 /**
- * "So what do I get if it comes in tonight?"
+ * The jackpot, and the two numbers that stop it reading like an advert.
  *
- * The next draw's estimated pot is not published anywhere a plain request can reach, but
- * this is - every figure here is derived from the real prize values and the real
- * combinatorics of the 924 tickets.
+ * This replaced a seven-row payout table. The table was correct and is still in
+ * data.json, but for a joke about a jackpot a ledger of small prizes is noise, and it
+ * buried the one figure anybody came for.
  *
- * Both halves go in the table or neither does. The payouts alone read as an argument FOR
- * playing: four hits already clears the stake. The probabilities alone read as an argument
- * that the prizes are stingy, which they are not. Only together do they say the true
- * thing, which is that the money is real and the odds are what take it back.
+ * What could not go: a pot with only its odds beside it is precisely how a lottery
+ * markets itself. So the block keeps the counterweight - how often the wheel pays nothing
+ * at all, and how rarely it clears its own stake - and it keeps the take-home rather than
+ * the announced figure, because the announced figure is not what a winner receives.
  */
-function payoutTable(game) {
-  const rows = game.payout_if_hit;
-  if (!rows || !rows.length) return null;
+function jackpotFocus(game) {
+  const p = game.prizes;
+  const s = game.payout_summary;
+  if (!p || !s) return null;
 
-  const table = el('table', 'stack-sm stack-sm--matrix');
-  const H = ['1 trên', 'thực nhận', 'lãi/lỗ'];
-  table.innerHTML = '<thead><tr><th>trúng</th>'
-    + H.map((h) => `<th class="num">${h}</th>`).join('') + '</tr></thead><tbody>'
-    + rows.map((r) => {
-        const net = r.net_vnd;
-        const sign = net > 0 ? '+' : '';
-        const cls = net > 0 ? 'num win' : 'num';
-        return `<tr><th>${r.hits} số</th>`
-          + `<td class="num" data-label="${H[0]}">${r.one_in ? r.one_in.toLocaleString('vi-VN') : '—'}</td>`
-          + `<td class="num" data-label="${H[1]}">${r.payout_vnd ? vnd(r.payout_vnd) : '—'}</td>`
-          + `<td class="${cls}" data-label="${H[2]}">${sign}${vnd(net)}</td></tr>`;
-      }).join('')
-    + '</tbody>';
-  return table;
+  const block = el('div', 'pot');
+  const net = p.top_jackpot_take_home_vnd || p.top_jackpot_vnd;
+
+  /* Three states, and the wording has to differ. The pot rolls over when nobody won, so
+     the next draw's is that plus new ticket sales - "ít nhất" is the only true word. If
+     somebody won, it has reset and this figure describes a pot that is gone. And if the
+     prize fetch failed, the figure belongs to an older draw and must say so rather than
+     pass itself off as current. */
+  const label = !p.matches_latest_draw
+    ? `Kỳ #${p.draw_id} về tay` : p.rolled_over
+    ? 'Trúng cả 6 thì về tay ít nhất' : `Kỳ #${p.draw_id} có người lấy rồi — về tay`;
+  block.appendChild(el('p', 'pot__label', label));
+  /* Digits and unit are separate elements so only the digits have to fit on one line.
+     "108,13 tỷ" broke across two lines at 280px as one string - and a 108 billion pot has
+     actually happened, it is in Vietlott's own winners table. Six digits fit; nine
+     characters did not. */
+  block.appendChild(el('p', 'pot__figure',
+    `<span class="pot__num">${billionsNum(net)}</span><span class="pot__unit">tỷ</span>`));
+  block.appendChild(el('p', 'pot__sub',
+    `công bố ${billions(p.top_jackpot_vnd)}, thuế giữ lại `
+    + `${billions(p.top_jackpot_tax_vnd || 0)}`
+    + (p.matches_latest_draw
+        ? ` · kỳ #${p.draw_id}`
+        : ` · kỳ #${p.latest_draw_id} thầy chưa đọc được`)));
+
+  const facts = el('dl', 'pot__facts');
+  const rows = [
+    ['bao 12 mỗi kỳ', vnd(game.wheel.cost_vnd)],
+    ['trúng cả 6', s.jackpot_one_in ? `1 phần ${s.jackpot_one_in.toLocaleString('vi-VN')}` : '—'],
+    ['không được gì', pct(s.nothing_probability) + ' số kỳ'],
+    ['có lãi', s.profit_one_in ? `1 phần ${s.profit_one_in.toLocaleString('vi-VN')} kỳ` : '—'],
+  ];
+  facts.innerHTML = rows.map(([k, v]) =>
+    `<dt>${k}</dt><dd class="num">${v}</dd>`).join('');
+  block.appendChild(facts);
+  return block;
 }
 
 /** C(pool, pick), computed rather than shipped, so it cannot disagree with the game spec. */
@@ -246,7 +272,7 @@ function stageTuong(fortune, error) {
 
 function stagePhan(data, profile, fortune) {
   const section = stage('02', `${tw('1f52e','🔮')} Thầy phán`,
-    'Mười hai số mỗi kỳ. Ghi trước giờ quay, không sửa được.');
+    'Mười hai số cho bao 12, sáu số cho vé Cơ bản. Ghi trước giờ quay, không sửa được.');
 
   const intro = el('div', 'thay-row');
   intro.innerHTML = THAY.flip('idle', 'blink')
@@ -267,20 +293,15 @@ function stagePhan(data, profile, fortune) {
       house.appendChild(ballRow(p.numbers, null));
       house.appendChild(el('p', 'note',
         `bao 12 = ${game.wheel.combinations} tổ hợp = <b>${vnd(game.wheel.cost_vnd)}</b>`));
-      const jackpot = jackpotLine(game);
-      if (jackpot) house.appendChild(jackpot);
-      const payout = payoutTable(game);
-      if (payout) {
-        house.appendChild(el('p', 'note', 'Hôm nay trúng thì thực nhận bao nhiêu:'));
-        house.appendChild(payout);
+      const basic = basicPick(p);
+      if (basic) house.appendChild(basic);
+      const pot = jackpotFocus(game);
+      if (pot) {
+        house.appendChild(pot);
         const six = game.payout_if_hit[game.payout_if_hit.length - 1];
         if (!six.uses_live_jackpot) {
           house.appendChild(el('p', 'note',
-            'Hàng cuối tính theo mức sàn — kỳ này thầy chưa đọc được nồi.'));
-        }
-        if (game.has_bonus) {
-          house.appendChild(el('p', 'note',
-            'Bảng này không tính số phụ. Trúng 5 số mà có cả số phụ thì ăn Jackpot 2.'));
+            'Con số này theo mức sàn — kỳ này thầy chưa đọc được nồi.'));
         }
       }
       house.appendChild(sermonList(p.numbers, p.sermon));
