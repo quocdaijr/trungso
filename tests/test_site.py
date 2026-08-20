@@ -128,6 +128,12 @@ def test_bundle_handles_empty_history():
 # --------------------------------------------------------- jackpot in the bundle
 
 
+def _jackpot_label(game: str) -> str:
+    """Power calls it "Jackpot 1"; Mega just "Jackpot". Getting this wrong is what caught
+    the production guard that refuses figures from another game's page."""
+    return "Jackpot 1" if game == "power655" else "Jackpot"
+
+
 def _store_prizes(game: str, draw_id: str, top: int = 34_897_731_150, winners: int = 0):
     from trungso.sources.vietlott_prizes import DrawPrizes, PrizeTier
 
@@ -135,8 +141,8 @@ def _store_prizes(game: str, draw_id: str, top: int = 34_897_731_150, winners: i
         DrawPrizes(
             game=game,
             draw_id=draw_id,
-            jackpots={"Jackpot 1": top},
-            tiers=(PrizeTier("Jackpot 1", winners, top),),
+            jackpots={_jackpot_label(game): top},
+            tiers=(PrizeTier(_jackpot_label(game), winners, top),),
             fetched_at="2026-08-20T07:00:00+00:00",
         )
     )
@@ -176,3 +182,88 @@ def test_prizes_are_null_when_never_fetched():
     game = next(g for g in payload["games"] if g["key"] == "power655")
 
     assert game["prizes"] is None
+
+
+# ------------------------------------------------ what today's draw would actually pay
+
+
+def test_payout_table_covers_every_hit_count():
+    store.write_draws("mega645", [make_draw(MEGA645, 1551)])
+    _store_prizes("mega645", "01551", top=24_507_110_500)
+
+    payload = site.build_bundle()
+    game = next(g for g in payload["games"] if g["key"] == "mega645")
+    rows = game["payout_if_hit"]
+
+    assert [r["hits"] for r in rows] == [0, 1, 2, 3, 4, 5, 6]
+
+
+def test_hitting_nothing_pays_nothing_and_loses_the_whole_stake():
+    store.write_draws("mega645", [make_draw(MEGA645, 1551)])
+    _store_prizes("mega645", "01551")
+
+    game = next(g for g in site.build_bundle()["games"] if g["key"] == "mega645")
+    zero = game["payout_if_hit"][0]
+
+    assert zero["payout_vnd"] == 0
+    assert zero["net_vnd"] == -game["wheel"]["cost_vnd"]
+
+
+def test_six_hits_uses_the_live_jackpot_not_the_floor():
+    """The floor is 12 billion; the scraped pot is 24.5. Showing the floor when we have
+    the real figure would understate it, which is just as wrong as overstating it."""
+    store.write_draws("mega645", [make_draw(MEGA645, 1551)])
+    _store_prizes("mega645", "01551", top=24_507_110_500)
+
+    game = next(g for g in site.build_bundle()["games"] if g["key"] == "mega645")
+    six = game["payout_if_hit"][6]
+
+    assert six["uses_live_jackpot"] is True
+    assert six["payout_vnd"] > 24_507_110_500
+
+
+def test_without_a_scraped_jackpot_the_table_falls_back_to_the_floor_and_says_so():
+    store.write_draws("mega645", [make_draw(MEGA645, 1551)])
+
+    game = next(g for g in site.build_bundle()["games"] if g["key"] == "mega645")
+    six = game["payout_if_hit"][6]
+
+    assert six["uses_live_jackpot"] is False
+    assert six["payout_vnd"] >= MEGA645.jackpot_floor["jackpot"]
+
+
+def test_the_loss_lives_in_the_probability_not_the_payout():
+    """Worth pinning because the obvious guess is wrong. A wheel is not a small win when
+    it lands - four hits on Mega already clears the stake, five pays 112 million against
+    9.24 million staked. The reason the ROI is -71% is that four-or-better happens about
+    once in 28 draws, not that the prizes are stingy. The table must show both halves, or
+    it argues the opposite of what the numbers say."""
+    store.write_draws("mega645", [make_draw(MEGA645, 1551)])
+    _store_prizes("mega645", "01551")
+
+    rows = next(g for g in site.build_bundle()["games"] if g["key"] == "mega645")["payout_if_hit"]
+
+    assert rows[3]["net_vnd"] < 0, "three hits still loses"
+    assert rows[4]["net_vnd"] > 0, "four hits already clears the stake"
+    assert rows[5]["net_vnd"] > 100_000_000
+    # and yet: the chance of doing four or better is tiny, which is where the ROI goes
+    assert sum(r["probability"] for r in rows[4:]) < 0.04
+
+
+def test_probability_column_matches_the_wheel_module():
+    from trungso import wheel
+
+    store.write_draws("mega645", [make_draw(MEGA645, 1551)])
+
+    game = next(g for g in site.build_bundle()["games"] if g["key"] == "mega645")
+    for row in game["payout_if_hit"]:
+        assert row["probability"] == round(wheel.hit_probability(MEGA645, row["hits"]), 9)
+
+
+def test_probabilities_sum_to_one():
+    store.write_draws("mega645", [make_draw(MEGA645, 1551)])
+
+    game = next(g for g in site.build_bundle()["games"] if g["key"] == "mega645")
+    total = sum(r["probability"] for r in game["payout_if_hit"])
+
+    assert abs(total - 1.0) < 1e-6

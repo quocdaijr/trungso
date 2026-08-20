@@ -208,6 +208,27 @@ confirms 40.000.000 / 500.000 / 50.000 for Power, matching `games.py` — and th
 already excluded from `roi_excluding_jackpot` precisely because it varies. A test now asserts
 the static table still matches the live one, so a silent upstream change would fail loudly.
 
+### If it comes in tonight, what do you actually get?
+
+The estimated pot for the *next* draw is not published anywhere a plain request can reach.
+This is, and it is the question the jackpot figure makes people ask anyway - so the page
+answers it from arithmetic instead of from a number it does not have.
+
+For Mega 6/45, a bao-12 ticket costs 9,240,000đ:
+
+| hits | 1 in | pays | net |
+|---|---|---|---|
+| 3 | 7 | 2,520,000đ | −6,720,000đ |
+| 4 | 31 | 15,120,000đ | **+5,880,000đ** |
+| 5 | 312 | 112,000,000đ | **+102,760,000đ** |
+| 6 | 8,815 | 24,946,610,500đ | **+24,937,370,500đ** |
+
+The table has to carry both halves. The money column alone reads as an argument *for*
+playing - four hits already clears the stake, and it does. The probability column alone
+reads as though the prizes were stingy, and they are not. Only together do they say the
+true thing: the payouts are real, and the odds are what take them back. Four-or-better
+happens about once in 28 draws, which is where the −71.57% goes.
+
 ## What the Honest Layer found
 
 Chi-square test, H₀ = "every number is equally likely":

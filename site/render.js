@@ -74,6 +74,39 @@ function jackpotLine(game) {
   return node;
 }
 
+/**
+ * "So what do I get if it comes in tonight?"
+ *
+ * The next draw's estimated pot is not published anywhere a plain request can reach, but
+ * this is - every figure here is derived from the real prize values and the real
+ * combinatorics of the 924 tickets.
+ *
+ * Both halves go in the table or neither does. The payouts alone read as an argument FOR
+ * playing: four hits already clears the stake. The probabilities alone read as an argument
+ * that the prizes are stingy, which they are not. Only together do they say the true
+ * thing, which is that the money is real and the odds are what take it back.
+ */
+function payoutTable(game) {
+  const rows = game.payout_if_hit;
+  if (!rows || !rows.length) return null;
+
+  const table = el('table', 'stack-sm stack-sm--matrix');
+  const H = ['1 trên', 'thực nhận', 'lãi/lỗ'];
+  table.innerHTML = '<thead><tr><th>trúng</th>'
+    + H.map((h) => `<th class="num">${h}</th>`).join('') + '</tr></thead><tbody>'
+    + rows.map((r) => {
+        const net = r.net_vnd;
+        const sign = net > 0 ? '+' : '';
+        const cls = net > 0 ? 'num win' : 'num';
+        return `<tr><th>${r.hits} số</th>`
+          + `<td class="num" data-label="${H[0]}">${r.one_in ? r.one_in.toLocaleString('vi-VN') : '—'}</td>`
+          + `<td class="num" data-label="${H[1]}">${r.payout_vnd ? vnd(r.payout_vnd) : '—'}</td>`
+          + `<td class="${cls}" data-label="${H[2]}">${sign}${vnd(net)}</td></tr>`;
+      }).join('')
+    + '</tbody>';
+  return table;
+}
+
 /** C(pool, pick), computed rather than shipped, so it cannot disagree with the game spec. */
 function totalCombos(game) {
   let n = 1;
@@ -236,6 +269,20 @@ function stagePhan(data, profile, fortune) {
         `bao 12 = ${game.wheel.combinations} tổ hợp = <b>${vnd(game.wheel.cost_vnd)}</b>`));
       const jackpot = jackpotLine(game);
       if (jackpot) house.appendChild(jackpot);
+      const payout = payoutTable(game);
+      if (payout) {
+        house.appendChild(el('p', 'note', 'Hôm nay trúng thì thực nhận bao nhiêu:'));
+        house.appendChild(payout);
+        const six = game.payout_if_hit[game.payout_if_hit.length - 1];
+        if (!six.uses_live_jackpot) {
+          house.appendChild(el('p', 'note',
+            'Hàng cuối tính theo mức sàn — kỳ này thầy chưa đọc được nồi.'));
+        }
+        if (game.has_bonus) {
+          house.appendChild(el('p', 'note',
+            'Bảng này không tính số phụ. Trúng 5 số mà có cả số phụ thì ăn Jackpot 2.'));
+        }
+      }
       house.appendChild(sermonList(p.numbers, p.sermon));
     } else {
       house.appendChild(el('p', 'hand', 'Kỳ này thầy chưa phán. Con chờ.'));

@@ -178,3 +178,43 @@ def test_as_dict_round_trips_through_json():
     assert revived["jackpots"]["Jackpot 1"] == 34_897_731_150
     assert revived["tiers"][0]["winners"] == 0
     assert revived["draw_id"] == "01386"
+
+
+# ------------------------------------- mapping scraped labels onto wheel.py's tier keys
+
+
+def test_tier_values_uses_the_keys_wheel_expects():
+    """wheel.payout_vnd is keyed on jackpot1/jackpot2; the page says "Jackpot 1"."""
+    result = prizes.parse_prizes(POWER655, "01386", POWER655_PAGE)
+
+    assert result.tier_values(POWER655) == {
+        "jackpot1": 34_897_731_150,
+        "jackpot2": 3_544_192_350,
+    }
+
+
+def test_tier_values_for_a_single_jackpot_game():
+    result = prizes.parse_prizes(MEGA645, "01551", MEGA645_PAGE)
+
+    assert result.tier_values(MEGA645) == {"jackpot": 24_507_110_500}
+
+
+def test_tier_values_feeds_straight_into_payout_vnd():
+    """The whole point of the mapping: no caller should have to translate labels."""
+    from trungso import wheel
+
+    result = prizes.parse_prizes(MEGA645, "01551", MEGA645_PAGE)
+    counts = wheel.prize_counts(MEGA645, 6)
+
+    paid = wheel.payout_vnd(MEGA645, counts, jackpots=result.tier_values(MEGA645))
+
+    # six hits wins the jackpot once, plus the lower tiers the other tickets pick up
+    assert paid > 24_507_110_500
+
+
+def test_tier_values_rejects_a_label_the_game_does_not_have():
+    """A Power page parsed against Mega would silently invent a jackpot2 otherwise."""
+    result = prizes.parse_prizes(POWER655, "01386", POWER655_PAGE)
+
+    with pytest.raises(ValueError, match="jackpot2"):
+        result.tier_values(MEGA645)

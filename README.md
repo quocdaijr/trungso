@@ -160,6 +160,26 @@ xác nhận 40.000.000 / 500.000 / 50.000 cho Power, khớp `games.py` — và n
 khỏi `roi_excluding_jackpot` chính vì nó biến động. Giờ có test bắt bảng tĩnh phải khớp bảng
 live, nên upstream đổi giá là nó văng lỗi chứ không im.
 
+### Hôm nay trúng thì thực nhận bao nhiêu?
+
+Con số ước tính nồi **kỳ tới** không có ở bất kỳ trang nào một request thuần lấy được.
+Nhưng câu này thì có — và nó chính là câu mà con số jackpot làm người ta muốn hỏi, nên
+trang trả lời bằng số học chứ không bằng một con số nó không có.
+
+Mega 6/45, bao 12 tốn 9.240.000đ:
+
+| trúng | 1 trên | thực nhận | lãi/lỗ |
+|---|---|---|---|
+| 3 | 7 | 2.520.000đ | −6.720.000đ |
+| 4 | 31 | 15.120.000đ | **+5.880.000đ** |
+| 5 | 312 | 112.000.000đ | **+102.760.000đ** |
+| 6 | 8.815 | 24.946.610.500đ | **+24.937.370.500đ** |
+
+Bảng buộc phải có **cả hai nửa**. Riêng cột tiền đọc ra thành lời khuyên nên chơi — trúng 4
+số đã có lãi thật. Riêng cột xác suất đọc ra thành "giải bèo", mà giải không hề bèo. Chỉ khi
+đứng cạnh nhau chúng mới nói đúng: tiền là thật, và xác suất là thứ lấy lại. Trúng 4 trở lên
+xảy ra khoảng **1 trên 28 kỳ** — đó là chỗ −71,57% đi ra.
+
 ## Kết quả Tầng Thật trên dữ liệu thật
 
 Kiểm định chi-square, H₀ = "mọi số đồng xác suất":

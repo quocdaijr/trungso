@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-20T07:51:53+00:00",
+ "generated_at": "2026-08-20T08:52:57+00:00",
  "disclaimer": "Xổ số là biến cố độc lập. Mỗi kỳ quay reset về 0. Không có số nóng, không có số lạnh. Phần mềm này không dự đoán được gì — nó chỉ tự tin quá mức và tự chấm điểm độ sai của chính mình. Bảng Phong Thần là paper-trading: tiền đốt trên giấy.",
  "games": [
   {
@@ -377,7 +377,86 @@
     "source": "live:vietlott.vn",
     "matches_latest_draw": true,
     "latest_draw_id": "01386"
-   }
+   },
+   "payout_if_hit": [
+    {
+     "hits": 0,
+     "probability": 0.210297425,
+     "one_in": 5,
+     "counts": {},
+     "payout_vnd": 0,
+     "net_vnd": -9240000,
+     "uses_live_jackpot": false
+    },
+    {
+     "hits": 1,
+     "probability": 0.398458279,
+     "one_in": 3,
+     "counts": {},
+     "payout_vnd": 0,
+     "net_vnd": -9240000,
+     "uses_live_jackpot": false
+    },
+    {
+     "hits": 2,
+     "probability": 0.280964171,
+     "one_in": 4,
+     "counts": {},
+     "payout_vnd": 0,
+     "net_vnd": -9240000,
+     "uses_live_jackpot": false
+    },
+    {
+     "hits": 3,
+     "probability": 0.093654724,
+     "one_in": 11,
+     "counts": {
+      "third": 84
+     },
+     "payout_vnd": 4200000,
+     "net_vnd": -5040000,
+     "uses_live_jackpot": false
+    },
+    {
+     "hits": 4,
+     "probability": 0.015418765,
+     "one_in": 65,
+     "counts": {
+      "second": 28,
+      "third": 224
+     },
+     "payout_vnd": 25200000,
+     "net_vnd": 15960000,
+     "uses_live_jackpot": false
+    },
+    {
+     "hits": 5,
+     "probability": 0.001174763,
+     "one_in": 851,
+     "counts": {
+      "first": 7,
+      "second": 105,
+      "third": 350
+     },
+     "payout_vnd": 350000000,
+     "net_vnd": 340760000,
+     "uses_live_jackpot": false
+    },
+    {
+     "hits": 6,
+     "probability": 3.1873e-05,
+     "one_in": 31374,
+     "counts": {
+      "jackpot1": 1,
+      "first": 36,
+      "second": 225,
+      "third": 400
+     },
+     "payout_vnd": 36470231150,
+     "net_vnd": 36460991150,
+     "uses_live_jackpot": true
+    }
+   ]
   },
   {
    "key": "mega645",
@@ -753,7 +832,86 @@
     "source": "live:vietlott.vn",
     "matches_latest_draw": true,
     "latest_draw_id": "01551"
-   }
+   },
+   "payout_if_hit": [
+    {
+     "hits": 0,
+     "probability": 0.135980337,
+     "one_in": 7,
+     "counts": {},
+     "payout_vnd": 0,
+     "net_vnd": -9240000,
+     "uses_live_jackpot": false
+    },
+    {
+     "hits": 1,
+     "probability": 0.349663723,
+     "one_in": 3,
+     "counts": {},
+     "payout_vnd": 0,
+     "net_vnd": -9240000,
+     "uses_live_jackpot": false
+    },
+    {
+     "hits": 2,
+     "probability": 0.331577668,
+     "one_in": 3,
+     "counts": {},
+     "payout_vnd": 0,
+     "net_vnd": -9240000,
+     "uses_live_jackpot": false
+    },
+    {
+     "hits": 3,
+     "probability": 0.147367852,
+     "one_in": 7,
+     "counts": {
+      "third": 84
+     },
+     "payout_vnd": 2520000,
+     "net_vnd": -6720000,
+     "uses_live_jackpot": false
+    },
+    {
+     "hits": 4,
+     "probability": 0.032088161,
+     "one_in": 31,
+     "counts": {
+      "second": 28,
+      "third": 224
+     },
+     "payout_vnd": 15120000,
+     "net_vnd": 5880000,
+     "uses_live_jackpot": false
+    },
+    {
+     "hits": 5,
+     "probability": 0.003208816,
+     "one_in": 312,
+     "counts": {
+      "first": 7,
+      "second": 105,
+      "third": 350
+     },
+     "payout_vnd": 112000000,
+     "net_vnd": 102760000,
+     "uses_live_jackpot": false
+    },
+    {
+     "hits": 6,
+     "probability": 0.000113443,
+     "one_in": 8815,
+     "counts": {
+      "jackpot": 1,
+      "first": 36,
+      "second": 225,
+      "third": 400
+     },
+     "payout_vnd": 24946610500,
+     "net_vnd": 24937370500,
+     "uses_live_jackpot": true
+    }
+   ]
   }
  ],
  "xsmb": {

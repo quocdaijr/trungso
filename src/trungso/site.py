@@ -53,6 +53,56 @@ def _prizes_payload(spec: GameSpec, draws: Sequence[Draw]) -> dict[str, Any] | N
     }
 
 
+def _payout_if_hit(
+    spec: GameSpec, prizes: Mapping[str, Any] | None
+) -> list[dict[str, Any]]:
+    """What a bao-12 ticket actually pays for each possible number of hits.
+
+    This is the question a jackpot figure makes people ask - "so what do I get if it
+    comes in tonight?" - and unlike the next draw's estimated pot, it is fully derivable:
+    `wheel.prize_counts` already knows how many of the 924 tickets win each tier when k
+    of the twelve are drawn, and the prize values are the real ones off the page.
+
+    The jackpot used is the scraped figure when we have it, the published floor when we
+    do not, and `uses_live_jackpot` says which. Falling back silently would understate
+    the pot by more than half, which is as dishonest as overstating it.
+
+    The bonus number is deliberately left out: including it would double every row, and
+    for Power it only changes the five-hit case. The page says so in words instead.
+    """
+    live = None
+    if prizes and prizes.get("jackpots"):
+        live = {
+            label.lower().replace(" ", ""): value
+            for label, value in prizes["jackpots"].items()
+        }
+        if set(live) - set(spec.jackpot_floor):
+            live = None  # figures from a different game's page; refuse rather than guess
+
+    cost = wheel.wheel_cost_vnd(spec)
+    rows: list[dict[str, Any]] = []
+    for k in range(spec.pick + 1):
+        counts = wheel.prize_counts(spec, k)
+        # Only the rows that actually reach a jackpot tier are priced off the live figure;
+        # the lower rows are the same either way, and flagging them would overstate what
+        # the scrape contributed.
+        wins_jackpot = counts.get("jackpot", counts.get("jackpot1", 0)) > 0
+        paid = wheel.payout_vnd(spec, counts, jackpots=live)
+        probability = wheel.hit_probability(spec, k)
+        rows.append(
+            {
+                "hits": k,
+                "probability": round(probability, 9),
+                "one_in": round(1 / probability) if probability else None,
+                "counts": {tier: n for tier, n in counts.items() if n},
+                "payout_vnd": paid,
+                "net_vnd": paid - cost,
+                "uses_live_jackpot": bool(live) and wins_jackpot,
+            }
+        )
+    return rows
+
+
 def _game_payload(
     spec: GameSpec,
     draws: Sequence[Draw],
@@ -63,6 +113,7 @@ def _game_payload(
     frequencies = stats.frequency(draws, spec) if draws else {}
     settled = {d.draw_id for d in draws}
     pending = [p for p in prophecies if p.game == spec.key and p.draw_id not in settled]
+    prizes = _prizes_payload(spec, draws)
 
     return {
         "key": spec.key,
@@ -96,7 +147,8 @@ def _game_payload(
         ),
         "pending_prophecy": pending[0].to_dict() if pending else None,
         "score": score.to_dict(),
-        "prizes": _prizes_payload(spec, draws),
+        "prizes": prizes,
+        "payout_if_hit": _payout_if_hit(spec, prizes),
     }
 
 

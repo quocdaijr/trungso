@@ -149,6 +149,18 @@ của kỳ nào.
 để bắt lỗi bóc dữ liệu: một "jackpot" thấp hơn mức sàn không phải jackpot nhỏ, nó là regex
 bắt sai dòng — parser phải văng lỗi thay vì công bố.
 
+**Bảng thực nhận** (`payout_if_hit`) — Với mỗi số lượng trúng k = 0..6, bao 12 thực nhận
+bao nhiêu. Suy ra được hoàn toàn: `wheel.prize_counts` đã biết trong 924 vé có bao nhiêu vé
+ăn hạng nào khi k trong 12 số về, còn giá mỗi hạng thì lấy từ trang thật.
+
+Bảng **phải có cả hai nửa** — tiền và xác suất. Riêng cột tiền đọc ra thành lời khuyên nên
+chơi (trúng 4 số đã có lãi). Riêng cột xác suất đọc ra thành "giải bèo", mà không hề bèo.
+Chỉ khi đứng cạnh nhau chúng mới nói đúng sự thật: tiền là thật, và xác suất là thứ lấy lại.
+
+Con số thật, đã tính bằng code chứ không nhẩm: bao 12 Mega 6/45 trúng 4 số lãi **+5,88 tr**,
+trúng 5 số lãi **+102,76 tr**. Chỗ ROI −71,57% đến từ việc trúng 4 trở lên chỉ khoảng
+**1 trên 28 kỳ**.
+
 ## Từ tránh dùng
 
 - **"số nóng" / "số lạnh" / "cầu" / "soi cầu"** — chỉ dùng khi đang trích dẫn để bóc phốt,
