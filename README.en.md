@@ -179,6 +179,7 @@ Python.
 |---|---|---|
 | [`thanhnhu/vietlott`](https://github.com/thanhnhu/vietlott) (MIT) | primary — Power 6/55 & Mega 6/45 | 1,386 + 1,353 draws since 2017 |
 | `vietlott.vn` | fallback when the mirror lags (latest draw only) | — |
+| `vietlott.vn` (same page) | Jackpot value and prize tiers per draw | 2 games |
 | [`khiemdoan/vietnam-lottery-xsmb-analysis`](https://github.com/khiemdoan/vietnam-lottery-xsmb-analysis) (MIT) | XSMB — honest layer + a cosmic signal | 7,526 draws since 2005 |
 | [`jbaranski/jeffs-lottery-utils`](https://github.com/jbaranski/jeffs-lottery-utils) (MIT) | Powerball & Mega Millions — statistics only | 1,395 + 918 draws |
 | CoinGecko / Open-Meteo | cosmic signals (BTC, weather) | — |
@@ -189,6 +190,23 @@ returns 403 from this network, including its plain HTML pages, with or without b
 The US games are **statistics-only**: no prophecies, no wheel, no scoreboard. Wheel-12 is a
 Vietlott product; the sole purpose of the US data is to let The Honest Layer show that American
 lotteries are exactly as random.
+
+### What the jackpot figure is, and is not
+
+The results page states the jackpot **as at a completed draw**, and that is the only jackpot
+figure a plain HTTP request can get: vietlott.vn serves its estimate for the *upcoming* draw
+through JavaScript, and the landing pages return an 18 KB shell with no data in it at all.
+
+So when nobody won, the site says **"ít nhất X"** — at least X — because the next draw's pot
+is that figure plus whatever the new tickets add. It never says "the jackpot is X". It also
+always names the draw the money belongs to, because if the prize fetch failed on the last
+run the stored figure describes an older draw, and a stale number wearing a current label is
+the one thing this repository is built not to print.
+
+The scoreboard's arithmetic did not change. The fixed tiers really are fixed — the live page
+confirms 40.000.000 / 500.000 / 50.000 for Power, matching `games.py` — and the jackpot was
+already excluded from `roi_excluding_jackpot` precisely because it varies. A test now asserts
+the static table still matches the live one, so a silent upstream change would fail loudly.
 
 ## What the Honest Layer found
 

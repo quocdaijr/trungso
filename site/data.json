@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-08-19T12:01:36+00:00",
+ "generated_at": "2026-08-20T07:51:53+00:00",
  "disclaimer": "Xổ số là biến cố độc lập. Mỗi kỳ quay reset về 0. Không có số nóng, không có số lạnh. Phần mềm này không dự đoán được gì — nó chỉ tự tin quá mức và tự chấm điểm độ sai của chính mình. Bảng Phong Thần là paper-trading: tiền đốt trên giấy.",
  "games": [
   {
@@ -336,6 +336,47 @@
     "prize_counts_total": {},
     "best_draw": null,
     "jackpot_hits": 0
+   },
+   "prizes": {
+    "game": "power655",
+    "draw_id": "01386",
+    "jackpots": {
+     "Jackpot 1": 34897731150,
+     "Jackpot 2": 3544192350
+    },
+    "tiers": [
+     {
+      "label": "Jackpot 1",
+      "winners": 0,
+      "value_vnd": 34897731150
+     },
+     {
+      "label": "Jackpot 2",
+      "winners": 0,
+      "value_vnd": 3544192350
+     },
+     {
+      "label": "Giải Nhất",
+      "winners": 9,
+      "value_vnd": 40000000
+     },
+     {
+      "label": "Giải Nhì",
+      "winners": 776,
+      "value_vnd": 500000
+     },
+     {
+      "label": "Giải Ba",
+      "winners": 16116,
+      "value_vnd": 50000
+     }
+    ],
+    "top_jackpot_vnd": 34897731150,
+    "rolled_over": true,
+    "fetched_at": "2026-08-20T07:51:29+00:00",
+    "source": "live:vietlott.vn",
+    "matches_latest_draw": true,
+    "latest_draw_id": "01386"
    }
   },
   {
@@ -677,6 +718,41 @@
      "cost_vnd": 9240000
     },
     "jackpot_hits": 0
+   },
+   "prizes": {
+    "game": "mega645",
+    "draw_id": "01551",
+    "jackpots": {
+     "Jackpot": 24507110500
+    },
+    "tiers": [
+     {
+      "label": "Jackpot",
+      "winners": 0,
+      "value_vnd": 24507110500
+     },
+     {
+      "label": "Giải Nhất",
+      "winners": 23,
+      "value_vnd": 10000000
+     },
+     {
+      "label": "Giải Nhì",
+      "winners": 1333,
+      "value_vnd": 300000
+     },
+     {
+      "label": "Giải Ba",
+      "winners": 21272,
+      "value_vnd": 30000
+     }
+    ],
+    "top_jackpot_vnd": 24507110500,
+    "rolled_over": true,
+    "fetched_at": "2026-08-20T07:51:53+00:00",
+    "source": "live:vietlott.vn",
+    "matches_latest_draw": true,
+    "latest_draw_id": "01551"
    }
   }
  ],

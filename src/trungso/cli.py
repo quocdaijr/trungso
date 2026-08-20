@@ -22,10 +22,11 @@ from .games import (
 )
 from .models import Draw, Prophecy, normalise_draw_id
 from .oracle import prophesy
-from .sources import us_lottery, vietlott_live, xsmb
+from .sources import us_lottery, vietlott_live, vietlott_prizes, xsmb
 from .sources import vietlott_mirror as mirror
 from .sources.vibes import gather
 from .sources.vietlott_live import LiveFetchError
+from .sources.vietlott_prizes import PrizeParseError
 from .store import ProphecyConflict
 
 VN_TZ = timezone(timedelta(hours=7))
@@ -128,6 +129,29 @@ def _try_live_fallback(spec: GameSpec, missing: Sequence[str]) -> bool:
     return bool(remaining)
 
 
+def _refresh_prizes(spec: GameSpec, latest_draw_id: str) -> None:
+    """Read the jackpot for the newest draw and store it.
+
+    Never fatal. The prize figures are commentary on the draw, not part of it, so a
+    layout change on vietlott.vn must not take the whole ingest down - it reports, keeps
+    whatever was stored last, and the site labels that figure with the draw it belongs to
+    so a stale number can never pass itself off as the current one.
+    """
+    try:
+        prizes = vietlott_prizes.fetch_prizes(spec, latest_draw_id)
+    except (PrizeParseError, LiveFetchError, requests.RequestException) as exc:
+        console.print(f"  [yellow]không đọc được giải thưởng:[/yellow] {exc}")
+        return
+
+    changed = store.write_prizes(prizes)
+    billions = prizes.top_jackpot_vnd / 1_000_000_000
+    state = "cộng dồn sang kỳ sau" if prizes.rolled_over else "đã có người trúng"
+    console.print(
+        f"  jackpot kỳ #{prizes.draw_id}: [bold]{billions:,.2f} tỷ[/bold] — {state}"
+        + ("" if changed else " [dim](không đổi)[/dim]")
+    )
+
+
 def _money(value: float) -> str:
     return f"{value:,.0f}đ"
 
@@ -144,6 +168,11 @@ def cmd_ingest(args: argparse.Namespace) -> int:
 
         console.print(f"  kỳ mới: [green]{added}[/green] · tổng: [bold]{total}[/bold]")
         console.print(f"  mới nhất: #{report['last_id']} ngày {report['last_date']}")
+
+        # Jackpot lives on the same vietlott.vn page as the draw, and only for Vietlott
+        # games - the US files carry no prize pool we can read.
+        if spec.wheel_playable and report["last_id"]:
+            _refresh_prizes(spec, report["last_id"])
 
         # Gap and lag checks assume a Vietlott draw calendar and a real draw number.
         # The US files carry neither, so applying them there would invent problems.

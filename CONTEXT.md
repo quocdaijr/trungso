@@ -131,6 +131,24 @@ nguyên hình ảnh. Ngoại lệ duy nhất có từ trước là Google Fonts.
 không được chứa thứ nó không sở hữu. Đây là lý do loại meme nhân vật có bản quyền, ảnh phim,
 và ảnh lấy từ mạng xã hội — thiếu giấy phép, không phải thiếu chỗ tìm.
 
+**Nồi** (jackpot) — Giá trị Jackpot **tại kỳ đã quay**, đọc từ trang kết quả vietlott.vn.
+Không phải ước tính cho kỳ sắp tới: vietlott chỉ phát con số ước tính qua JavaScript, HTML
+thuần không có. Vì vậy trang **không bao giờ** gọi nó là "giải đang", chỉ gọi là nồi của
+kỳ nào.
+
+**Cộng dồn** (rolled over) — Hạng cao nhất của kỳ đó không ai trúng, nên nồi chuyển sang kỳ
+sau. Đây là lý do câu duy nhất đúng là **"ít nhất X"**: kỳ sau sẽ là X cộng thêm tiền vé
+bán ra. Trúng rồi thì nồi về mức sàn, và trang phải nói ra chuyện đó chứ không im.
+
+**Khớp kỳ mới nhất** (`matches_latest_draw`) — Cờ so `draw_id` của số liệu giải với kỳ mới
+nhất đã lưu. Nếu lượt đọc giải thất bại, con số còn lại thuộc về một kỳ cũ hơn; giấu nó thì
+mất thông tin, mà trưng nó như số hiện tại thì là nói dối. Cờ này để trang nói rõ tiền đó
+của kỳ nào.
+
+**Mức sàn** (`jackpot_floor`) — Giá trị nồi reset về sau khi có người trúng. Cũng là ngưỡng
+để bắt lỗi bóc dữ liệu: một "jackpot" thấp hơn mức sàn không phải jackpot nhỏ, nó là regex
+bắt sai dòng — parser phải văng lỗi thay vì công bố.
+
 ## Từ tránh dùng
 
 - **"số nóng" / "số lạnh" / "cầu" / "soi cầu"** — chỉ dùng khi đang trích dẫn để bóc phốt,
@@ -146,6 +164,8 @@ và ảnh lấy từ mạng xã hội — thiếu giấy phép, không phải th
 - **"đăng ký" / "tài khoản" / "thu thập dữ liệu người dùng"** — không tồn tại trong project
   này và sẽ không tồn tại. Cá nhân hoá đạt được **không cần** lưu gì của ai.
 - **"chắc chắn trúng" / "số chuẩn" / "cam kết"** — thầy bựa tới đâu cũng dừng trước câu này.
+- **"giải đang X tỷ"** — trang không biết con số đó. Nó biết nồi của kỳ đã quay,
+  nên chỉ được nói **"ít nhất X"** khi cộng dồn, và phải kèm số kỳ.
 - **"em"** khi oracle nói — oracle xưng **thầy**, gọi **con**. Không phải trợ lý.
 - **"thấy trên Facebook"** như một nguồn tài nguyên — mạng xã hội không phải giấy
   phép. Ảnh không có nguồn và licence xác minh được thì không vào repo.

@@ -34,6 +34,25 @@ DISCLAIMER = (
 )
 
 
+def _prizes_payload(spec: GameSpec, draws: Sequence[Draw]) -> dict[str, Any] | None:
+    """The stored jackpot, tagged with whether it still describes the newest draw.
+
+    `matches_latest_draw` is the whole point of this function. If the prize fetch failed
+    on the last run, the stored figure belongs to an older draw - and a jackpot labelled
+    as current when it is not would be exactly the kind of number this project refuses to
+    print. The renderer must read this flag before it words anything.
+    """
+    stored = store.read_prizes(spec.key)
+    if not stored:
+        return None
+    latest_id = draws[-1].draw_id if draws else None
+    return {
+        **stored,
+        "matches_latest_draw": bool(latest_id and stored.get("draw_id") == latest_id),
+        "latest_draw_id": latest_id,
+    }
+
+
 def _game_payload(
     spec: GameSpec,
     draws: Sequence[Draw],
@@ -77,6 +96,7 @@ def _game_payload(
         ),
         "pending_prophecy": pending[0].to_dict() if pending else None,
         "score": score.to_dict(),
+        "prizes": _prizes_payload(spec, draws),
     }
 
 

@@ -157,3 +157,54 @@ def test_scoreboard_write_is_skipped_when_only_time_moved():
     payload = {"generated_at": "2026-08-19T00:00:00Z", "per_game": {}}
     assert store.write_scoreboard(payload) is True
     assert store.write_scoreboard({**payload, "generated_at": "2026-08-19T18:45:00Z"}) is False
+
+
+# --------------------------------------------------------------------------- prizes
+
+
+def _prizes(top: int = 34_897_731_150, winners: int = 0, when: str = "2026-08-20T07:00:00+00:00"):
+    from trungso.sources.vietlott_prizes import DrawPrizes, PrizeTier
+
+    return DrawPrizes(
+        game="power655",
+        draw_id="01386",
+        jackpots={"Jackpot 1": top, "Jackpot 2": 3_544_192_350},
+        tiers=(PrizeTier("Jackpot 1", winners, top), PrizeTier("Giải Ba", 16_116, 50_000)),
+        fetched_at=when,
+    )
+
+
+def test_write_prizes_then_read_them_back():
+    assert store.write_prizes(_prizes()) is True
+
+    stored = store.read_prizes("power655")
+    assert stored["jackpots"]["Jackpot 1"] == 34_897_731_150
+    assert stored["rolled_over"] is True
+    assert stored["draw_id"] == "01386"
+
+
+def test_read_prizes_returns_none_when_never_fetched():
+    assert store.read_prizes("mega645") is None
+
+
+def test_a_second_write_of_the_same_figures_does_not_touch_the_file():
+    """The jackpot only moves when a draw happens. Rewriting on every cron run would
+    turn the audit trail into two junk commits a day - the same trap generated_at set."""
+    store.write_prizes(_prizes())
+
+    assert store.write_prizes(_prizes(when="2026-08-20T19:30:00+00:00")) is False
+
+
+def test_a_changed_jackpot_does_get_written():
+    store.write_prizes(_prizes())
+
+    assert store.write_prizes(_prizes(top=41_000_000_000)) is True
+    assert store.read_prizes("power655")["jackpots"]["Jackpot 1"] == 41_000_000_000
+
+
+def test_somebody_winning_gets_written_even_at_the_same_amount():
+    """Same pot, but rolled_over flips - that is the whole story of the draw."""
+    store.write_prizes(_prizes(winners=0))
+
+    assert store.write_prizes(_prizes(winners=1)) is True
+    assert store.read_prizes("power655")["rolled_over"] is False

@@ -123,3 +123,56 @@ def test_bundle_handles_empty_history():
         assert game["latest"] is None
         assert game["chi_square"] is None
         assert game["score"]["draws_scored"] == 0
+
+
+# --------------------------------------------------------- jackpot in the bundle
+
+
+def _store_prizes(game: str, draw_id: str, top: int = 34_897_731_150, winners: int = 0):
+    from trungso.sources.vietlott_prizes import DrawPrizes, PrizeTier
+
+    store.write_prizes(
+        DrawPrizes(
+            game=game,
+            draw_id=draw_id,
+            jackpots={"Jackpot 1": top},
+            tiers=(PrizeTier("Jackpot 1", winners, top),),
+            fetched_at="2026-08-20T07:00:00+00:00",
+        )
+    )
+
+
+def test_bundle_carries_the_jackpot_for_the_newest_draw():
+    store.write_draws("power655", [make_draw(POWER655, 1386)])
+    _store_prizes("power655", "01386")
+
+    payload = site.build_bundle()
+    game = next(g for g in payload["games"] if g["key"] == "power655")
+
+    assert game["prizes"]["top_jackpot_vnd"] == 34_897_731_150
+    assert game["prizes"]["rolled_over"] is True
+    assert game["prizes"]["matches_latest_draw"] is True
+
+
+def test_a_jackpot_from_an_older_draw_is_flagged_not_hidden():
+    """If the prize fetch failed, the stored figure belongs to a draw that is no longer
+    the newest. Hiding it loses information; presenting it as current would be a lie.
+    The flag lets the page say which draw the money belongs to."""
+    store.write_draws("power655", [make_draw(POWER655, 1386), make_draw(POWER655, 1387)])
+    _store_prizes("power655", "01386")
+
+    payload = site.build_bundle()
+    game = next(g for g in payload["games"] if g["key"] == "power655")
+
+    assert game["prizes"]["matches_latest_draw"] is False
+    assert game["prizes"]["draw_id"] == "01386"
+    assert game["prizes"]["latest_draw_id"] == "01387"
+
+
+def test_prizes_are_null_when_never_fetched():
+    store.write_draws("power655", [make_draw(POWER655, 1386)])
+
+    payload = site.build_bundle()
+    game = next(g for g in payload["games"] if g["key"] == "power655")
+
+    assert game["prizes"] is None

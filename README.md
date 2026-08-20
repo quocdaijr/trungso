@@ -132,6 +132,7 @@ chi, nạp âm mỗi năm 1929–2035) nhúng vào `site/data.json`. Có test đ
 |---|---|---|
 | [`thanhnhu/vietlott`](https://github.com/thanhnhu/vietlott) (MIT) | Nguồn chính — Power 6/55 & Mega 6/45 | 1386 + 1353 kỳ, từ 2017 |
 | `vietlott.vn` | Dự phòng khi mirror lag (chỉ lấy được kỳ mới nhất) | — |
+| `vietlott.vn` (cùng trang đó) | Giá trị nồi + các hạng giải theo từng kỳ | 2 game |
 | [`khiemdoan/vietnam-lottery-xsmb-analysis`](https://github.com/khiemdoan/vietnam-lottery-xsmb-analysis) (MIT) | XSMB — Tầng Thật + tín hiệu vũ trụ | 7526 kỳ, từ 2005 |
 | [`jbaranski/jeffs-lottery-utils`](https://github.com/jbaranski/jeffs-lottery-utils) (MIT) | Powerball & Mega Millions — chỉ để thống kê | 1395 + 918 kỳ |
 | CoinGecko / Open-Meteo | Tín hiệu vũ trụ (BTC, thời tiết) | — |
@@ -142,6 +143,22 @@ chi, nạp âm mỗi năm 1929–2035) nhúng vào `site/data.json`. Có test đ
 Game Mỹ **chỉ để thống kê** — không tiên tri, không bao 12, không Bảng Phong Thần. Bao 12
 là sản phẩm của Vietlott; mục đích duy nhất của data Mỹ là cho Tầng Thật chỉ ra rằng xổ số
 Mỹ cũng ngẫu nhiên y như vậy.
+
+### Con số nồi là gì, và không là gì
+
+Trang kết quả ghi giá trị Jackpot **tại kỳ đã quay** — và đó là con số duy nhất một request
+HTTP thuần lấy được: vietlott.vn phát ước tính cho kỳ **sắp tới** qua JavaScript, còn các
+trang chủ/`choi-ngay` trả về một vỏ 18 KB không có dữ liệu nào.
+
+Nên khi không ai trúng, trang ghi **"ít nhất X"**, vì nồi kỳ sau là X cộng thêm tiền vé bán
+ra. Nó không bao giờ ghi "giải đang X". Nó cũng luôn nói rõ tiền đó của **kỳ nào**: nếu lượt
+đọc giải thất bại, con số còn lưu thuộc về một kỳ cũ hơn — và một con số cũ mang nhãn hiện
+tại đúng là thứ repo này dựng ra để không in.
+
+Phép tính của Bảng Phong Thần **không đổi**. Các hạng cố định đúng là cố định — trang live
+xác nhận 40.000.000 / 500.000 / 50.000 cho Power, khớp `games.py` — và nồi thì vốn đã bị loại
+khỏi `roi_excluding_jackpot` chính vì nó biến động. Giờ có test bắt bảng tĩnh phải khớp bảng
+live, nên upstream đổi giá là nó văng lỗi chứ không im.
 
 ## Kết quả Tầng Thật trên dữ liệu thật
 

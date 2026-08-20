@@ -34,6 +34,52 @@ const GENDERS = [['', 'không muốn nói'], ['nam', 'Nam'], ['nữ', 'Nữ']];
 const CAN_PHUOC_ROI = -0.8;
 
 const vnd = (n) => (n || 0).toLocaleString('vi-VN') + 'đ';
+/** Billions, because 34.897.731.150 is a number nobody reads and "34,90 tỷ" is one they do. */
+const billions = (n) => (n / 1e9).toLocaleString('vi-VN', {maximumFractionDigits: 2}) + ' tỷ';
+
+/**
+ * The jackpot line.
+ *
+ * Three things this must never do, in order of how badly they would break the page's
+ * one promise:
+ *   1. Call the figure the current jackpot. It is the pot as at a completed draw. When
+ *      nobody won, the next draw's pot is that plus new ticket sales, so the only true
+ *      word is "ít nhất".
+ *   2. Show a figure from an older draw as though it described the newest one. If the
+ *      prize fetch failed, `matches_latest_draw` is false and the draw id is stated.
+ *   3. Put the number anywhere near a suggestion that it is winnable. It sits beside the
+ *      cost of chasing it on purpose.
+ */
+function jackpotLine(game) {
+  const p = game.prizes;
+  if (!p) return null;
+
+  const pot = billions(p.top_jackpot_vnd);
+  const stale = !p.matches_latest_draw;
+  let text;
+  if (stale) {
+    text = `Nồi kỳ #${p.draw_id}: <b>${pot}</b>. Kỳ #${p.latest_draw_id} thầy chưa đọc được.`;
+  } else if (p.rolled_over) {
+    text = `Nồi đang cộng dồn: <b>ít nhất ${pot}</b> — kỳ #${p.draw_id} không ai lấy.`;
+  } else {
+    text = `Kỳ #${p.draw_id} đã có người trúng <b>${pot}</b>. Nồi về mức sàn.`;
+  }
+
+  const node = el('p', 'note jackpot', text);
+  // The ratio is arithmetic, not theatre, so it says itself plainly.
+  const odds = Math.round(1 / (game.wheel.combinations / totalCombos(game)));
+  node.appendChild(el('span', 'jackpot__odds',
+    `bao 12 mua ${game.wheel.combinations} trên ${totalCombos(game).toLocaleString('vi-VN')} `
+    + `tổ hợp — 1 phần ${odds.toLocaleString('vi-VN')}`));
+  return node;
+}
+
+/** C(pool, pick), computed rather than shipped, so it cannot disagree with the game spec. */
+function totalCombos(game) {
+  let n = 1;
+  for (let i = 0; i < game.pick; i++) n = n * (game.pool - i) / (i + 1);
+  return Math.round(n);
+}
 const pct = (n) => (n * 100).toFixed(2) + '%';
 const pad = (n) => String(n).padStart(2, '0');
 
@@ -188,6 +234,8 @@ function stagePhan(data, profile, fortune) {
       house.appendChild(ballRow(p.numbers, null));
       house.appendChild(el('p', 'note',
         `bao 12 = ${game.wheel.combinations} tổ hợp = <b>${vnd(game.wheel.cost_vnd)}</b>`));
+      const jackpot = jackpotLine(game);
+      if (jackpot) house.appendChild(jackpot);
       house.appendChild(sermonList(p.numbers, p.sermon));
     } else {
       house.appendChild(el('p', 'hand', 'Kỳ này thầy chưa phán. Con chờ.'));
@@ -359,7 +407,15 @@ function heatmap(freq, pool, offset = 1) {
     const t = hi === lo ? 0.5 : (count - lo) / (hi - lo);
     const cell = el('button', 'cell', pad(n));
     cell.type = 'button';
-    cell.style.opacity = String(0.45 + 0.55 * t);
+    /* The heat used to be the cell's own opacity, which faded the LABEL along with it -
+       the coldest number measured 2.78:1 on veso, well under AA, and no contrast check
+       caught it because opacity never touches the computed `color`. The tint moved to the
+       background; the label now always reads at full ink. Custom property rather than an
+       inline background so the pressed-state rule can still win. */
+    // Unitless 0..1. How far that goes is --heat-max, which is per skin because the
+    // safe ceiling is: 60% on veso, 37% on thantai. CSS does the multiply, so switching
+    // theme re-tints every cell with no JS involved.
+    cell.style.setProperty('--heat', t.toFixed(3));
     cell.setAttribute('aria-label', `Số ${pad(n)}, ra ${count} lần`);
     cell.setAttribute('aria-pressed', 'false');
     cell.addEventListener('click', () => {
