@@ -9,10 +9,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        # v7, not the v10.0.1 release: astral-sh stopped publishing floating major tags
+        # after v7, so `@v10` is not a ref that exists and the run fails to resolve it.
+        # v7 is already on node24, which is all the deprecation warning was asking for.
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
@@ -24,3 +27,36 @@ jobs:
 
       - name: Test
         run: uv run pytest
+
+  # Pages used to deploy only from the Oracle workflow, which runs on a cron. That meant
+  # a code-only change sat undeployed until the next scheduled run - up to fourteen hours
+  # of a green tick next to a stale site. The upload lives here rather than in a shared
+  # reusable workflow on purpose: Oracle uploads from its own working tree AFTER it commits
+  # new data, while this uploads the pushed commit. Same two lines, genuinely different
+  # trees, and merging them would have deployed Oracle's pre-commit data.
+  deploy-pages:
+    if: github.event_name == 'push'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    # Pages allows one deployment in flight. Oracle's deploy job shares this group so a
+    # push that lands mid-cron queues instead of failing.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+      - id: deploy
+        uses: actions/deploy-pages@v5
