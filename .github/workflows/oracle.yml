@@ -26,10 +26,10 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v10
         with:
           enable-cache: true
 
@@ -85,21 +85,25 @@ jobs:
           fi
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
-  # GitHub Pages is unavailable on a private repo under the free plan, so this job
-  # cannot succeed until the repo is public (or the account is on Pro). It is marked
-  # continue-on-error so the data pipeline above still reports green in the meantime,
-  # and it starts working on its own the moment Pages is enabled - no edit needed.
+  # This job was continue-on-error while the repo was private, because Pages is
+  # unavailable on a private repo under the free plan and the data pipeline still had to
+  # report green. The repo is public now and Pages works, so the flag has been removed:
+  # all it would do today is hide a real deploy failure behind a green tick, which is the
+  # exact failure mode this project exists to avoid.
   deploy-pages:
     needs: run
     runs-on: ubuntu-latest
-    continue-on-error: true
+    # Shared with the CI workflow's deploy job - Pages allows one deployment in flight.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
