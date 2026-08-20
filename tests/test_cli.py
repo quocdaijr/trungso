@@ -209,3 +209,42 @@ def test_every_command_prints_the_disclaimer(capsys):
         args = cli.build_parser().parse_args(argv)
         args.handler(args)
         assert "paper-trading" in capsys.readouterr().out
+
+
+# ------------------------------------------------- jackpot refresh must never be fatal
+
+
+def test_prize_failure_does_not_break_ingest(monkeypatch, capsys):
+    """The jackpot is commentary on a draw, not part of it. A vietlott.vn layout change
+    must cost us the figure, not the whole ingest run."""
+    from trungso.sources import vietlott_prizes
+
+    def explode(*_args, **_kwargs):
+        raise vietlott_prizes.PrizeParseError("power655: no gt_jackpot block")
+
+    monkeypatch.setattr(cli.vietlott_prizes, "fetch_prizes", explode)
+
+    cli._refresh_prizes(POWER655, "01386")
+
+    assert "không đọc được giải thưởng" in capsys.readouterr().out
+    assert store.read_prizes("power655") is None
+
+
+def test_prize_refresh_stores_and_reports(monkeypatch, capsys):
+    from trungso.sources.vietlott_prizes import DrawPrizes, PrizeTier
+
+    fake = DrawPrizes(
+        game="power655",
+        draw_id="01386",
+        jackpots={"Jackpot 1": 34_897_731_150},
+        tiers=(PrizeTier("Jackpot 1", 0, 34_897_731_150),),
+        fetched_at="2026-08-20T07:00:00+00:00",
+    )
+    monkeypatch.setattr(cli.vietlott_prizes, "fetch_prizes", lambda *a, **k: fake)
+
+    cli._refresh_prizes(POWER655, "01386")
+
+    out = capsys.readouterr().out
+    assert "34,90 tỷ" in out or "34.90 tỷ" in out
+    assert "cộng dồn sang kỳ sau" in out
+    assert store.read_prizes("power655")["top_jackpot_vnd"] == 34_897_731_150

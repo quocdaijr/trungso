@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING
 from .models import Draw, Prophecy
 
 if TYPE_CHECKING:  # pragma: no cover
+    from .sources.vietlott_prizes import DrawPrizes
     from .sources.xsmb import XsmbDraw
 
 ENV_DATA_DIR = "TRUNGSO_DATA_DIR"
@@ -166,6 +167,32 @@ def write_scoreboard(payload: dict) -> bool:
 
 def read_scoreboard() -> dict | None:
     path = scoreboard_path()
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def prizes_path(game: str) -> Path:
+    return data_dir() / "prizes" / f"{game}.json"
+
+
+def write_prizes(prizes: DrawPrizes) -> bool:
+    """Persist one draw's money figures. Returns whether the file changed.
+
+    `fetched_at` is excluded from the comparison on purpose. A completed draw's jackpot
+    does not move, so every cron run would otherwise rewrite the file with nothing but a
+    new timestamp - the same trap `generated_at` set, and the reason this helper exists.
+    What that costs is knowing when the figure was last *checked*; what it buys is a
+    history where a commit means the money actually changed.
+    """
+    path = prizes_path(prizes.game)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return write_json_if_changed(path, prizes.as_dict(), ignore=("fetched_at",))
+
+
+def read_prizes(game: str) -> dict | None:
+    """The last stored figures for a game, or None if they were never fetched."""
+    path = prizes_path(game)
     if not path.exists():
         return None
     return json.loads(path.read_text(encoding="utf-8"))

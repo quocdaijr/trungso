@@ -28,6 +28,9 @@
  *
  *   theme    ink/paper  dim/paper  accent/paper  accent-2/paper
  *   veso        15.01      5.18       4.63          1.34  <- see the veso rules
+ *
+ * --color-good is not in that table because it is not a paper-relative accent: it
+ * lands on paper-2 inside torn blocks. Measured there, veso needed 45% lightness.
  *   thantai      8.79      4.84       4.77          7.78
  *   viahe       16.16      4.61      14.50         16.05
  *   y2k         15.74      6.09      12.07          5.36
@@ -65,6 +68,12 @@
      since it pairs a comma at the right edge with a mark at the left edge of the next
      line, which can never meet. Bungee Shade overrides this; see the y2k block. */
   --lh-display: 1.12;
+  /* Heatmap tint ceiling. Per skin, because the safe maximum is a property of the skin,
+     not a taste setting: accent-2 is a pale gold on thantai and a bright yellow on viahe,
+     so tinting a dark cell moves it TOWARD the light ink and contrast falls away. Swept
+     in 1% steps against the composited cell: AA held to 60% on veso and y2k, 40% on
+     viahe, 37% on thantai. These sit under those ceilings with room to spare. */
+  --heat-max: 52%;
   --ball: 50%;
   --tap: 44px; /* WCAG 2.5.8 / Apple HIG minimum touch target */
 
@@ -103,7 +112,9 @@
                                             was 3.53:1, short of AA for 14px bold UI text */
   --color-accent-2: oklch(84.2% 0.168 90.4); /* #F5C518 - fills only */
   --color-rule: oklch(19.7% 0.013 55.5);
-  --color-good: oklch(52.4% 0.134 144); /* #2F7D32 */
+  --color-good: oklch(45% 0.134 144); /* deepened from 52.4%: it measured 3.71:1 on
+                                        paper-2, which is where .win and .kpi--good
+                                        actually sit. AA starts at 46.4%; this has margin. */
   --color-bad: oklch(49.9% 0.181 29.1); /* #B3231A */
   --color-warn: oklch(67.9% 0.142 76.5); /* #C98A00 */
   --color-focus: oklch(54% 0.206 29.1);
@@ -118,6 +129,7 @@
  * Household shrine. Deep lacquer red, gilt lettering, high-contrast serif.
  */
 [data-theme="thantai"] {
+  --heat-max: 30%;
   --color-paper: oklch(37.7% 0.136 26.8); /* #7A1414 */
   --color-paper-2: oklch(31.5% 0.112 26.5); /* #5E0F0F */
   --color-ink: oklch(92.9% 0.043 84.6); /* #F5E6C8 */
@@ -140,6 +152,7 @@
  * Raw pavement brutalism. Near-black, phosphor green, condensed slab type.
  */
 [data-theme="viahe"] {
+  --heat-max: 32%;
   --color-paper: oklch(14.5% 0 90); /* #0A0A0A */
   --color-paper-2: oklch(19.1% 0 90); /* #141414 */
   --color-ink: oklch(93.1% 0 90); /* #E8E8E8 */

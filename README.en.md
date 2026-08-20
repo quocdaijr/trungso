@@ -179,6 +179,7 @@ Python.
 |---|---|---|
 | [`thanhnhu/vietlott`](https://github.com/thanhnhu/vietlott) (MIT) | primary — Power 6/55 & Mega 6/45 | 1,386 + 1,353 draws since 2017 |
 | `vietlott.vn` | fallback when the mirror lags (latest draw only) | — |
+| `vietlott.vn` (same page) | Jackpot value and prize tiers per draw | 2 games |
 | [`khiemdoan/vietnam-lottery-xsmb-analysis`](https://github.com/khiemdoan/vietnam-lottery-xsmb-analysis) (MIT) | XSMB — honest layer + a cosmic signal | 7,526 draws since 2005 |
 | [`jbaranski/jeffs-lottery-utils`](https://github.com/jbaranski/jeffs-lottery-utils) (MIT) | Powerball & Mega Millions — statistics only | 1,395 + 918 draws |
 | CoinGecko / Open-Meteo | cosmic signals (BTC, weather) | — |
@@ -189,6 +190,44 @@ returns 403 from this network, including its plain HTML pages, with or without b
 The US games are **statistics-only**: no prophecies, no wheel, no scoreboard. Wheel-12 is a
 Vietlott product; the sole purpose of the US data is to let The Honest Layer show that American
 lotteries are exactly as random.
+
+### What the jackpot figure is, and is not
+
+The results page states the jackpot **as at a completed draw**, and that is the only jackpot
+figure a plain HTTP request can get: vietlott.vn serves its estimate for the *upcoming* draw
+through JavaScript, and the landing pages return an 18 KB shell with no data in it at all.
+
+So when nobody won, the site says **"ít nhất X"** — at least X — because the next draw's pot
+is that figure plus whatever the new tickets add. It never says "the jackpot is X". It also
+always names the draw the money belongs to, because if the prize fetch failed on the last
+run the stored figure describes an older draw, and a stale number wearing a current label is
+the one thing this repository is built not to print.
+
+The scoreboard's arithmetic did not change. The fixed tiers really are fixed — the live page
+confirms 40.000.000 / 500.000 / 50.000 for Power, matching `games.py` — and the jackpot was
+already excluded from `roi_excluding_jackpot` precisely because it varies. A test now asserts
+the static table still matches the live one, so a silent upstream change would fail loudly.
+
+### If it comes in tonight, what do you actually get?
+
+The estimated pot for the *next* draw is not published anywhere a plain request can reach.
+This is, and it is the question the jackpot figure makes people ask anyway - so the page
+answers it from arithmetic instead of from a number it does not have.
+
+For Mega 6/45, a bao-12 ticket costs 9,240,000đ:
+
+| hits | 1 in | pays | net |
+|---|---|---|---|
+| 3 | 7 | 2,520,000đ | −6,720,000đ |
+| 4 | 31 | 15,120,000đ | **+5,880,000đ** |
+| 5 | 312 | 112,000,000đ | **+102,760,000đ** |
+| 6 | 8,815 | 24,946,610,500đ | **+24,937,370,500đ** |
+
+The table has to carry both halves. The money column alone reads as an argument *for*
+playing - four hits already clears the stake, and it does. The probability column alone
+reads as though the prizes were stingy, and they are not. Only together do they say the
+true thing: the payouts are real, and the odds are what take them back. Four-or-better
+happens about once in 28 draws, which is where the −71.57% goes.
 
 ## What the Honest Layer found
 
