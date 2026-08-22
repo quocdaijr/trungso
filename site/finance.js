@@ -277,12 +277,20 @@ function sessionLabel(stamp, today) {
   return `Cập nhật lúc ${stamp} (giờ VN).`;
 }
 
-function factGrid(pairs) {
+/**
+ * `numeric` picks the monospaced face for the value.
+ *
+ * design.md: any column of figures uses --font-num. The lottery page's fact grids hold
+ * words (can chi, nạp âm), so they keep the body face; this page's hold prices, and in
+ * Be Vietnam Pro those misalign by up to 77px with no tabular set to fall back on.
+ */
+function factGrid(pairs, { numeric = false } = {}) {
   const grid = el('div', 'facts');
+  const cls = numeric ? 'fact__v fact__v--num' : 'fact__v';
   for (const [k, v, extra] of pairs) {
     const cell = el('div', 'fact');
     cell.appendChild(el('div', 'fact__k', k));
-    cell.appendChild(el('div', 'fact__v', v));
+    cell.appendChild(el('div', cls, v));
     if (extra) cell.appendChild(extra);
     grid.appendChild(cell);
   }
@@ -323,7 +331,7 @@ function goldBlock(gold, xau) {
     pairs.push([`${row.label} — mua vào`, trieu(row.buyLuong) + '/lượng']);
     pairs.push([`${row.label} — bán ra`, trieu(row.sellLuong) + '/lượng']);
   }
-  box.appendChild(factGrid(pairs));
+  box.appendChild(factGrid(pairs, { numeric: true }));
   box.appendChild(el('p', 'note',
     'PNJ niêm yết theo <b>chỉ</b> (3,75 g); trang quy ra <b>lượng</b> (10 chỉ, 37,5 g) '
     + 'vì đó là đơn vị người ta nói khi nói về vàng miếng.'));
@@ -350,7 +358,7 @@ function stocksBlock(indices, foreign) {
   for (const idx of indices.value) {
     const cell = el('div', 'fact');
     cell.appendChild(el('div', 'fact__k', idx.code));
-    cell.appendChild(el('div', 'fact__v', points(idx.price)));
+    cell.appendChild(el('div', 'fact__v fact__v--num', points(idx.price)));
     cell.appendChild(deltaTag(idx.change,
       `${points(Math.abs(idx.change))} (${signedPct(idx.changePct)})`));
     grid.appendChild(cell);
@@ -366,7 +374,7 @@ function stocksBlock(indices, foreign) {
     const rows = foreign.value.rows.map((r) => {
       const cell = el('div', 'fact');
       cell.appendChild(el('div', 'fact__k', r.code));
-      cell.appendChild(el('div', 'fact__v', vnd(Math.round(r.netVal))));
+      cell.appendChild(el('div', 'fact__v fact__v--num', vnd(Math.round(r.netVal))));
       cell.appendChild(deltaTag(r.netVal, r.netVal >= 0 ? 'mua ròng' : 'bán ròng'));
       return cell;
     });
@@ -391,13 +399,13 @@ function cryptoBlock(crypto) {
   for (const c of crypto.value) {
     const cell = el('div', 'fact');
     cell.appendChild(el('div', 'fact__k', c.ticker + ' / USD'));
-    cell.appendChild(el('div', 'fact__v', usd(c.usd)));
+    cell.appendChild(el('div', 'fact__v fact__v--num', usd(c.usd)));
     cell.appendChild(deltaTag(c.change24h, signedPct(c.change24h) + ' · 24h'));
     grid.appendChild(cell);
 
     const cellV = el('div', 'fact');
     cellV.appendChild(el('div', 'fact__k', c.ticker + ' / VND'));
-    cellV.appendChild(el('div', 'fact__v', vnd(Math.round(c.vnd))));
+    cellV.appendChild(el('div', 'fact__v fact__v--num', vnd(Math.round(c.vnd))));
     grid.appendChild(cellV);
   }
   box.appendChild(grid);
@@ -590,7 +598,7 @@ function stageSuThat(d) {
           ['Vàng thế giới quy ra lượng', trieu(worldLuong) + '/lượng'],
           ['SJC bán ra', trieu(sjc.sellLuong) + '/lượng'],
           ['Chênh lệch', signedPct(premium)],
-        ]));
+        ], { numeric: true }));
         zero.appendChild(el('p', 'note',
           `Tỷ giá dùng để quy đổi là <b>${Math.round(rate).toLocaleString('vi-VN')} ₫/$</b>, `
           + 'suy ra từ chính CoinGecko (cùng một đồng được niêm yết bằng cả USD lẫn VND). '
