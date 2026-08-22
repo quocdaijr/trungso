@@ -14,7 +14,7 @@ import pytest
 TOKENS = (Path(__file__).resolve().parents[1] / "site" / "tokens.css").read_text(
     encoding="utf-8"
 )
-INDEX = (Path(__file__).resolve().parents[1] / "site" / "index.html").read_text(
+PAGE_CSS = (Path(__file__).resolve().parents[1] / "site" / "page.css").read_text(
     encoding="utf-8"
 )
 
@@ -64,7 +64,7 @@ def test_the_heat_fallback_is_safe_for_every_skin():
     """render.js sets only a unitless ratio, so the cap comes from CSS. If a skin ever
     loses its override the fallback in the calc() applies - and that fallback has to be
     survivable on the *strictest* skin, not the most forgiving one."""
-    fallback = re.search(r"var\(--heat-max,\s*(\d+)%\)", INDEX)
+    fallback = re.search(r"var\(--heat-max,\s*(\d+)%\)", PAGE_CSS)
     assert fallback, "the .cell background no longer carries a --heat-max fallback"
 
     assert int(fallback.group(1)) <= min(MEASURED_CEILING.values())
