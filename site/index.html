@@ -315,15 +315,14 @@ form.khai input{appearance:none; -webkit-appearance:none}
 .btn--ghost{background:transparent; color:var(--color-ink); border-color:var(--color-rule)}
 
 /* ---------------- footer: Ft5 statement ---------------- */
+/* The footer owns its vertical rhythm and its background; the .wrap inside owns the
+   measure and the safe-area inset. Without that split the footer sat at whatever width
+   its own content chose - 625px on any desktop - and stopped lining up with the page
+   above it. .ft__statement and .ft__meta went with the Ft5 footer this replaced. */
 .ft{border-top:var(--rule-slab) solid var(--color-rule); margin-top:var(--space-2xl);
-  padding:var(--space-xl) var(--space-md);
+  padding-block:var(--space-xl);
   padding-bottom:calc(var(--space-xl) + env(safe-area-inset-bottom, 0));
   background:var(--color-paper-2)}
-.ft__statement{font-family:var(--font-display); font-size:var(--text-2xl); line-height:1.1;
-  max-width:24ch; margin:0 auto var(--space-md); text-align:center;
-  overflow-wrap:anywhere; min-width:0; color:var(--color-ink)}
-.ft__meta{text-align:center; color:var(--color-ink-dim); font-size:var(--text-xs);
-  max-width:70ch; margin:0 auto}
 
 /* ---------------- screen-reader only ---------------- */
 .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px;
@@ -405,7 +404,7 @@ form.khai input{appearance:none; -webkit-appearance:none}
   .stack-sm td,.stack-sm td.num{font-family:var(--font-num); font-size:var(--text-lg);
     text-align:left; border:0; padding:2px 0 0}
   /* 12px is a label size, not a reading size. */
-  .note,th,.sermon li,.ft__meta{font-size:var(--text-sm)}
+  .note,th,.sermon li{font-size:var(--text-sm)}
   .scroll{position:relative}
   .scroll::after{content:"cuộn ngang →"; position:absolute; right:0; top:-1.4em;
     font-family:var(--font-num); font-size:var(--text-xs); color:var(--color-ink-dim)}
@@ -450,20 +449,33 @@ form.khai input{appearance:none; -webkit-appearance:none}
   color:var(--color-ink); margin:var(--space-xs) 0}
 
 /* ---------------- footer: Ft4 colophon ---------------- */
-.colophon{font-family:var(--font-num); font-size:var(--text-sm); line-height:1.55;
-  max-width:74ch; margin:0 auto}
+.colophon{font-family:var(--font-num); font-size:var(--text-sm); line-height:1.55}
 .colophon h2{font-family:var(--font-num); font-size:var(--text-xs); font-weight:700;
-  letter-spacing:.18em; margin:0 0 var(--space-xs); color:var(--color-ink)}
-.colophon dl{display:grid; grid-template-columns:minmax(0,22ch) minmax(0,1fr);
-  gap:2px var(--space-md); margin:0 0 var(--space-md)}
-.colophon dt{overflow-wrap:anywhere; color:var(--color-ink)}
-.colophon dd{margin:0; color:var(--color-ink-dim); overflow-wrap:anywhere}
-.colophon__block{margin:0 0 var(--space-md); color:var(--color-ink-dim)}
-.colophon__made{color:var(--color-ink); border-top:var(--rule-hair) solid var(--color-rule);
-  padding-top:var(--space-sm); margin:0}
-@media (max-width:640px){
-  .colophon dl{grid-template-columns:minmax(0,1fr); gap:0}
-  .colophon dt{margin-top:var(--space-xs)}
+  letter-spacing:.18em; margin:0 0 var(--space-sm); color:var(--color-ink)}
+
+/* Two columns once there is room. The credits are a tabular list, not prose, so the whole
+   block used to sit inside a 74ch reading measure - 625px no matter how wide the window,
+   which is what made it look squeezed on a desktop. The measure now applies only to the
+   one part of the footer that is actually prose. */
+.colophon__cols{display:grid; grid-template-columns:minmax(0,1fr); gap:var(--space-lg)}
+@media (min-width:900px){
+  .colophon__cols{grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-xl)}
+}
+
+/* dt above dd at every width, not beside it. The side-by-side form needed a fixed dt
+   column and no width fits both "EMOJI" and "khiemdoan/vietnam-lottery-xsmb-analysis":
+   at 22ch the long repo names wrapped on every viewport, desktop included. Stacking
+   removes the constraint instead of tuning it. */
+.colophon dl{margin:0}
+.colophon dt{color:var(--color-ink); overflow-wrap:anywhere}
+.colophon dd{margin:0 0 var(--space-sm); padding-left:var(--space-sm);
+  color:var(--color-ink-dim); overflow-wrap:anywhere}
+.colophon dd:last-of-type{margin-bottom:0}
+.colophon__block{margin:var(--space-md) 0 0; color:var(--color-ink-dim)}
+.colophon__made{
+  color:var(--color-ink); border-top:var(--rule-hair) solid var(--color-rule);
+  padding-top:var(--space-sm); margin:var(--space-lg) 0 0;
+  max-width:70ch; /* this part IS prose, so it keeps a measure */
 }
 
 /* ---------------- reveal ---------------- */
@@ -521,23 +533,30 @@ form.khai input{appearance:none; -webkit-appearance:none}
 </main>
 
 <footer class="ft">
-  <div class="colophon">
-    <h2>CẢM ƠN</h2>
-    <dl>
-      <dt>thanhnhu/vietlott</dt><dd>mirror Power 6/55 + Mega 6/45</dd>
-      <dt>khiemdoan/vietnam-lottery-xsmb-analysis</dt><dd>7.526 kỳ XSMB từ 2005</dd>
-      <dt>jbaranski/jeffs-lottery-utils</dt><dd>Powerball + Mega Millions</dd>
-      <dt>CoinGecko · Open-Meteo</dt><dd>tín hiệu vũ trụ</dd>
-      <dt>Đường dây Ngày Mai 096.306.1414</dt><dd>hỗ trợ tâm lý miễn phí</dd>
-    </dl>
-    <p class="colophon__block">Tất cả đều MIT. Không có họ thì không có trang này.</p>
-    <dl>
-      <dt>TRANH</dt><dd>Đông Hồ “Đại Cát” — public domain, Wikimedia Commons</dd>
-      <dt>EMOJI</dt><dd>Twemoji — đồ hoạ CC-BY 4.0, © Twitter/X</dd>
-      <dt>HÌNH THẦY</dt><dd>vẽ tay, thuộc repo này</dd>
-    </dl>
+  <div class="wrap colophon">
+    <div class="colophon__cols">
+      <section>
+        <h2>CẢM ƠN</h2>
+        <dl>
+          <dt>thanhnhu/vietlott</dt><dd>mirror Power 6/55 + Mega 6/45</dd>
+          <dt>khiemdoan/vietnam-lottery-xsmb-analysis</dt><dd>7.526 kỳ XSMB từ 2005</dd>
+          <dt>jbaranski/jeffs-lottery-utils</dt><dd>Powerball + Mega Millions</dd>
+          <dt>CoinGecko · Open-Meteo</dt><dd>tín hiệu vũ trụ</dd>
+          <dt>Đường dây Ngày Mai 096.306.1414</dt><dd>hỗ trợ tâm lý miễn phí</dd>
+        </dl>
+        <p class="colophon__block">Tất cả đều MIT. Không có họ thì không có trang này.</p>
+      </section>
+      <section>
+        <h2>TÀI NGUYÊN</h2>
+        <dl>
+          <dt>TRANH</dt><dd>Đông Hồ “Đại Cát” — public domain, Wikimedia Commons</dd>
+          <dt>EMOJI</dt><dd>Twemoji — đồ hoạ CC-BY 4.0, © Twitter/X</dd>
+          <dt>HÌNH THẦY</dt><dd>vẽ tay, thuộc repo này</dd>
+        </dl>
+      </section>
+    </div>
     <p class="colophon__made">
-      Made with ♡, 5827 dòng code, 535 test, và một lượng token AI không ai muốn nhắc lại.<br>
+      Made with ♡, 5846 dòng code, 535 test, và một lượng token AI không ai muốn nhắc lại.<br>
       Độ chính xác dự đoán: 0%.<br>
       <a href="https://github.com/quocdaijr/trungso">MIT</a> · 2026 · không bán gì ·
       không liên quan Vietlott · 18+ ·
