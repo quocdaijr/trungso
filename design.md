@@ -31,7 +31,14 @@ Stage numbers sit **above** their titles in the same column. Number-left / title
 the most reliable templated-editorial tell and is not used here.
 
 Nav: **N7 brutal slab** — thick sticky bar, wordmark left, four rubber stamps right.
-Footer: **Ft5 statement** — one sentence, no link columns.
+Footer: **Ft4 colophon** — two columns of credits (sources · assets) above one prose block.
+It was Ft5 statement until 2026-08-19, when the brief asked for thanks rather than a
+statement; `.hallmark/log.json` carries both entries. A locked system file that disagrees
+with what shipped is worse than no locked file, so it gets amended, not left behind.
+
+Section rhythm is **not** uniform: `02 · PHÁN` gets extra air because it is the loud stage,
+and `04 · SỰ THẬT` comes in tighter because that is where the fortune-teller goes silent.
+Equal padding on all five stages would flatten the one contrast the page is built on.
 
 ## Shape language
 
@@ -68,6 +75,22 @@ Passion One · Rubik Mono One.
 
 **2. A 3D display face is illegible below ~20px.** Data values use `--font-body` at weight
 800, never `--font-display`. "ĐẠI LÂM MỘC" in Bungee Shade at 16px is a smudge.
+
+Size is not the only reason, and the fix is not `--font-body` either. Measured per-digit in
+the DOM, at the same size and weight the page actually renders:
+
+| face | role | digit-width spread |
+|---|---|---|
+| Bungee · Anton · Playfair Display | `--font-display` | 5.84 - 12.15px |
+| Be Vietnam Pro | `--font-body` | **77.13px, and `tabular-nums` does not help** |
+| Grandstander | `--font-body` (y2k) | 60.4px → 0 with `tabular-nums` |
+| JetBrains Mono | `--font-num` | **0** |
+
+Be Vietnam Pro as loaded ships **no tabular figure set**, so `font-variant-numeric` is a
+no-op in `veso` and `thantai` - the two skins that use it as the body face. So **any column
+of figures uses `--font-num`**, which is monospaced and cannot misalign. That is already what
+`.ball`, `.cell`, `.num`, `.pot__num` and the tables do; `.kpi` was the one exception and is
+no longer. `tabular-nums` stays on as belt-and-braces for any future non-mono face.
 
 ## Contrast floor — measured, not assumed
 

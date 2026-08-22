@@ -4,6 +4,13 @@
  * mobile: pass (34, 49, 50-57) · honest: pass (46) · chrome: pass (47)
  * tokens: pass (48) · icons: see note · motion: 4 primitives
  *
+ * Audited 2026-08-22. Fixed: .kpi wore --font-display in a column of figures (every
+ * display face here has proportional digits, 5.84-12.15px spread) and --font-body was no
+ * better - Be Vietnam Pro ships no tabular figure set, so tabular-nums is a no-op in veso
+ * and thantai. .kpi now uses --font-num like every other figure on the page: spread 0.
+ * Also: .privacy's 6px green left edge was the side-stripe-card tell, now --color-rule;
+ * z-index 9999 became a named --z-* scale; the five stages no longer share one padding.
+ *
  * Known, deliberate deviations - stated rather than quietly passed:
  *   G22  viahe's neutrals are chroma 0 on purpose; the skin is called Vỉa Hè and the
  *        point is raw pavement, not a tinted grey. The other three skins tint theirs.
@@ -12,6 +19,10 @@
  *   G30  emoji appear at stage titles. They are self-hosted, attributed Twemoji SVGs
  *        chosen per stage (🔮 divination, 📉 losses, 📊 statistics), not the generic
  *        ✨🚀⚡ set standing in for a missing icon system.
+ *   G45  five stage eyebrows (00-04). The exception list names Long Document, Manifesto
+ *        and Catalogue-numbered, and caps at 1-2; Narrative Workflow is not on it. Kept:
+ *        design.md specifies them, a fortune-telling session is genuinely ordinal, and the
+ *        hard ban - tag-left / heading-right - is respected. Flagged, not silently passed.
  *   G55  the per-column ink test still reports 3-4px of bounding-box overlap on wrapped
  *        display heads. A tone mark's box is wider and taller than its ink; checked by
  *        eye at 320/390/414 on all four skins and the marks clear. See --lh-display.
@@ -80,6 +91,11 @@
   --heat-max: 52%;
   --ball: 50%;
   --tap: 44px; /* WCAG 2.5.8 / Apple HIG minimum touch target */
+
+  /* ---- stacking: named, so nobody has to guess whether 9999 was load-bearing ---- */
+  --z-nav: 100;    /* the sticky slab */
+  --z-gate: 1000;  /* the first-visit warning modal, above the nav */
+  --z-grain: 9000; /* the print grain sits over everything and takes no pointer events */
 
   /* ---- motion ---- */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);

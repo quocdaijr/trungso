@@ -1,5 +1,17 @@
 [
   {
+    "date": "2026-08-22",
+    "verb": "audit + fix",
+    "macrostructure": "Narrative Workflow (unchanged - design.md governs)",
+    "theme": "custom x4 (unchanged)",
+    "nav": "N7 brutal slab (unchanged)",
+    "footer": "Ft4 colophon (design.md amended - it still said Ft5)",
+    "findings": "1 critical / 3 major / 3 minor; 1 false positive dismissed",
+    "fixed": "kpi figure face (--font-display -> --font-num, digit spread 12.15px -> 0), privacy side-stripe green -> --color-rule, z-index 9999 -> named --z-* scale, uniform stage padding -> varied rhythm, design.md footer line",
+    "deferred": "G45 five stage eyebrows - design.md specifies them and the content is ordinal; flagged for the owner rather than changed",
+    "brief": "optimise the existing design"
+  },
+  {
     "date": "2026-08-19",
     "macrostructure": "Narrative Workflow",
     "theme": "custom",
