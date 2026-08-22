@@ -261,6 +261,22 @@ function todayHcm() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: HCM }).format(new Date());
 }
 
+/**
+ * What to say about the timestamp VNDIRECT returned.
+ *
+ * Takes today as an argument rather than reading the clock, because the branch that
+ * matters most is the one that only occurs on a trading day - and a test that can only
+ * run Monday to Friday is a test that does not run.
+ */
+function sessionLabel(stamp, today) {
+  if (!stamp) return null;
+  if (stamp.slice(0, 10) !== today) {
+    return `Đây là <b>phiên gần nhất</b> (${stamp}), không phải hôm nay. `
+         + 'Sàn nghỉ thứ Bảy, Chủ nhật và ngày lễ.';
+  }
+  return `Cập nhật lúc ${stamp} (giờ VN).`;
+}
+
 function factGrid(pairs) {
   const grid = el('div', 'facts');
   for (const [k, v, extra] of pairs) {
@@ -341,15 +357,8 @@ function stocksBlock(indices, foreign) {
   }
   box.appendChild(grid);
 
-  const stamp = indices.value[0].lastUpdated;
-  const sessionDay = stamp ? stamp.slice(0, 10) : null;
-  if (sessionDay && sessionDay !== todayHcm()) {
-    box.appendChild(el('p', 'note',
-      `Đây là <b>phiên gần nhất</b> (${stamp}), không phải hôm nay. `
-      + 'Sàn nghỉ thứ Bảy, Chủ nhật và ngày lễ.'));
-  } else if (stamp) {
-    box.appendChild(el('p', 'note', `Cập nhật lúc ${stamp} (giờ VN).`));
-  }
+  const note = sessionLabel(indices.value[0].lastUpdated, todayHcm());
+  if (note) box.appendChild(el('p', 'note', note));
   box.appendChild(sourceLine('indices'));
 
   if (foreign.ok) {
@@ -631,7 +640,7 @@ async function boot() {
 
 window.TrungsoFinance = {
   parseGold, parseXau, parseIndices, parseForeign, parseCrypto,
-  impliedUsdVnd, canonical, marketRoot, digitRoot, silentCount,
+  impliedUsdVnd, canonical, marketRoot, digitRoot, silentCount, todayHcm, sessionLabel,
   DONG_PER_PNJ_UNIT, CHI_PER_LUONG, OZT_PER_LUONG,
 };
 
