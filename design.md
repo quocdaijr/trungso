@@ -31,10 +31,33 @@ Stage numbers sit **above** their titles in the same column. Number-left / title
 the most reliable templated-editorial tell and is not used here.
 
 Nav: **N7 brutal slab** — thick sticky bar, wordmark left, four rubber stamps right.
-Footer: **Ft4 colophon** — two columns of credits (sources · assets) above one prose block.
-It was Ft5 statement until 2026-08-19, when the brief asked for thanks rather than a
-statement; `.hallmark/log.json` carries both entries. A locked system file that disagrees
-with what shipped is worse than no locked file, so it gets amended, not left behind.
+Footer: **Ft2 credit columns** — three columns of the same `<h2> + <dl>` shape (thanks ·
+assets · this page) over one full-width base strip. Every column head carries a hairline,
+so three rules of equal length landing on one y is what makes the grid legible; below the
+breakpoint the columns stack and the same rule becomes the section divider.
+
+It was Ft5 statement until 2026-08-19, then Ft4 colophon until 2026-08-22;
+`.hallmark/log.json` carries all three entries. A locked system file that disagrees with
+what shipped is worse than no locked file, so it gets amended, not left behind.
+
+Ft4's prose block is what forced the change, and the reason is worth keeping: it held a
+`max-width: 70ch` while the credit columns above it filled the 1060px `.wrap`, so its top
+rule stopped 440px short of the block it was supposed to close and its one sentence wrapped
+mid-phrase with half the row empty. Together with a 12px `padding-left` on every `dd`, the
+footer ran **four competing left axes** in one block. The fix was not to widen the prose —
+it was to delete it and let a third column carry that content in the same shape as the other
+two, leaving **one left axis, repeated three times**. Two rules follow from that:
+
+- **No element in the footer gets a measure of its own.** A reading measure inside a block
+  whose siblings are full-width is not typography, it is a second, invisible container.
+- **Hierarchy inside a column is carried by colour, never by indentation.** `--color-ink-dim`
+  already separates `dd` from `dt`; a 12px indent on top of it is too small to read as
+  hierarchy and big enough to read as sloppiness.
+
+The column ratio is `1.25fr 1fr 1fr` and the breakpoint is 980px. Both are measured, not
+chosen: the longest credit is 329.5px unwrapped, three even columns give 318.66px, and the
+old 900px breakpoint left the long name wrapped from 904px to 960px. A breakpoint inherited
+across a change in column count is a breakpoint nobody has measured.
 
 Section rhythm is **not** uniform: `02 · PHÁN` gets extra air because it is the loud stage,
 and `04 · SỰ THẬT` comes in tighter because that is where the fortune-teller goes silent.
