@@ -17,7 +17,11 @@ honesty.
 
 ## Macrostructure — Narrative Workflow
 
-A fortune-telling session is an ordered thing, so the page is too:
+A fortune-telling session is an ordered thing, so the page is too. There are **two pages**,
+and both run the same shape: the fortune-teller shouts through the opening stages, then goes
+silent for one stage of cold arithmetic. Same skins, same tokens, same stage frame.
+
+`site/index.html` — the lottery session:
 
 | stage | content |
 |---|---|
@@ -27,10 +31,27 @@ A fortune-telling session is an ordered thing, so the page is too:
 | `03 · SỔ NỢ` | scoreboard, ROI, ROI-excluding-jackpot, head-to-head, "cạn phước" |
 | `04 · SỰ THẬT` | chi-square across five lotteries, heatmaps, recent draws, XSMB |
 
+`site/tai-chinh.html` — the money page. Three stages rather than five, because there is no
+birth date to take and no scoreboard to keep; the reading is generated from the prices
+themselves, so it has nothing to be scored against:
+
+| stage | content |
+|---|---|
+| `00 · PHÁN TÀI` | the fortune-teller reads the market: a digit root over the fetched figures, an element, and how many sources were silent |
+| `01 · SỔ GIÁ` | gold (SJC bars and plain rings, plus world spot), the three indices, foreign net flows, crypto — each with its source and the API's own timestamp |
+| `02 · SỰ THẬT` | what is genuinely realtime and what is end-of-session, why there is no land price, and the page checking its own gold against world spot |
+
 Stage numbers sit **above** their titles in the same column. Number-left / title-right is
 the most reliable templated-editorial tell and is not used here.
 
-Nav: **N7 brutal slab** — thick sticky bar, wordmark left, four rubber stamps right.
+The two pages are **not** interchangeable in voice. Stage `04 · SỰ THẬT` on the lottery page
+and `02 · SỰ THẬT` on the money page are the silent stages; everything above them shouts.
+A page that let the fortune-teller into its statistics stage would lose the joke and the
+honesty in the same move.
+
+Nav: **N7 brutal slab** — thick sticky bar, wordmark left, four rubber stamps right, and one
+`.slab__to` text link between the wordmark and the stamps carrying the reader to the other
+page. It is body face, not a fifth stamp: five stamps would read as five skins.
 Footer: **Ft2 credit columns** — three columns of the same `<h2> + <dl>` shape (thanks ·
 assets · this page) over one full-width base strip. Every column head carries a hairline,
 so three rules of equal length landing on one y is what makes the grid legible; below the
@@ -115,15 +136,28 @@ of figures uses `--font-num`**, which is monospaced and cannot misalign. That is
 `.ball`, `.cell`, `.num`, `.pot__num` and the tables do; `.kpi` was the one exception and is
 no longer. `tabular-nums` stays on as belt-and-braces for any future non-mono face.
 
+The money page is where this rule earns its keep, because it is nothing but columns of
+figures. `.fact__v` stays on the body face - on the lottery page it holds words (can chi,
+nạp âm) - and the money page opts its price cells into `.fact__v--num`. `.delta`, the
+signed-change chip, is `--font-num` for the same reason. Both are weight **700**, not 800:
+only 400 and 700 of JetBrains Mono are loaded, and 800 would be a synthesised bold.
+Re-measured per-digit in the DOM across all four skins: spread **0**.
+
 ## Contrast floor — measured, not assumed
 
-Every text surface clears **AA 4.5:1 in all four skins**; the lowest on the page is 4.56.
+Every text surface clears **AA 4.5:1 in all four skins**, on **both pages**; the lowest
+measured anywhere is 4.56 (`.note` on `veso`).
 Two tokens exist purely to hold that line:
 
 - `--color-on-accent-2` — the dark colour to place on a solid `--color-accent-2` fill.
   Accent-2 is a loud colour in every skin, so `--color-ink` on top fails (1.01:1 in `viahe`).
 - `veso`'s `--color-accent` was deepened from `oklch(60.4%)` to `oklch(54%)`. Cream-on-red
   was 3.53:1, short of AA for the 14px bold UI text that uses it.
+
+`.delta` is a chip on `--color-paper-2` rather than bare text on `--color-paper`, and that
+is a contrast decision, not a decorative one: on `thantai` the paper **is** lacquer red, so
+`--color-bad` on it measured **4.26:1** — under AA. The same colour on `paper-2` measures
+5.32, which is where `.kpi--bad` already lives.
 
 Measure with a canvas, not by parsing `getComputedStyle().color` — it returns `oklch(...)`
 verbatim, and string-parsing that as RGB produces confident nonsense.
@@ -154,3 +188,10 @@ A fifth primitive would need the same treatment, or it does not get added.
 
 `site/tokens.css` is the single source for every colour, face, space, and duration. No page
 CSS declares a raw colour or a `font-family` string; everything references a token by name.
+
+`site/page.css` holds the page styles and is **shared by both pages** — it was inline in
+`index.html` until the money page needed the same stage frame, and two copies of a
+stylesheet is how two pages start disagreeing. `site/dom.js` does the same job for the
+handful of helpers that build a stage or format a number. A component that only one page
+uses still lives in `page.css`; splitting per-page stylesheets would put the shared frame
+back at risk of drifting.

@@ -1,8 +1,11 @@
-"""The colophon quotes a line count and a test count.
+"""The colophon quotes a line count and a test count, and both READMEs wear a test badge.
 
-Both were measured, so both rot the moment the code changes - and a stale number on a
-site whose entire premise is that no number lies would be the worst bug in the repo.
-These two tests make the footer impossible to leave behind.
+All of them were measured, so all of them rot the moment the code changes - and a stale
+number on a site whose entire premise is that no number lies would be the worst bug in the
+repo. These tests make them impossible to leave behind.
+
+The badge is here because it proved the point: it sat at 459 while the suite passed 570,
+silently, for 111 tests. The footer never drifted, because the footer had a test.
 """
 
 from __future__ import annotations
@@ -14,6 +17,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "site" / "index.html"
+READMES = (ROOT / "README.md", ROOT / "README.en.md")
 
 # The same set the footer's figure was measured over: shipped code, not its tests.
 COUNTED = (
@@ -64,3 +68,24 @@ def test_footer_test_count_is_the_collected_one(request):
         pytest.skip("chỉ kiểm khi chạy toàn bộ suite")
     _, claimed = footer_claim()
     assert claimed == request.session.testscollected
+
+
+def test_readme_badges_state_the_collected_test_count(request):
+    """Both language editions carry the badge, so both can rot; the English one is the
+    likelier to be forgotten, which is exactly why it is asserted rather than trusted."""
+    opt = request.config.option
+    narrowed = (
+        [a for a in request.config.args if "::" in a or a.endswith(".py")]
+        or getattr(opt, "keyword", "")
+        or getattr(opt, "markexpr", "")
+    )
+    if narrowed:
+        pytest.skip("chỉ kiểm khi chạy toàn bộ suite")
+
+    for readme in READMES:
+        match = re.search(r"tests-(\d+)%20passing", readme.read_text(encoding="utf-8"))
+        assert match, f"{readme.name} no longer carries a test-count badge"
+        assert int(match.group(1)) == request.session.testscollected, (
+            f"{readme.name} badge says {match.group(1)} tests, "
+            f"the suite collects {request.session.testscollected}"
+        )
