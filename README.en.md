@@ -248,6 +248,47 @@ reads as though the prizes were stingy, and they are not. Only together do they 
 true thing: the payouts are real, and the odds are what take them back. Four-or-better
 happens about once in 28 draws, which is where the −71.57% goes.
 
+## The finance page — `/tai-chinh.html`
+
+A second page with the same two layers: the fortune-teller reads the market, then the page
+states what that reading is worth. Gold (SJC bars and plain rings), the three exchange
+indices, foreign net flows, and crypto.
+
+It differs from the lottery page in exactly one way: **no Python is involved**. No source
+module, no store, no bundle, no cron. The browser calls five APIs directly, and **no figure
+is committed to the repository**.
+
+| Block | Source | Actual freshness |
+|---|---|---|
+| Domestic gold | PNJ | Quoted price, changes a few times a day |
+| World gold | gold-api.com | Realtime |
+| Indices + foreign flows | VNDIRECT | **End of session (EOD)** |
+| Crypto | CoinGecko | Realtime, 24/7 |
+
+Three things the page states rather than hides:
+
+**It is not realtime.** The real HOSE/HNX realtime feeds run over SignalR websockets and are
+sold under vendor contracts; the only documented source (SSI FastConnect) requires signing up
+in person at a branch. So the equity figures are end-of-session, and the page prints the
+API's own timestamp rather than the page load time. At weekends it says *"latest session"*.
+
+**Nothing is stored.** Every usable price endpoint is an internal API with no terms attached.
+The repo already has a rule: *what has no verifiable licence does not get checked in*. So the
+page fetches in the browser and commits nothing. The cost is real: **a dead source is an
+empty block**, and no stale number is substituted. Each block degrades on its own — one
+silent API never takes the page down.
+
+**There is no land price.** It was planned, then dropped, and the reason is printed on the
+page: Vietnam's residential property price index exists only as a **2019 indicator
+specification that has never published a figure**; the national real-estate database portal
+mandated by Decree 94/2024 **does not resolve**; and BIS, OECD, FRED, and the IMF Global
+Housing Watch all **exclude Vietnam**. Inventing a number would be easy. Saying it does not
+exist is correct.
+
+> This page is **not investment advice**. The reading in stage 00 is a digit sum; its
+> predictive value is **zero**, exactly like the lottery oracle's. See
+> [DISCLAIMER.md](DISCLAIMER.md) section 2.
+
 ## What the Honest Layer found
 
 Chi-square test, H₀ = "every number is equally likely":

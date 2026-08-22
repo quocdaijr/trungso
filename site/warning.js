@@ -6,14 +6,51 @@
  * locally - there is no server to record it on, and recording it is not the point.
  *
  * The point is that nobody reaches the numbers without passing the sentence.
+ *
+ * Each page warns about its own hazard and remembers its own acknowledgement. A visitor
+ * who landed on the money page has not been told anything about lotteries, and one who
+ * dismissed the lottery gate has not been told that the share prices are end-of-session.
+ * Sharing one key across both would silently skip whichever sentence they never read.
  */
 'use strict';
 
-const ACK_KEY = 'trungso.ack.v1';
+/* The lottery page keeps the original key so nobody who already agreed is asked twice. */
+const GATES = {
+  xoso: {
+    ackKey: 'trungso.ack.v1',
+    eyebrow: '⚠ Đọc trước khi xem số',
+    title: 'Trang này không dự đoán được xổ số.<br>Không phần mềm nào làm được.',
+    lede: 'Đây là một thí nghiệm đốt token AI. Mọi con số ở đây là ngẫu nhiên, và trang tự '
+        + 'công khai chứng minh điều đó bằng chi-square trên 12.578 kỳ quay.',
+    points: [
+      'Không bán gì — không thu tiền, không tài khoản, không quảng cáo',
+      'Không liên quan Vietlott — không liên kết, không tài trợ, không uỷ quyền',
+      'Dữ liệu từ mirror bên thứ ba, có thể sai — cần chính xác thì tra vietlott.vn',
+      '18+ · tự chịu rủi ro',
+    ],
+  },
+  taichinh: {
+    ackKey: 'trungso.ack.taichinh.v1',
+    eyebrow: '⚠ Đọc trước khi xem giá',
+    title: 'Trang này không phải tư vấn đầu tư.<br>Và nó không biết giá ngày mai.',
+    lede: 'Số liệu lấy thẳng từ API công khai của bên thứ ba — không tài liệu, không cam '
+        + 'kết. Quẻ của thầy sinh ra từ một phép cộng chữ số, và giá trị dự báo của nó bằng không.',
+    points: [
+      'Không khuyến nghị mua bán — không bán gì, không quảng cáo, không affiliate',
+      'Chứng khoán Việt ở đây là số <b>cuối phiên</b>, không phải realtime',
+      'Nguồn có thể sai, thiếu hoặc chết — cần số chính xác thì tra thẳng nguồn gốc',
+      'Tự chịu rủi ro — mọi quyết định tài chính là của riêng bạn',
+    ],
+  },
+};
+
+function gateCopy() {
+  return GATES[document.body && document.body.dataset.page] || GATES.xoso;
+}
 
 function hasAcknowledged() {
   try {
-    return localStorage.getItem(ACK_KEY) === '1';
+    return localStorage.getItem(gateCopy().ackKey) === '1';
   } catch {
     // Private browsing refuses reads. Show the warning again rather than assume consent.
     return false;
@@ -22,7 +59,7 @@ function hasAcknowledged() {
 
 function remember() {
   try {
-    localStorage.setItem(ACK_KEY, '1');
+    localStorage.setItem(gateCopy().ackKey, '1');
   } catch {
     // Storage blocked. The modal still closes - see closeGate. Failing to remember a
     // dismissal must never leave the visitor locked out of the page.
@@ -35,20 +72,13 @@ function buildGate() {
   gate.setAttribute('role', 'dialog');
   gate.setAttribute('aria-modal', 'true');
   gate.setAttribute('aria-labelledby', 'gate-title');
+  const copy = gateCopy();
   gate.innerHTML = `
     <div class="gate__panel">
-      <p class="gate__eyebrow">⚠ Đọc trước khi xem số</p>
-      <h2 class="gate__title" id="gate-title">Trang này không dự đoán được xổ số.<br>Không phần mềm nào làm được.</h2>
-      <p class="gate__lede">
-        Đây là một thí nghiệm đốt token AI. Mọi con số ở đây là ngẫu nhiên, và trang tự
-        công khai chứng minh điều đó bằng chi-square trên 12.578 kỳ quay.
-      </p>
-      <ul class="gate__list">
-        <li>Không bán gì — không thu tiền, không tài khoản, không quảng cáo</li>
-        <li>Không liên quan Vietlott — không liên kết, không tài trợ, không uỷ quyền</li>
-        <li>Dữ liệu từ mirror bên thứ ba, có thể sai — cần chính xác thì tra vietlott.vn</li>
-        <li>18+ · tự chịu rủi ro</li>
-      </ul>
+      <p class="gate__eyebrow">${copy.eyebrow}</p>
+      <h2 class="gate__title" id="gate-title">${copy.title}</h2>
+      <p class="gate__lede">${copy.lede}</p>
+      <ul class="gate__list">${copy.points.map((t) => `<li>${t}</li>`).join('')}</ul>
       <div class="gate__actions">
         <button class="btn" type="button" id="gate-ok">TÔI HIỂU</button>
         <a class="gate__more" href="https://github.com/quocdaijr/trungso/blob/main/DISCLAIMER.md"
@@ -118,7 +148,8 @@ function trackTopbarHeight() {
 }
 
 window.TrungsoWarning = {
-  ACK_KEY, hasAcknowledged, initWarningGate, openGate, closeGate, trackTopbarHeight,
+  GATES, gateCopy, hasAcknowledged, initWarningGate, openGate, closeGate,
+  trackTopbarHeight,
 };
 
 function boot() {

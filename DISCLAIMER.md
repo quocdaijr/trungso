@@ -34,6 +34,24 @@ chơi bao 12: **−71,6%** (jackpot ở mức sàn) tới **−86,3%** (bỏ jac
 Không có gì trong repo hay trên trang là lời khuyên tài chính, đầu tư, pháp lý hay bất kỳ
 dạng tư vấn chuyên môn nào.
 
+Điều này áp dụng **đặc biệt** cho trang tài chính (`/tai-chinh.html`), nơi hiển thị giá
+vàng, chỉ số chứng khoán và giá crypto:
+
+- **Không khuyến nghị mua bán.** "Quẻ" của thầy ở chặng 00 sinh ra từ một phép cộng chữ số
+  trên chính mấy con số phía dưới. Giá trị dự báo của nó bằng **không**, đúng như oracle xổ số.
+- **Dữ liệu từ API công khai của bên thứ ba, không có tài liệu và không có cam kết.** Nguồn
+  đang dùng là PNJ, gold-api.com, VNDIRECT và CoinGecko. Không nguồn nào trong đó là API có
+  hợp đồng — tất cả đều là endpoint nội bộ phục vụ web của chính chủ, nên chúng có thể đổi
+  schema, bật xác thực, hoặc ngừng hoạt động bất cứ lúc nào mà không báo trước.
+- **Chứng khoán Việt là số cuối phiên (EOD), không phải realtime.** Feed realtime chính thức
+  của HOSE và HNX đi qua websocket và phân phối theo hợp đồng vendor; trang này không có nó.
+- **Giá crypto quy đổi sang VND là quy đổi qua tỷ giá của CoinGecko**, không phải giá khớp
+  lệnh trên một sàn Việt Nam.
+- **Trang không lưu lại số liệu tài chính nào.** Mọi con số do trình duyệt của bạn gọi thẳng
+  tới nguồn, mỗi lần tải lại. Nguồn chết thì ô đó trống — trang không dựng lại số cũ.
+
+Cần số chính xác để giao dịch thì tra thẳng nguồn gốc, đừng dùng trang này.
+
 ### 3. Không bán gì
 
 Không thu tiền. Không tài khoản. Không thanh toán. Không quảng cáo. Không affiliate. Không
@@ -121,6 +139,27 @@ excluded).
 
 Nothing in this repository or on the site is financial, investment, legal, or any other kind
 of professional advice.
+
+This applies **especially** to the finance page (`/tai-chinh.html`), which displays gold
+prices, stock indices, and crypto prices:
+
+- **No buy or sell recommendation.** The fortune-teller's "reading" in stage 00 is a digit
+  sum over the very numbers printed below it. Its predictive value is **zero**, exactly like
+  the lottery oracle's.
+- **Data comes from undocumented third-party public APIs with no guarantees.** The sources
+  in use are PNJ, gold-api.com, VNDIRECT, and CoinGecko. None of them is a contracted API —
+  each is an internal endpoint serving its owner's own front end, so any of them may change
+  shape, require authentication, or disappear without notice.
+- **Vietnamese equities here are end-of-session (EOD), not realtime.** The official realtime
+  feeds from HOSE and HNX run over websockets and are distributed under vendor contracts;
+  this page does not have them.
+- **Crypto prices in VND are a currency conversion done by CoinGecko**, not a trade price on
+  any Vietnamese exchange.
+- **No financial data is stored.** Every figure is fetched by your browser directly from the
+  source on each page load. When a source is down, that block is empty — no stale number is
+  substituted.
+
+If you need accurate figures to trade on, go to the source. Do not use this page.
 
 ### 3. Nothing is for sale
 

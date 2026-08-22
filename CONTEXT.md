@@ -97,6 +97,33 @@ Repo này commit dữ liệu vào git public, nên PII **không được phép**
 mỗi năm) nhúng trong `site/data.json`. Trình duyệt **không** cài lại thuật toán âm lịch; nó
 tra bảng. Nhờ vậy hai bên không thể lệch nhau, và có test đối chiếu chéo qua Node.
 
+**Trang tài chính** (`site/tai-chinh.html`) — Trang thứ hai của site. Cùng hai tầng như
+trang xổ số: thầy phán một quẻ ở chặng 00, số liệu trung thực ở chặng 01, và chặng 02 nói
+thẳng quẻ đó đáng giá bao nhiêu. Khác trang xổ số ở đúng một chỗ: **không có Python nào
+tham gia**. Không nguồn, không store, không bundle, không cron.
+
+**Fetch-tại-trình-duyệt** (client-only fetch) — Nguyên tắc của trang tài chính: mọi con số
+do trình duyệt gọi thẳng tới nguồn, và **không con số nào được commit**. Đây là quyết định
+**giấy phép**, không phải kỹ thuật — mọi endpoint giá dùng được đều là API nội bộ không có
+điều khoản nào kèm theo, mà luật repo đã có sẵn là *"không có licence xác minh được thì không
+vào repo"*. Cái giá phải trả là có thật và không được giấu: không có bản bake để rơi về, nên
+**nguồn chết là ô trống**. Khác hẳn `Chỉ-tại-máy`, vốn nói về PII.
+
+**Suy biến theo khối** (per-block degradation) — Một nguồn im **chỉ** được làm hỏng đúng ô
+của nó, kèm tên nguồn và lý do. Không bao giờ để trang trắng, và không bao giờ dựng số cũ lên
+thay. Cùng hợp đồng với `vibes.py`: tín hiệu chết trả `None`, không raise.
+
+**Nghìn đồng mỗi chỉ** (PNJ unit) — PNJ niêm yết theo **chỉ** (3,75 g) và tính bằng **nghìn
+đồng**, nên `14760` là 14.760.000 đ/chỉ = **147.600.000 đ/lượng**. Đọc nhầm thành đồng/lượng
+là sai **10 lần** mà vẫn trông hợp lý. Đã đối chiếu ba đường độc lập: XAU spot quy qua tỷ giá
+CoinGecko, các dòng bạc của BTMC có ghi rõ khối lượng gram, và chính giá PNJ. Vàng Việt thấp
+hơn giá thế giới 10 lần là điều arbitrage không cho phép.
+
+**Cuối phiên** (EOD) — Trạng thái thật của số liệu chứng khoán trên trang. Realtime thật của
+HOSE/HNX đi qua websocket SignalR và phân phối theo hợp đồng vendor; nguồn có tài liệu duy
+nhất (SSI FastConnect) bắt ra quầy ký giấy. Trang **không bao giờ** được gán nhãn "realtime"
+cho số chứng khoán — dán nhãn sai chính là thứ project này dựng lên để bóc.
+
 **Thầy / con** — Ngôi xưng hô của **mọi văn bản hướng tới người đọc**: lời sấm, README,
 tagline, và câu kết mục giấy phép. Thầy bói vỉa hè, không phải trợ lý. Thầy **không bao giờ**
 nói "chắc chắn trúng" — đó là câu của trang lừa đảo, và là ranh giới cứng.
@@ -208,6 +235,19 @@ và jackpot chia cho nhiều người trúng. Không biết thì phải nói kh�
   từ được chọn có chủ ý.
 - **"data.ny.gov"** như một nguồn khả dụng — cả domain trả 403 từ mạng này. Nguồn Mỹ đang
   dùng là `jbaranski/jeffs-lottery-utils`.
+- **`sjc.com.vn`** như nguồn giá vàng — cả ba endpoint trả **403 Cloudflare**, kể cả khi kèm
+  User-Agent browser và `Referer`. Kinh nghiệm `vietlott.vn` **không** chuyển giao được sang
+  đây; cách đúng là **đổi nguồn (PNJ, có luôn giá SJC)**, không phải leo thang công cụ.
+- **`apipubaws.tcbs.com.vn`** — từng dùng rộng rãi, nay **403 Cloudflare**.
+- **`giavang.doji.vn`** — **503**, site hỏng. **`api.phuquygroup.vn`** — **500**, còn rò cả
+  tên user database trong thông báo lỗi.
+- **`vnstock`** như một dependency — `LICENSE.md` **cấm phân phối lại**, mà repo này là public
+  MIT. Ngoài ra nó fingerprint máy, gửi telemetry, và có cổng chấp nhận điều khoản khi chạy
+  lần đầu. Nó cũng chỉ là lớp bọc quanh chính những endpoint gọi thẳng được.
+- **"realtime"** cho số liệu chứng khoán Việt — xem `Cuối phiên`.
+- **"giá đất trung bình"** như một con số lấy được — không tồn tại nguồn nào. Chỉ số giá bất
+  động sản của VN mới ở dạng bản đặc tả 2019 chưa từng công bố; cổng CSDL quốc gia theo
+  NĐ 94/2024 không phân giải tên miền; BIS, OECD, FRED và IMF đều không có Việt Nam.
 - **"cloudscraper"** như thứ bắt buộc để crawl `vietlott.vn` — đã kiểm chứng là **không
   cần**: `requests` kèm User-Agent browser trả về 200.
 - **"đăng ký" / "tài khoản" / "thu thập dữ liệu người dùng"** — không tồn tại trong project

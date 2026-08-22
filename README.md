@@ -198,6 +198,43 @@ số đã có lãi thật. Riêng cột xác suất đọc ra thành "giải bè
 đứng cạnh nhau chúng mới nói đúng: tiền là thật, và xác suất là thứ lấy lại. Trúng 4 trở lên
 xảy ra khoảng **1 trên 28 kỳ** — đó là chỗ −71,57% đi ra.
 
+## Trang tài chính — `/tai-chinh.html`
+
+Trang thứ hai, cùng hai tầng: thầy phán một quẻ về chợ, rồi trang tự nói quẻ đó đáng giá
+bao nhiêu. Vàng (miếng SJC + nhẫn trơn), chỉ số ba sàn, giao dịch khối ngoại, và crypto.
+
+Khác trang xổ số ở đúng một chỗ: **không có Python nào tham gia**. Không nguồn, không
+store, không bundle, không cron. Trình duyệt gọi thẳng năm API, và **không con số nào được
+commit vào repo**.
+
+| Khối | Nguồn | Độ tươi thật |
+|---|---|---|
+| Vàng trong nước | PNJ | Giá niêm yết, đổi vài lần/ngày |
+| Vàng thế giới | gold-api.com | Realtime |
+| Chỉ số + khối ngoại | VNDIRECT | **Cuối phiên (EOD)** |
+| Crypto | CoinGecko | Realtime, 24/7 |
+
+Ba điều trang nói thẳng thay vì giấu:
+
+**Không phải realtime.** Realtime thật của HOSE/HNX đi qua websocket SignalR và bán theo
+hợp đồng vendor; nguồn duy nhất có tài liệu (SSI FastConnect) bắt ra quầy ký giấy. Nên số
+chứng khoán ở đây là cuối phiên, và trang in dấu thời gian gốc của API chứ không phải giờ
+tải trang. Cuối tuần nó ghi rõ *"phiên gần nhất"*.
+
+**Không lưu gì cả.** Mọi endpoint giá dùng được đều là API nội bộ không kèm điều khoản nào.
+Luật repo đã có sẵn: *không có licence xác minh được thì không vào repo*. Nên trang fetch
+tại trình duyệt và không commit. Cái giá là thật: **nguồn chết là ô trống**, và trang không
+dựng số cũ lên thay. Mỗi khối suy biến riêng — một API im không kéo đổ trang.
+
+**Không có giá đất.** Định có, rồi bỏ, và lý do được in ra ngay trên trang: chỉ số giá bất
+động sản của Việt Nam mới tồn tại ở dạng bản đặc tả chỉ tiêu **năm 2019 chưa từng công bố số
+liệu**; cổng CSDL bất động sản quốc gia theo NĐ 94/2024 **không phân giải tên miền**; và
+BIS, OECD, FRED, IMF Global Housing Watch đều **không có Việt Nam**. Bịa một con số thì dễ.
+Nói rằng nó không tồn tại thì đúng.
+
+> Trang này **không phải tư vấn đầu tư**. Quẻ ở chặng 00 là một phép cộng chữ số, giá trị
+> dự báo bằng **không** — đúng như oracle xổ số. Xem [DISCLAIMER.md](DISCLAIMER.md) mục 2.
+
 ## Kết quả Tầng Thật trên dữ liệu thật
 
 Kiểm định chi-square, H₀ = "mọi số đồng xác suất":

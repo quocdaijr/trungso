@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>trungso — Thầy phán số, toán học phán thầy</title>
+<title>trungso — Thầy phán giá, số liệu phán thầy</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%AE%3C/text%3E%3C/svg%3E">
 
 <!-- Skin must be on <html> before the first paint, or the page flashes the default. -->
@@ -19,20 +19,19 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&family=Anton&family=Playfair+Display:wght@700;900&family=Be+Vietnam+Pro:wght@400;600;800&family=Grandstander:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Sriracha&display=swap">
 <link rel="stylesheet" href="./tokens.css">
-
 <link rel="stylesheet" href="./page.css">
 </head>
-<body id="top" data-page="xoso">
+<body id="top" data-page="taichinh">
 <div class="grain" aria-hidden="true"></div>
 
 <div class="topbar">
 <p class="warnstrip">
-  ⚠ Trò đùa — trang này <b>không dự đoán được xổ số</b>. Mọi số là ngẫu nhiên. 18+ ·
+  ⚠ Trò đùa — trang này <b>không phải tư vấn đầu tư</b>. Số liệu tham khảo, có thể sai hoặc trễ ·
   <a href="https://github.com/quocdaijr/trungso/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">miễn trừ trách nhiệm</a>
 </p>
 <nav class="slab">
   <a class="slab__mark" href="#top">trungso</a>
-  <a class="slab__to" href="./tai-chinh.html">Tài chính →</a>
+  <a class="slab__to" href="./index.html">← Xổ số</a>
   <div class="slab__themes" role="radiogroup" aria-label="Chọn bộ da">
     <button class="stamp" role="radio" type="button" data-set-theme="veso" aria-checked="true"><span class="stamp__full">VÉ SỐ</span><span class="stamp__short">V</span></button>
     <button class="stamp" role="radio" type="button" data-set-theme="thantai" aria-checked="false"><span class="stamp__full">THẦN TÀI</span><span class="stamp__short">T</span></button>
@@ -43,54 +42,43 @@
 </div>
 
 <header class="wrap masthead">
-  <h1 class="masthead__title">Thầy phán số,<br>toán học phán thầy</h1>
+  <h1 class="masthead__title">Thầy phán giá,<br>số liệu phán thầy</h1>
   <p class="masthead__lede">
-    Thầy ngồi đây ban số. Máy ngồi cạnh chấm điểm thầy. Cả hai đều công khai.
+    Vàng, chứng khoán, crypto. Thầy phán một quẻ. Rồi trang tự nói quẻ đó đáng giá bao nhiêu.
   </p>
   <p class="disclaim">
-    <b>Đọc trước:</b> xổ số là biến cố độc lập — mỗi kỳ quay reset về 0, không có số nóng,
-    không có số lạnh. Trang này <b>không dự đoán được gì</b>. Nó chỉ tự tin quá mức rồi tự
-    chấm điểm độ sai của mình. Tiền ở đây là <b>tiền giấy</b>.
+    <b>Đọc trước:</b> đây <b>không phải</b> tư vấn tài chính, đầu tư hay khuyến nghị mua bán.
+    Số liệu lấy trực tiếp từ API công khai của bên thứ ba — <b>không có tài liệu, không có
+    cam kết</b>, có thể sai, thiếu hoặc trễ. Chứng khoán Việt ở đây là số
+    <b>cuối phiên</b>, không phải realtime.
     <br><br>
-    Không bán gì · không liên quan Vietlott · dữ liệu từ mirror bên thứ ba có thể sai
-    (cần chính xác thì tra <a href="https://vietlott.vn" target="_blank" rel="noopener">vietlott.vn</a>) ·
-    18+ · tự chịu rủi ro ·
+    Không bán gì · không quảng cáo · không affiliate · không thu thập dữ liệu ·
+    cần số chính xác thì tra thẳng nguồn gốc ·
     <a href="https://github.com/quocdaijr/trungso/blob/main/DISCLAIMER.md" target="_blank" rel="noopener">bản miễn trừ đầy đủ</a>
   </p>
 </header>
 
 <main class="wrap" id="app">
-  <p class="note" id="boot">Đang mở sổ…</p>
+  <p class="note" id="boot">Thầy đang hỏi giá…</p>
 </main>
 
 <footer class="ft">
-  <div class="wrap colophon">
-    <div class="colophon__cols">
-      <section>
-        <h2>CẢM ƠN</h2>
-        <dl>
-          <dt>thanhnhu/vietlott</dt><dd>mirror Power 6/55 + Mega 6/45</dd>
-          <dt>khiemdoan/vietnam-lottery-xsmb-analysis</dt><dd>7.526 kỳ XSMB từ 2005</dd>
-          <dt>jbaranski/jeffs-lottery-utils</dt><dd>Powerball + Mega Millions</dd>
-          <dt>CoinGecko · Open-Meteo</dt><dd>tín hiệu vũ trụ</dd>
-          <dt>Đường dây Ngày Mai 096.306.1414</dt><dd>hỗ trợ tâm lý miễn phí</dd>
-        </dl>
-        <p class="colophon__block">Tất cả đều MIT. Không có họ thì không có trang này.</p>
-      </section>
-      <section>
-        <h2>TÀI NGUYÊN</h2>
-        <dl>
-          <dt>TRANH</dt><dd>Đông Hồ “Đại Cát” — public domain, Wikimedia Commons</dd>
-          <dt>EMOJI</dt><dd>Twemoji — đồ hoạ CC-BY 4.0, © Twitter/X</dd>
-          <dt>HÌNH THẦY</dt><dd>vẽ tay, thuộc repo này</dd>
-        </dl>
-      </section>
-    </div>
+  <div class="colophon">
+    <h2>NGUỒN</h2>
+    <dl>
+      <dt>PNJ</dt><dd>giá vàng miếng SJC và nhẫn trơn</dd>
+      <dt>gold-api.com</dt><dd>giá vàng thế giới XAU/USD</dd>
+      <dt>VNDIRECT</dt><dd>chỉ số ba sàn và giao dịch khối ngoại</dd>
+      <dt>CoinGecko</dt><dd>giá crypto, kèm quy đổi VND</dd>
+    </dl>
+    <p class="colophon__block">
+      Không nguồn nào ở trên là API có hợp đồng — tất cả đều là endpoint nội bộ của chính
+      chủ. Trang này không lưu lại số của họ, chỉ hiển thị rồi thôi.
+    </p>
     <p class="colophon__made">
-      Made with ♡, 6695 dòng code, 566 test, và một lượng token AI không ai muốn nhắc lại.<br>
-      Độ chính xác dự đoán: 0%.<br>
+      <a href="./index.html">← Về trang xổ số</a><br>
       <a href="https://github.com/quocdaijr/trungso">MIT</a> · 2026 · không bán gì ·
-      không liên quan Vietlott · 18+ ·
+      không phải tư vấn đầu tư · 18+ ·
       <a href="https://github.com/quocdaijr/trungso/blob/main/DISCLAIMER.md">miễn trừ trách nhiệm</a>
     </p>
   </div>
@@ -101,6 +89,6 @@
 <script src="./warning.js"></script>
 <script src="./theme.js"></script>
 <script src="./personal.js"></script>
-<script src="./render.js"></script>
+<script src="./finance.js"></script>
 </body>
 </html>
