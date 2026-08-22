@@ -62,7 +62,7 @@ form.khai input:focus-visible,form.khai select:focus-visible{
 
 /* --- grain: the page should feel printed, not rendered --- */
 .grain{
-  position:fixed; inset:0; z-index:9999; pointer-events:none;
+  position:fixed; inset:0; z-index:var(--z-grain); pointer-events:none;
   opacity:var(--grain-opacity); mix-blend-mode:var(--grain-blend);
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -70,7 +70,7 @@ form.khai input:focus-visible,form.khai select:focus-visible{
 /* ---------------- warning: always-on strip + first-visit gate ---------------- */
 /* The strip and the nav share one sticky wrapper. Making the nav sticky on its own
    would let it slide under the strip on scroll. */
-.topbar{position:sticky; top:0; z-index:100; padding-top:env(safe-area-inset-top, 0)}
+.topbar{position:sticky; top:0; z-index:var(--z-nav); padding-top:env(safe-area-inset-top, 0)}
 .warnstrip{
   background:var(--color-accent-2); color:var(--color-on-accent-2);
   font-size:var(--text-xs); font-weight:700; line-height:1.35;
@@ -82,7 +82,7 @@ form.khai input:focus-visible,form.khai select:focus-visible{
 
 html.is-gated,html.is-gated body{overflow:hidden}
 .gate{
-  position:fixed; inset:0; z-index:1000; display:grid; place-items:center;
+  position:fixed; inset:0; z-index:var(--z-gate); display:grid; place-items:center;
   padding:var(--space-md); background:var(--color-paper);
   overflow-y:auto;
 }
@@ -170,6 +170,9 @@ main.wrap{padding-bottom:var(--space-2xl)}
   overflow-wrap:anywhere; min-width:0; color:var(--color-ink)}
 .masthead__lede{font-family:var(--font-hand); font-size:var(--text-lg);
   color:var(--color-ink-dim); max-width:44ch; margin:0 0 var(--space-md)}
+/* Not one padding for all five. 02 · PHÁN is the loud stage and gets air; 04 · SỰ THẬT is
+   the cold-arithmetic stage where the fortune-teller goes silent, so it comes in tighter -
+   the rhythm carries the joke the copy is making. */
 .stage{padding-top:var(--space-2xl);
   /* --topbar-h is measured at runtime by warning.js; the fallback is the tallest
      the sticky wrapper gets, so a missed measurement over-clears rather than hides. */
@@ -188,6 +191,9 @@ main.wrap{padding-bottom:var(--space-2xl)}
 }
 .stage__lede{color:var(--color-ink-dim); max-width:58ch; margin:0 0 var(--space-md)}
 .stage + .stage{border-top:var(--rule-hair) solid var(--color-rule)}
+/* The two stages that carry the page's joke get their own rhythm. */
+#stage-02{padding-top:calc(var(--space-2xl) + var(--space-lg))}
+#stage-04{padding-top:var(--space-xl)}
 
 /* ---------------- blocks: uneven rules, never an even 1px box ---------------- */
 .block{
@@ -239,7 +245,17 @@ th,td{text-align:left; padding:var(--space-2xs) var(--space-xs);
 th{color:var(--color-ink-dim); font-weight:600}
 td.num,th.num{text-align:right; font-family:var(--font-num)}
 .scroll{overflow-x:auto}
-.kpi{font-family:var(--font-display); font-size:var(--text-3xl); line-height:1;
+/* --font-num, matching every other figure on the page (.ball, .cell, .num, .pot__num, the
+   tables). .kpi was the one number wearing a different face, and it renders two percentages
+   stacked in a single column, so the digits have to line up.
+   Three faces were tried and measured, per-digit, in the DOM:
+     --font-display  spread 5.84-12.15px, proportional in all four skins
+     --font-body     spread 77.13px in veso/thantai - Be Vietnam Pro ships NO tabular figure
+                     set, so font-variant-numeric is a no-op there (77.13 -> 77.13)
+     --font-num      spread 0 - JetBrains Mono is monospaced, so it cannot misalign
+   Weight 700, not 800: only 400 and 700 are loaded, and 800 would be a synthesised bold. */
+.kpi{font-family:var(--font-num); font-weight:700; font-variant-numeric:tabular-nums;
+  font-size:var(--text-3xl); line-height:1;
   overflow-wrap:anywhere; min-width:0}
 .kpi--bad{color:var(--color-bad)}
 .kpi--good{color:var(--color-good)}
@@ -273,7 +289,10 @@ td.num,th.num{text-align:right; font-family:var(--font-num)}
 }
 
 /* ---------------- privacy + disclaimer ---------------- */
-.privacy{background:var(--color-paper); border-left:var(--rule-slab) solid var(--color-good);
+/* --color-rule, not --color-good. A thick coloured edge is design.md's shape language and
+   stays; a 6px GREEN one is the 2018-SaaS side-stripe card almost verbatim, and --color-good
+   is the scoreboard's "this went right" signal, not a structural colour. */
+.privacy{background:var(--color-paper); border-left:var(--rule-slab) solid var(--color-rule);
   padding:var(--space-sm) var(--space-md); margin:var(--space-sm) 0;
   color:var(--color-ink); font-size:var(--text-sm)}
 .disclaim{background:var(--color-accent-2); color:var(--color-on-accent-2);
@@ -556,7 +575,7 @@ form.khai input{appearance:none; -webkit-appearance:none}
       </section>
     </div>
     <p class="colophon__made">
-      Made with ♡, 5846 dòng code, 535 test, và một lượng token AI không ai muốn nhắc lại.<br>
+      Made with ♡, 5881 dòng code, 535 test, và một lượng token AI không ai muốn nhắc lại.<br>
       Độ chính xác dự đoán: 0%.<br>
       <a href="https://github.com/quocdaijr/trungso">MIT</a> · 2026 · không bán gì ·
       không liên quan Vietlott · 18+ ·
