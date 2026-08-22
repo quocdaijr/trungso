@@ -311,7 +311,7 @@ form.khai input{appearance:none; -webkit-appearance:none}
 .btn[disabled]{opacity:.45; cursor:not-allowed; transform:none}
 .btn--ghost{background:transparent; color:var(--color-ink); border-color:var(--color-rule)}
 
-/* ---------------- footer: Ft5 statement ---------------- */
+/* ---------------- footer shell ---------------- */
 /* The footer owns its vertical rhythm and its background; the .wrap inside owns the
    measure and the safe-area inset. Without that split the footer sat at whatever width
    its own content chose - 625px on any desktop - and stopped lining up with the page
@@ -445,35 +445,76 @@ form.khai input{appearance:none; -webkit-appearance:none}
 .basic__note{font-family:var(--font-hand); font-size:var(--text-sm);
   color:var(--color-ink); margin:var(--space-xs) 0}
 
-/* ---------------- footer: Ft4 colophon ---------------- */
+/* ---------------- footer: Ft2 credit columns ---------------- */
+/* Was Ft4 colophon - columns of credits above one prose block. The prose block is gone,
+   and that is the whole fix. It carried max-width:70ch, so on a 1060px .wrap its 1px top
+   rule stopped 440px short of the columns above it and closed nothing; the sentence inside
+   wrapped mid-phrase with half the row empty. Its content now lives in a third column that
+   is structurally identical to the other two, so the footer has ONE left axis repeated
+   three times instead of four axes disagreeing. */
 .colophon{font-family:var(--font-num); font-size:var(--text-sm); line-height:1.55}
-.colophon h2{font-family:var(--font-num); font-size:var(--text-xs); font-weight:700;
-  letter-spacing:.18em; margin:0 0 var(--space-sm); color:var(--color-ink)}
 
-/* Two columns once there is room. The credits are a tabular list, not prose, so the whole
-   block used to sit inside a 74ch reading measure - 625px no matter how wide the window,
-   which is what made it look squeezed on a desktop. The measure now applies only to the
-   one part of the footer that is actually prose. */
+/* The hairline is what makes three columns read as three columns. Three rules of equal
+   length landing on the same y is the cheapest possible grid cue, and below 900px - where
+   the columns stack - the same rule doubles as the section divider, so the single-column
+   form does not collapse into one long undifferentiated list. Hair here, not slab: .ft
+   already owns the slab edge, and design.md forbids an even box on four sides. */
+.colophon h2{font-family:var(--font-num); font-size:var(--text-xs); font-weight:700;
+  letter-spacing:.18em; margin:0 0 var(--space-sm); color:var(--color-ink);
+  border-bottom:var(--rule-hair) solid var(--color-rule); padding-bottom:var(--space-xs)}
+
+/* Columns are not equal fractions, and the reason was measured rather than eyeballed.
+   "khiemdoan/vietnam-lottery-xsmb-analysis" needs 329.5px unwrapped at --text-sm in
+   JetBrains Mono. Three even columns of the 1020px content box with --space-lg gutters
+   give 318.66px each - checked by switching the live grid to repeat(3,minmax(0,1fr)) and
+   re-measuring, not by arithmetic - and that dt then renders 43.6px tall, i.e. two lines.
+   Because dt carries overflow-wrap:anywhere it breaks mid-word, so it is a wrap that never
+   overflows and never gets reported, only seen. 1.25fr 1fr 1fr gives column 1 a measured
+   367.69px and every dt stays on one line. The ratio is what the content asks for anyway:
+   five credits left, three assets middle, three meta right.
+
+   980px, not the 900px the two-column version used. Swept the viewport in 8px steps: at
+   904px column 1 is 307.7px and the long dt is already two lines, and it stays two lines
+   all the way to 960px (329.2px, still 0.3px short). 968px is the first width that clears
+   it at 332.3px. Turning three columns on at 900 would have shipped a wrap for 68px of
+   viewport that nobody would have thought to check, because the breakpoint was inherited
+   rather than re-measured after the column count changed.
+
+   Measuring note: do not count lines with Range.getClientRects() here. The footer links are
+   display:inline-block for their tap target, so their rect sits 4px above the text rect and
+   a naive top-count reports "MIT · 2026" as two lines when it is one. Divide the element
+   height by line-height instead. */
 .colophon__cols{display:grid; grid-template-columns:minmax(0,1fr); gap:var(--space-lg)}
-@media (min-width:900px){
-  .colophon__cols{grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-xl)}
+@media (min-width:980px){
+  .colophon__cols{grid-template-columns:1.25fr 1fr 1fr; gap:var(--space-lg)}
+  .colophon__cols--2{grid-template-columns:1.25fr 1fr}
 }
 
 /* dt above dd at every width, not beside it. The side-by-side form needed a fixed dt
    column and no width fits both "EMOJI" and "khiemdoan/vietnam-lottery-xsmb-analysis":
    at 22ch the long repo names wrapped on every viewport, desktop included. Stacking
-   removes the constraint instead of tuning it. */
+   removes the constraint instead of tuning it.
+
+   dd is NOT indented. It used to carry padding-left:var(--space-sm), which put every
+   second line on a 12px-offset axis of its own - too small to read as hierarchy, big
+   enough to read as sloppiness, and the hierarchy was already carried by --color-ink-dim.
+   One axis per column, no exceptions. */
 .colophon dl{margin:0}
 .colophon dt{color:var(--color-ink); overflow-wrap:anywhere}
-.colophon dd{margin:0 0 var(--space-sm); padding-left:var(--space-sm);
-  color:var(--color-ink-dim); overflow-wrap:anywhere}
+.colophon dd{margin:0 0 var(--space-sm); color:var(--color-ink-dim);
+  overflow-wrap:anywhere}
 .colophon dd:last-of-type{margin-bottom:0}
-.colophon__block{margin:var(--space-md) 0 0; color:var(--color-ink-dim)}
-.colophon__made{
-  color:var(--color-ink); border-top:var(--rule-hair) solid var(--color-rule);
-  padding-top:var(--space-sm); margin:var(--space-lg) 0 0;
-  max-width:70ch; /* this part IS prose, so it keeps a measure */
-}
+
+/* Inline links at --text-sm are a 14px-tall hit area. WCAG 2.5.8 asks 24x24 as AA, and
+   --tap (44px) is the AAA figure the page uses for real controls; a footnote link is not a
+   control, so this takes the AA line and gets there with padding rather than by growing
+   the type. inline-block is required for padding-block to affect the box at all. */
+.colophon a{display:inline-block; padding-block:var(--space-2xs)}
+
+/* The base strip spans the full .wrap - no measure. That is the difference between a rule
+   that closes the footer and the one that used to stop halfway across it. */
+.colophon__base{margin:var(--space-lg) 0 0; padding-top:var(--space-sm);
+  border-top:var(--rule-hair) solid var(--color-rule); color:var(--color-ink-dim)}
 
 /* ---------------- reveal ---------------- */
 .reveal{opacity:0; transform:translateY(14px);

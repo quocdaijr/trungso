@@ -1,6 +1,19 @@
 [
   {
     "date": "2026-08-22",
+    "verb": "footer rebuild",
+    "macrostructure": "Narrative Workflow (unchanged - design.md governs)",
+    "theme": "custom x4 (unchanged)",
+    "nav": "N7 brutal slab (unchanged)",
+    "footer": "Ft2 credit columns (was Ft4 colophon)",
+    "findings": "four competing left axes in one block: a 70ch prose measure inside a 1060px wrap, a 12px dd indent, no rule tying the column heads together, and 5-vs-3 items leaving the second column short",
+    "fixed": "deleted .colophon__made and .colophon__block (the 70ch measure) and moved their content into a third column of the same <h2> + <dl> shape; dropped dd padding-left so each column has one left axis; hairline under every h2 as the grid cue and, when stacked, the section divider; new full-width .colophon__base; footer links inline-block for a 29.8px tap target (WCAG 2.5.8 AA); tai-chinh.html footer was missing .wrap entirely and bled to the viewport edge - now on the same system",
+    "measured": "longest credit dt 329.5px unwrapped; even 3-col gives 318.66px and wraps it, 1.25fr 1fr 1fr gives 367.69px and does not; breakpoint swept in 8px steps - 960px still wraps at 329.2px, 968px clears at 332.3px, so 900 -> 980; verified across 15 widths x 4 skins x 2 pages, zero horizontal overflow",
+    "deferred": "at 320-360px the longest credit still wraps - the column is 280-320px and the string needs 329.5px, so it cannot fit. It breaks at a hyphen (xsmb- / analysis), not mid-word, so it is left alone",
+    "brief": "footer looks messy - alignment is all over the place"
+  },
+  {
+    "date": "2026-08-22",
     "verb": "audit + fix",
     "macrostructure": "Narrative Workflow (unchanged - design.md governs)",
     "theme": "custom x4 (unchanged)",
