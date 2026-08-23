@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-571%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-636%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-12%2C578-informational.svg)](#what-the-honest-layer-found)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.53%20→%20random-informational.svg)](#what-the-honest-layer-found)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -100,6 +100,8 @@ uv run trungso backtest --game mega645  # replay the oracle over all of history 
 uv run trungso today                    # dashboard for the next draw
 uv run trungso site                     # emit site/data.json for the static page
 uv run trungso notify --kind prophecy   # push the twelve numbers to Telegram
+uv run trungso pulse --plan             # which hours today get a random pulse
+uv run trungso pulse --force --dry-run  # preview one card without sending it
 ```
 
 View the static site:
@@ -110,6 +112,34 @@ uv run trungso site && python3 -m http.server -d site 8000
 
 Telegram needs `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` (GitHub Secrets in CI). Without them
 `notify` fails loudly, while the data pipeline is **never** affected.
+
+### Random pulses through the day — `trungso pulse`
+
+Beyond the two fixed slots (10:00 for the numbers, 18:45 for the result), `pulse` sends
+**two or three messages a day at arbitrary hours between 08:00 and 22:00 VN**, one card each:
+hot and cold numbers, chi-square, longest absences, the next draw with the jackpot and the
+price of a wheel, the Hall of Shame, one line of the pending prophecy, XSMB, the cosmic
+signals, and a personal fortune.
+
+The hours are random but not unpredictable-to-themselves: a day's plan comes from a
+`sha256(date)` seed, so `pulse.yml` can run hourly with no state file to keep — the other
+twelve wake-ups exit 0 having sent nothing. A day never repeats a *kind* of card, and a manual
+`workflow_dispatch` run sends immediately rather than waiting for an hour on the plan.
+
+The window is cut into `n` equal bands (two pulses → 08:00–14:00 and 15:00–22:00; three →
+08:00–12:00, 13:00–17:00, 18:00–22:00) and each band contributes one uniformly-chosen hour.
+That keeps the spread across hours **flat** — a 1.14× spread over 3650 days — at the price of
+two pulses occasionally landing in adjacent hours across a band boundary, on roughly 15% of
+days. An earlier version enforced "at least 3h apart", and **that constraint was itself** why
+08:00 and 22:00 came up 1.55× as often as 20:00: sampling uniformly over valid *schedules* is
+not sampling uniformly over *hours*.
+
+The personal layer reads `TRUNGSO_BIRTH_DATE` (with optional `TRUNGSO_GENDER` and
+`TRUNGSO_NAME`) and lives only as a secret. The `pulse` job runs with
+`permissions: contents: read` — it commits nothing — and a malformed value is reported by
+naming the variable and nothing else, because these logs are public. The
+[no-PII rule](#personalisation--and-why-there-is-no-sign-up) holds: the birth date is nowhere
+in this repository.
 
 ## Wheel-12 arithmetic
 

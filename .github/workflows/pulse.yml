@@ -1,0 +1,55 @@
+name: Pulse
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Hourly across 08:00-22:00 VN (01:00-15:00 UTC). The cron is deliberately dumb:
+    # `trungso pulse` computes the day's two or three firing hours from a seed derived
+    # from the date, so every runner agrees on the plan with no state file to keep, and
+    # the other twelve wake-ups exit 0 having sent nothing.
+    - cron: '0 1-15 * * *'
+
+# Read-only on purpose. This job commits nothing, which is what keeps a birth date
+# supplied through a secret from ever reaching the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: pulse
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        # v7 for the same reason as ci.yml: astral-sh stopped publishing floating major
+        # tags after it, so `@v10` is not a ref that resolves.
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Sync dependencies
+        run: uv sync --frozen
+
+      # `|| true` for the same reason as the notify step in oracle.yml: a dead bot, an
+      # unset secret or a rate limit is not a reason to paint this run red. Missing
+      # Telegram config exits 1 by design, and that must stay a non-event here.
+      #
+      # A manual run forces the send. Without --force it would recompute today's plan,
+      # find that the current hour is not in it and exit 0 having sent nothing - and a
+      # button that does nothing is worse than no button.
+      - name: Pulse
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Optional, and never committed anywhere. `pulse` reports a malformed value by
+          # naming the variable and nothing else, because these logs are public.
+          TRUNGSO_BIRTH_DATE: ${{ secrets.TRUNGSO_BIRTH_DATE }}
+          TRUNGSO_GENDER: ${{ secrets.TRUNGSO_GENDER }}
+          TRUNGSO_NAME: ${{ secrets.TRUNGSO_NAME }}
+        run: |
+          uv run trungso pulse \
+            ${{ github.event_name == 'workflow_dispatch' && '--force' || '' }} || true
