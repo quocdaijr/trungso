@@ -102,7 +102,7 @@ def test_today_shows_the_prophecy_that_oracle_just_wrote(capsys):
     ],
 )
 def test_draw_has_happened(now, expected):
-    assert cli._draw_has_happened(date(2026, 8, 19), now) is expected
+    assert cli.draw_has_happened(date(2026, 8, 19), now) is expected
 
 
 def test_parser_requires_a_command():

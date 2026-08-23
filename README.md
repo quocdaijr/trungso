@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-571%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-636%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-12%2C578-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.53%20→%20random-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -77,6 +77,8 @@ uv run trungso backtest --game mega645  # tiên tri lại toàn bộ lịch sử
 uv run trungso today                    # dashboard kỳ quay tới
 uv run trungso site                     # sinh site/data.json cho trang tĩnh
 uv run trungso notify --kind prophecy   # đẩy 12 số lên Telegram
+uv run trungso pulse --plan             # giờ nào hôm nay sẽ có tin random
+uv run trungso pulse --force --dry-run  # xem thử một thẻ, không gửi gì
 ```
 
 Xem trang tĩnh:
@@ -87,6 +89,29 @@ uv run trungso site && python3 -m http.server -d site 8000
 
 Telegram cần `TELEGRAM_BOT_TOKEN` và `TELEGRAM_CHAT_ID` (GitHub Secrets khi chạy CI).
 Thiếu biến thì `notify` báo lỗi rõ ràng, còn pipeline dữ liệu **không bao giờ** bị ảnh hưởng.
+
+### Tin random trong ngày — `trungso pulse`
+
+Ngoài hai mốc cố định (10h: 12 số, 18h45: kết quả), `pulse` gửi **2–3 tin/ngày vào giờ bất
+kỳ trong 8h–22h VN**, mỗi tin một thẻ: nóng/lạnh, chi-square, số lâu chưa ra, lịch + jackpot +
+giá bao 12, Bảng Phong Thần, một lời sấm, XSMB, tín hiệu vũ trụ, và lá số cá nhân.
+
+Giờ gửi là random nhưng **không phải bất định**: kế hoạch của một ngày sinh ra từ seed
+`sha256(ngày)`, nên `pulse.yml` chạy mỗi giờ mà không cần state file — 12 lần thức dậy còn lại
+thoát 0 và không gửi gì. Một ngày không lặp lại cùng một *loại* thẻ. Bấm `workflow_dispatch`
+là gửi ngay, không đợi tới giờ.
+
+Khung giờ cắt thành `n` dải bằng nhau (2 tin → 8–14h và 15–22h; 3 tin → 8–12h, 13–17h, 18–22h),
+mỗi dải bốc uniform một giờ. Cách này giữ phân bố giờ **phẳng** (lệch 1,14× trên 3650 ngày);
+đổi lại, hai tin có thể rơi sát nhau qua ranh dải, khoảng 15% số ngày. Bản trước ép "cách nhau
+≥ 3h" và **chính ràng buộc đó** làm 8h với 22h xuất hiện 1,55× nhiều hơn 20h — vì uniform trên
+*tập kế hoạch hợp lệ* không phải uniform trên *giờ*.
+
+Lá số cá nhân đọc từ `TRUNGSO_BIRTH_DATE` (kèm `TRUNGSO_GENDER`, `TRUNGSO_NAME` tuỳ chọn) và
+chỉ ở dạng secret. Job `pulse` có `permissions: contents: read` — nó không commit gì cả, và
+thông báo lỗi chỉ gọi tên biến chứ không in giá trị, vì log Actions là công khai. Nguyên tắc
+[không thu thập PII](#cá-nhân-hoá--và-vì-sao-không-có-đăng-ký) vẫn nguyên: ngày sinh không nằm
+ở đâu trong repo này.
 
 ## Bốn bộ da
 

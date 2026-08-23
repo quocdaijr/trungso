@@ -4,24 +4,18 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Sequence
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
 
 import requests
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from . import notify, scoreboard, site, stats, store, wheel
-from .games import (
-    GAMES,
-    PROPHECY_GAMES,
-    GameSpec,
-    draw_days_between,
-    get_game,
-    next_draw_date,
-)
-from .models import Draw, Prophecy, normalise_draw_id
+from . import notify, pulse, scoreboard, site, stats, store, wheel
+from .games import GAMES, PROPHECY_GAMES, GameSpec, get_game
+from .models import Draw, Prophecy
 from .oracle import prophesy
+from .schedule import VN_TZ, draw_has_happened, next_target, now_vn, today_vn
 from .sources import us_lottery, vietlott_live, vietlott_prizes, xsmb
 from .sources import vietlott_mirror as mirror
 from .sources.vibes import gather
@@ -29,47 +23,12 @@ from .sources.vietlott_live import LiveFetchError
 from .sources.vietlott_prizes import PrizeParseError
 from .store import ProphecyConflict
 
-VN_TZ = timezone(timedelta(hours=7))
-DRAW_HOUR_VN = 18
 DISCLAIMER = (
     "[dim]Xổ số là biến cố độc lập. Phần mềm này không dự đoán được gì. "
     "Bảng Phong Thần là paper-trading — đốt tiền trên giấy.[/dim]"
 )
 
 console = Console()
-
-
-def _today_vn() -> date:
-    return datetime.now(VN_TZ).date()
-
-
-def _draw_has_happened(day: date, now: datetime | None = None) -> bool:
-    now = now or datetime.now(VN_TZ)
-    return day < now.date() or (day == now.date() and now.hour >= DRAW_HOUR_VN)
-
-
-def next_target(
-    spec: GameSpec, draws: Sequence[Draw], *, now: datetime | None = None
-) -> tuple[str, date]:
-    """Work out which draw to prophesy for, and its id.
-
-    The id is derived by counting the draw days between the last stored draw and the
-    target, so an upstream mirror that skipped a draw does not cause the oracle to
-    prophesy a draw that already happened.
-    """
-    if not draws:
-        raise RuntimeError(f"no {spec.key} history stored - run `trungso ingest` first")
-
-    now = now or datetime.now(VN_TZ)
-    target = next_draw_date(spec, now.date(), inclusive=True)
-    if _draw_has_happened(target, now):
-        target = next_draw_date(spec, target + timedelta(days=1), inclusive=True)
-
-    last = max(draws, key=lambda d: d.draw_id)
-    intervening = draw_days_between(spec, last.date + timedelta(days=1), target)
-    # Must be normalised: stored draw_ids are zero-padded, so an unpadded id here
-    # silently fails every `==` lookup against saved prophecies and draws.
-    return normalise_draw_id(int(last.draw_id) + len(intervening)), target
 
 
 def _specs(game: str | None, *, prophecy_only: bool = False) -> tuple[GameSpec, ...]:
@@ -157,7 +116,7 @@ def _money(value: float) -> str:
 
 
 def cmd_ingest(args: argparse.Namespace) -> int:
-    today = _today_vn()
+    today = today_vn()
     problems = 0
     for spec in _specs(args.game):
         console.print(f"[bold]{spec.display}[/bold] — tải từ mirror…")
@@ -183,7 +142,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
             missing = [
                 d
                 for d in report["missing_draw_dates"]
-                if _draw_has_happened(date.fromisoformat(d))
+                if draw_has_happened(date.fromisoformat(d))
             ]
             if missing:
                 console.print(
@@ -420,7 +379,7 @@ def cmd_backtest(args: argparse.Namespace) -> int:
 
 
 def cmd_today(args: argparse.Namespace) -> int:
-    now = datetime.now(VN_TZ)
+    now = now_vn()
     console.print(f"[bold]Hôm nay {now.date()} ({now.strftime('%H:%M')} giờ VN)[/bold]\n")
 
     for spec in _specs(args.game, prophecy_only=True):
@@ -508,6 +467,81 @@ def cmd_notify(args: argparse.Namespace) -> int:
     return 1 if failed else 0
 
 
+def _parse_now(raw: str | None) -> datetime:
+    """`--now` for testing a specific hour. A naive value is read as Vietnam time."""
+    if not raw:
+        return now_vn()
+    moment = datetime.fromisoformat(raw)
+    return moment if moment.tzinfo else moment.replace(tzinfo=VN_TZ)
+
+
+def cmd_pulse(args: argparse.Namespace) -> int:
+    """Push one random card at a randomly-chosen hour of the day.
+
+    Called hourly by `pulse.yml` and exits 0 without sending on the hours that are not
+    in today's plan, so the cron can stay dumb and stateless.
+    """
+    now = _parse_now(args.now)
+    day = now.astimezone(VN_TZ).date()
+    plan = ", ".join(f"{hour:02d}h" for hour in pulse.slots_for(day))
+
+    if args.plan:
+        console.print(f"Kế hoạch {day}: [cyan]{plan}[/cyan]")
+        console.print(DISCLAIMER)
+        return 0
+
+    index = pulse.slot_index(now)
+    if index is None and not args.force:
+        console.print(f"[dim]giờ này không có tin (kế hoạch hôm nay: {plan})[/dim]")
+        console.print(DISCLAIMER)
+        return 0
+
+    # A dry run is a local preview, so it must not demand anybody's bot token.
+    if not args.dry_run:
+        try:
+            notify.require_config()
+        except notify.TelegramNotConfigured as exc:
+            console.print(f"[red]{exc}[/red]")
+            return 1
+
+    # A typo in one secret costs one card, not the whole pulse - and the warning names
+    # the variable without echoing it, because Actions logs are public.
+    fortune = None
+    try:
+        fortune = pulse.read_fortune_from_env(day)
+    except pulse.BirthDateError as exc:
+        console.print(f"[yellow]bỏ qua lá số:[/yellow] {exc}")
+
+    cards = pulse.build_cards(
+        _specs(args.game, prophecy_only=False),
+        now=now,
+        fortune=fortune,
+        allow_network=not args.offline,
+    )
+    # `--force` off-plan has no slot number; the hour stands in for one so that forcing
+    # at different times previews different cards instead of the same one all day.
+    card = pulse.card_for_slot(cards, day, index if index is not None else now.hour)
+    if card is None:
+        console.print("[yellow]không dựng được thẻ nào — chạy `trungso ingest` trước[/yellow]")
+        console.print(DISCLAIMER)
+        return 0
+
+    console.print(f"[dim]{len(cards)} thẻ dựng được · chọn[/dim] [bold]{card.key}[/bold]")
+    if args.dry_run:
+        console.print(Panel(pulse.format_card(card, now=now), border_style="cyan"))
+        console.print(DISCLAIMER)
+        return 0
+
+    if pulse.send_card(card, now=now):
+        console.print(f"[green]đã gửi Telegram:[/green] {card.key}")
+        console.print(DISCLAIMER)
+        return 0
+
+    console.print(f"[red]gửi Telegram thất bại:[/red] {card.key}")
+    console.print(DISCLAIMER)
+    return 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="trungso", description="Máy tiên tri xổ số tự vả mặt. Không dự đoán được gì."
@@ -546,6 +580,15 @@ def build_parser() -> argparse.ArgumentParser:
         default="prophecy",
         help="prophecy = 12 số trước kỳ quay · result = kết quả sau kỳ quay",
     )
+
+    pulse_cmd = add("pulse", "tin random trong ngày lên Telegram", cmd_pulse)
+    pulse_cmd.add_argument(
+        "--plan", action="store_true", help="chỉ in các giờ đã chọn cho hôm nay"
+    )
+    pulse_cmd.add_argument("--force", action="store_true", help="gửi bất kể giờ nào")
+    pulse_cmd.add_argument("--dry-run", action="store_true", help="in tin ra, không gửi")
+    pulse_cmd.add_argument("--offline", action="store_true", help="bỏ tín hiệu cần mạng")
+    pulse_cmd.add_argument("--now", help="ghi đè thời điểm (ISO 8601, mặc định giờ VN)")
     return parser
 
 
