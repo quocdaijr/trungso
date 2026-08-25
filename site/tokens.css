@@ -91,6 +91,7 @@
   --heat-max: 52%;
   --ball: 50%;
   --tap: 44px; /* WCAG 2.5.8 / Apple HIG minimum touch target */
+  --heat-gap: 2px; /* named so .block--heat can size a 10x10 grid from it */
 
   /* ---- stacking: named, so nobody has to guess whether 9999 was load-bearing ---- */
   --z-nav: 100;    /* the sticky slab */

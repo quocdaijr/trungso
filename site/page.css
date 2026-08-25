@@ -192,6 +192,13 @@ main.wrap{padding-bottom:var(--space-2xl)}
 .row{display:flex; flex-wrap:wrap; gap:var(--space-md)}
 .row > *{flex:1 1 320px; min-width:0}
 
+/* A 10x10 heatmap needs a fixed width to keep its cells at --tap, and the default 320px
+   basis does not say so - a third block in the row silently squeezed it to 280px. This
+   basis is the arithmetic, not a guess: ten cells, nine gaps, and the block's own chrome.
+   Anything else in the row wraps below rather than stealing from the grid. */
+.block--heat{flex-basis:calc(10 * var(--tap) + 9 * var(--heat-gap)
+  + 2 * var(--space-md) + var(--rule-slab))}
+
 /* ---------------- lottery balls ---------------- */
 .balls{display:flex; flex-wrap:wrap; gap:var(--space-xs); margin:var(--space-sm) 0}
 .ball{
@@ -253,10 +260,6 @@ td.num,th.num{text-align:right; font-family:var(--font-num)}
 .block__head{font-family:var(--font-display); font-weight:400; font-style:normal;
   font-size:var(--text-lg); line-height:1.15; margin:0 0 var(--space-xs);
   color:var(--color-ink); overflow-wrap:anywhere; min-width:0}
-
-/* heatmap */
-.heat{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(38px,100%),1fr));
-  gap:2px; margin-top:var(--space-sm)}
 
 /* the one place the fortune-teller touches the numbers */
 .verdict-stamp{
@@ -359,9 +362,23 @@ form.khai input{appearance:none; -webkit-appearance:none}
 /* ---------------- heatmap: tappable, not hover-only ---------------- */
 /* `title` does not exist on touch. Every cell is a button and writes to a live readout,
    so the frequency data is reachable without a mouse. */
-.heat{display:grid; gap:2px; margin-top:var(--space-sm)}
+.heat{display:grid; gap:var(--heat-gap); margin-top:var(--space-sm)}
 .heat--pool{grid-template-columns:repeat(auto-fill,minmax(min(44px,100%),1fr))}
 .heat--matrix{grid-template-columns:repeat(10,minmax(0,1fr))}
+
+/* The matrix has exactly ten columns, so its tracks shrink with the container while a
+   .cell asks for a fixed 44x44. `minmax(0,1fr)` lets a track go BELOW its item's minimum,
+   and the cell then overflows its track and paints over its neighbour - measured at 15.7px
+   of overlap per cell in a three-up row, and 13.4px on a 390px phone, which is where this
+   had been shipping unnoticed since the 10x10 grid landed.
+
+   So the matrix cell drops the floor and simply fills its track. The tap target is not
+   abandoned: --block-heat-basis below keeps the whole grid at the full --tap wherever the
+   row has room, and where it does not, the cell lands near 26-31px. That is the same AA
+   line page.css already takes for colophon links - WCAG 2.5.8 asks 24x24 as AA, and 44 is
+   the AAA figure - except here it applies only when the viewport forces it. */
+.heat--matrix .cell{min-height:0}
+
 .cell{
   aspect-ratio:1; min-height:var(--tap); touch-action:manipulation;
   display:grid; place-items:center; font-family:var(--font-num);

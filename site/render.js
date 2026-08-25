@@ -554,7 +554,9 @@ function stageSuThat(data) {
     const row = el('div', 'row');
     row.appendChild(chiSquareTable(k.chi_square,
       `${k.display} · ${k.draw_count.toLocaleString('vi-VN')} bảng · ${k.provinces} đài · ${k.first_date} → ${k.last_date}`));
-    const heat = el('div', 'block');
+    // block--heat, not plain block: a 10x10 grid needs its width stated, or a third block
+    // in the row squeezes the cells past the point where they overlap each other.
+    const heat = el('div', 'block block--heat');
     heat.appendChild(el('h3', 'block__head', 'Tần suất 00–99 (hai số cuối mỗi giải)'));
     heat.appendChild(heatmap(k.frequency, 100, 0));
     heat.appendChild(el('p', 'note',
