@@ -20,6 +20,7 @@ from trungso.cli import VN_TZ, build_parser
 from trungso.games import MEGA645, MEGAMILLIONS, POWER655
 from trungso.models import Prophecy, utc_now
 from trungso.oracle import ORACLE_VERSION
+from trungso.sources import markets
 from trungso.sources.vibes import CosmicSignals
 from trungso.sources.xsmb import PRIZE_SLOTS, XsmbDraw
 
@@ -625,3 +626,150 @@ def test_every_card_of_the_real_deck_is_valid_telegram_html(monkeypatch):
     assert len(cards) > 8
     for card in cards:
         assert html_problems(pulse.format_card(card, now=now)) == [], card.key
+
+
+# ------------------------------------------------------------------- gold and crypto
+
+A_BOARD = markets.GoldBoard(
+    quotes=(
+        markets.GoldQuote("SJC", "Vàng miếng SJC 999.9", 14_760_000, 15_060_000),
+        markets.GoldQuote("N24K", "Nhẫn Trơn PNJ 999.9", 14_750_000, 15_050_000),
+    ),
+    branch="hochiminh",
+    updated_at="25/08/2026 08:37:59",
+)
+SOME_COINS = (
+    markets.CoinQuote("BTC", "Bitcoin", 80_662.0, 2_108_530_000.0, 4.54),
+    markets.CoinQuote("ETH", "Ethereum", 2_506.52, 65_520_000.0, -2.90),
+    markets.CoinQuote("SOL", "Solana", 101.53, 2_650_000.0, None),
+)
+
+
+def test_gold_card_quotes_per_luong_not_per_chi():
+    """People buy lượng. Printing the published đ/chỉ figure with a lượng label, or the
+    other way round, is the ×10 error this whole feature is one keystroke away from."""
+    card = pulse.card_gold(A_BOARD)
+    assert card is not None
+    body = "\n".join(card.lines)
+    assert "150,600,000" in body or "150.6" in body
+    assert "15,060,000" not in body
+
+
+def test_gold_card_names_the_spread_a_buyer_eats():
+    card = pulse.card_gold(A_BOARD)
+    body = "\n".join(card.lines)
+    assert "1.99%" in body or "2.0%" in body
+    assert "3,000,000" in body or "3.00" in body
+
+
+def test_gold_card_carries_the_moment_the_board_was_read():
+    card = pulse.card_gold(A_BOARD)
+    assert "25/08/2026" in "\n".join(card.lines)
+
+
+def test_gold_card_shows_the_domestic_premium_when_world_spot_is_known():
+    card = pulse.card_gold(A_BOARD, world_usd_per_oz=4635.4, usd_vnd=26_140)
+    body = "\n".join(card.lines)
+    assert "thế giới" in body
+    assert "%" in body
+
+
+def test_gold_card_omits_the_premium_rather_than_guessing_a_rate():
+    """No exchange rate means no premium line - never a premium computed off a guess."""
+    body = "\n".join(pulse.card_gold(A_BOARD, world_usd_per_oz=4635.4).lines)
+    assert "thế giới" not in body
+
+
+def test_gold_card_is_absent_without_a_board():
+    assert pulse.card_gold(None) is None
+    assert pulse.card_gold(markets.GoldBoard(quotes=())) is None
+
+
+def test_crypto_card_reports_usd_vnd_and_the_daily_move():
+    card = pulse.card_crypto(SOME_COINS)
+    assert card is not None
+    body = "\n".join(card.lines)
+    assert "BTC" in body and "ETH" in body and "SOL" in body
+    assert "+4.5" in body
+    assert "-2.9" in body
+
+
+def test_crypto_card_handles_a_missing_daily_move():
+    """SOL has no 24h figure in the fixture; that must not become 'None%' or a crash."""
+    body = "\n".join(pulse.card_crypto(SOME_COINS).lines)
+    assert "None" not in body
+
+
+def test_crypto_card_is_absent_without_quotes():
+    assert pulse.card_crypto(()) is None
+
+
+def test_gold_and_crypto_labels_are_escaped_for_telegram():
+    board = markets.GoldBoard(
+        quotes=(markets.GoldQuote("X", "Vàng <b>A</b> & B", 1_000_000, 1_100_000),),
+    )
+    assert html_problems(pulse.format_card(pulse.card_gold(board), now=at(10))) == []
+
+
+def test_market_cards_join_the_deck_when_the_network_is_available(monkeypatch):
+    monkeypatch.setattr(pulse.markets, "fetch_gold_board", lambda **k: A_BOARD)
+    monkeypatch.setattr(pulse.markets, "fetch_coins", lambda **k: SOME_COINS)
+    monkeypatch.setattr(pulse.markets, "fetch_world_gold_usd_per_oz", lambda **k: 4635.4)
+
+    keys = {c.key for c in pulse.build_cards((MEGA645,), now=at(10), allow_network=True)}
+    assert {"gold", "crypto"} <= keys
+
+
+def test_market_cards_stay_out_when_offline():
+    keys = {c.key for c in pulse.build_cards((MEGA645,), now=at(10), allow_network=False)}
+    assert "gold" not in keys
+    assert "crypto" not in keys
+
+
+def test_a_blocked_market_source_costs_one_card_not_the_pulse(monkeypatch):
+    """Exactly the vietlott.vn failure mode: 403 for a datacenter IP, 200 for a laptop."""
+    monkeypatch.setattr(pulse.markets, "fetch_gold_board", lambda **k: None)
+    monkeypatch.setattr(pulse.markets, "fetch_coins", lambda **k: ())
+    monkeypatch.setattr(pulse.markets, "fetch_world_gold_usd_per_oz", lambda **k: None)
+
+    cards = pulse.build_cards((MEGA645,), now=at(10), allow_network=True)
+    assert cards
+    assert "gold" not in {c.key for c in cards}
+
+
+# --------------------------------------------------------------- stale jackpot notice
+
+
+def test_schedule_card_flags_a_jackpot_from_an_older_draw():
+    """vietlott.vn has been 403ing the runner since 2026-08-20, so the stored jackpot is
+    two draws behind the stored results. A figure that old must say so itself."""
+    draws = [make_draw(MEGA645, i) for i in range(1, 1554)]
+    prizes = {"draw_id": "01551", "top_jackpot_vnd": 24_507_110_500, "rolled_over": True}
+
+    body = "\n".join(pulse.card_schedule(MEGA645, draws, prizes, now=at(10)).lines)
+    assert "01551" in body
+    assert "kỳ cũ" in body or "chưa cập nhật" in body
+
+
+def test_schedule_card_says_nothing_extra_when_the_jackpot_is_current():
+    draws = [make_draw(MEGA645, i) for i in range(1, 10)]
+    latest = max(draws, key=lambda d: d.draw_id)
+    prizes = {"draw_id": latest.draw_id, "top_jackpot_vnd": 24_507_110_500, "rolled_over": True}
+
+    body = "\n".join(pulse.card_schedule(MEGA645, draws, prizes, now=at(10)).lines)
+    assert "kỳ cũ" not in body and "chưa cập nhật" not in body
+
+
+def test_lottery_cards_keep_the_lottery_disclaimer():
+    card = pulse.Card(key="k", title="t", lines=("x",))
+    assert notify.DISCLAIMER in pulse.format_card(card, now=at(10))
+
+
+def test_market_cards_carry_their_own_disclaimer_not_the_lottery_one():
+    """"Xổ số là biến cố độc lập" says nothing true about a gold board, and a disclaimer
+    that does not fit what it is attached to is decoration, not honesty."""
+    for card in (pulse.card_gold(A_BOARD), pulse.card_crypto(SOME_COINS)):
+        text = pulse.format_card(card, now=at(10))
+        assert notify.DISCLAIMER not in text
+        assert pulse.MARKET_DISCLAIMER in text
+        assert "tư vấn đầu tư" in text

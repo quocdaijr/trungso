@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-636%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-682%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-12%2C578-informational.svg)](#what-the-honest-layer-found)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.53%20→%20random-informational.svg)](#what-the-honest-layer-found)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -119,7 +119,21 @@ Beyond the two fixed slots (10:00 for the numbers, 18:45 for the result), `pulse
 **two or three messages a day at arbitrary hours between 08:00 and 22:00 VN**, one card each:
 hot and cold numbers, chi-square, longest absences, the next draw with the jackpot and the
 price of a wheel, the Hall of Shame, one line of the pending prophecy, XSMB, the cosmic
-signals, and a personal fortune.
+signals, **gold prices**, **crypto prices**, and a personal fortune.
+
+#### Gold: the unit is where this goes wrong
+
+PNJ publishes **thousands of dong per chỉ**; Vietnamese buyers talk in **dong per lượng**; a
+lượng is ten chỉ. The wrong answer therefore sits exactly one zero away from the right one,
+and 15 million a lượng looks no less plausible than 150 million to anyone not holding the bar.
+The conversion lives in one place (`sources/markets.py`) and `tests/test_markets.py` pins it
+from **both ends**: against the figure webgia.com publishes in plain dong, and against world
+spot converted independently.
+
+The card also reports two numbers people rarely look at: the **dealer spread** (~2%, lost the
+instant you buy) and the **domestic premium** over converted world spot (~3%). The rate used
+for that conversion is the one the price source itself implies, not a bank rate, and is
+labelled as such — with no rate available the premium line is **dropped rather than guessed**.
 
 The hours are random but not unpredictable-to-themselves: a day's plan comes from a
 `sha256(date)` seed, so `pulse.yml` can run hourly with no state file to keep — the other
