@@ -9,6 +9,7 @@ import pytest
 from conftest import make_draw
 from trungso import cli, store
 from trungso.games import MEGA645, POWER655
+from trungso.sources import kienthiet
 
 VN = cli.VN_TZ
 
@@ -119,6 +120,10 @@ def test_parser_requires_a_command():
         ["score"],
         ["backtest", "--limit", "10"],
         ["today"],
+        ["ingest", "--region", "mn", "--since", "2026-08-01"],
+        ["ingest", "--backfill"],
+        ["stats", "--region", "mb"],
+        ["oracle", "--region", "mt", "--dry-run", "--offline"],
     ],
 )
 def test_every_command_parses(argv):
@@ -129,6 +134,11 @@ def test_every_command_parses(argv):
 def test_unknown_game_is_rejected():
     with pytest.raises(SystemExit):
         cli.build_parser().parse_args(["stats", "--game", "keno"])
+
+
+def test_unknown_region_is_rejected():
+    with pytest.raises(SystemExit):
+        cli.build_parser().parse_args(["stats", "--region", "mien-tay"])
 
 
 def test_stats_reports_missing_data_instead_of_crashing(capsys):
@@ -209,6 +219,81 @@ def test_every_command_prints_the_disclaimer(capsys):
         args = cli.build_parser().parse_args(argv)
         args.handler(args)
         assert "paper-trading" in capsys.readouterr().out
+
+
+# --------------------------------------------------------------- xổ số kiến thiết
+
+
+def _a_southern_board(day: date, province: str = "an-giang") -> kienthiet.Board:
+    return kienthiet.Board(
+        date=day,
+        region="mn",
+        province=province,
+        tiers=(
+            ("db", ("510332",)),
+            ("g1", ("89516",)),
+            ("g2", ("44895",)),
+            ("g3", ("52640", "02439")),
+            ("g4", ("90111", "32541", "20491", "71417", "32217", "57371", "15096")),
+            ("g5", ("1635",)),
+            ("g6", ("9670", "9023", "3404")),
+            ("g7", ("516",)),
+            ("g8", ("54",)),
+        ),
+    )
+
+
+def test_region_narrows_stats_to_one_mien(capsys):
+    store.write_boards("mn", [_a_southern_board(date(2026, 8, 20))])
+    args = cli.build_parser().parse_args(["stats", "--region", "mn"])
+    args.handler(args)
+
+    out = capsys.readouterr().out
+    assert "Miền Nam" in out
+    assert "Miền Trung" not in out
+
+
+def test_ingest_with_a_region_leaves_the_vietlott_games_alone(monkeypatch, capsys):
+    """--region means kiến thiết only; nothing should reach for a Vietlott mirror."""
+    from trungso import kienthiet_ingest
+
+    def explode(*_a, **_k):  # pragma: no cover - the point is that it never runs
+        raise AssertionError("a Vietlott mirror was fetched for a --region run")
+
+    monkeypatch.setattr(cli, "_fetch_for", explode)
+    monkeypatch.setattr(
+        kienthiet_ingest,
+        "ingest_region",
+        lambda region, **_k: kienthiet_ingest.IngestReport(region=region),
+    )
+
+    args = cli.build_parser().parse_args(["ingest", "--region", "mn"])
+    assert args.handler(args) == 0
+    assert "Mega 6/45" not in capsys.readouterr().out
+
+
+def test_oracle_writes_a_ve_then_refuses_a_second(capsys):
+    """The vé guard is the ticket half of the append-only rule."""
+    today = cli.today_vn()
+    store.write_boards("mn", [_a_southern_board(today - timedelta(days=7))])
+
+    argv = ["oracle", "--region", "mn", "--offline"]
+    cli.build_parser().parse_args(argv).handler(cli.build_parser().parse_args(argv))
+    first = len(store.read_ve())
+
+    args = cli.build_parser().parse_args(argv)
+    args.handler(args)
+
+    assert first == len(store.read_ve())
+    assert first >= 1
+    assert "bỏ qua" in capsys.readouterr().out
+
+
+def test_mien_bac_is_never_phan(capsys):
+    args = cli.build_parser().parse_args(["oracle", "--region", "mb", "--offline"])
+    args.handler(args)
+
+    assert store.read_ve() == ()
 
 
 # ------------------------------------------------- jackpot refresh must never be fatal

@@ -25,15 +25,16 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
 
-from . import stats, store, wheel
+from . import kienthiet_scoreboard, stats, store, wheel
 from .astrology import Fortune, read_fortune
 from .games import GameSpec
+from .kienthiet_scoreboard import VeScore
 from .models import Draw, Prophecy
 from .notify import DISCLAIMER, MAX_MESSAGE_CHARS, send_message
 from .schedule import VN_TZ, next_target
 from .scoreboard import GameScore
 from .scoreboard import build as build_score
-from .sources import markets
+from .sources import kienthiet, markets
 from .sources import xsmb as xsmb_source
 from .sources.vibes import CosmicSignals, gather
 
@@ -391,6 +392,53 @@ def card_crypto(coins: Sequence[markets.CoinQuote]) -> Card | None:
     )
 
 
+def card_kienthiet(region: str, boards: Sequence[kienthiet.Board]) -> Card | None:
+    """One region of xổ số kiến thiết, in the 00-99 tail space XSMB already lives in."""
+    if not boards:
+        return None
+    spec = kienthiet.REGIONS[region]
+    latest = max(boards, key=lambda b: b.date)
+    ranked = sorted(kienthiet.frequency(boards).items(), key=lambda kv: (-kv[1], kv[0]))
+    report = kienthiet.summarise(boards)
+    # Miền Bắc is one đài, so naming it would just repeat the card title back.
+    where = (
+        f"Đài gần nhất: <b>{kienthiet.PROVINCES[latest.province].display}</b> "
+        if len(kienthiet.provinces_in(region)) > 1
+        else "Kỳ gần nhất: "
+    )
+    return Card(
+        key=f"kienthiet_{region}",
+        title=f"🎟️ Kiến thiết {spec.display} — hai chữ số cuối",
+        lines=(
+            f"{where}({latest.date.strftime('%d/%m/%Y')}) ĐB <b>{latest.special}</b>",
+            f"{report['count']:,} bảng · {report['provinces']} đài · "
+            f"{report['observations']:,} lượt số trong không gian 00–99",
+            f"ra nhiều nhất: {_numbers(ranked[:TOP_N])}",
+            f"ra ít nhất: {_numbers(ranked[-TOP_N:])}",
+        ),
+    )
+
+
+def card_ve(score: VeScore) -> Card | None:
+    """The vé Hall of Shame. Its headline number is arithmetic, not a sample."""
+    if not score.tickets:
+        return None
+    return Card(
+        key="ve",
+        title="🎫 Thầy phán vé số — mỗi đài một vé",
+        lines=(
+            f"{score.tickets:,} vé đã chấm · trúng gì đó: <b>{score.winning_tickets:,}</b>",
+            f"tiền vé: {score.paper_burned_vnd:,}đ · trúng: {score.paper_won_vnd:,}đ",
+            f"ROI: <b>{score.roi * 100:+.2f}%</b> "
+            f"(bỏ ĐB &amp; phụ ĐB: {score.roi_excluding_headline * 100:+.2f}%)",
+            f"ROI lý thuyết: <b>{score.theoretical_roi * 100:+.2f}%</b> — "
+            "cơ cấu giải trả về đúng 5 tỷ trên 10 tỷ doanh thu mỗi đài mỗi kỳ.",
+            "",
+            "<i>Thầy phán hay con tự bốc thì con số vẫn thế.</i>",
+        ),
+    )
+
+
 def card_vibes(signals: CosmicSignals, *, day: date) -> Card | None:
     """The one card that always exists: the moon needs no network."""
     lines = [f"Hôm nay {day.strftime('%d/%m/%Y')}:"]
@@ -554,8 +602,17 @@ def build_cards(
     board = markets.fetch_gold_board() if allow_network else None
     coins = markets.fetch_coins() if allow_network else ()
     world = markets.fetch_world_gold_usd_per_oz() if allow_network else None
+
+    tickets = store.read_ve()
+    kien_thiet_boards = []
+    for region in kienthiet.REGIONS:
+        boards = store.read_boards(region)
+        kien_thiet_boards += boards
+        cards.append(card_kienthiet(region, boards))
+
     cards += [
         card_xsmb(xsmb_draws),
+        card_ve(kienthiet_scoreboard.build(tickets, kien_thiet_boards)),
         card_vibes(signals, day=day),
         card_gold(board, world_usd_per_oz=world, usd_vnd=markets.implied_usd_vnd(coins)),
         card_crypto(coins),

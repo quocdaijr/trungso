@@ -427,6 +427,43 @@ function chiSquareTable(chi, label) {
 }
 
 /**
+ * One đài, one vé, 10.000đ. The prize table pays back exactly half of what a đài takes,
+ * so the theoretical ROI is −50% — not an estimate, arithmetic. It is printed next to the
+ * realised figure precisely because the two will not match for a very long time: giải đặc
+ * biệt is 40% of the pool and lands about once per million tickets.
+ */
+function veBlock(ve) {
+  const block = el('div', 'block');
+  block.appendChild(el('h3', 'block__head', 'Bảng Phong Thần vé số'));
+  if (!ve.tickets) {
+    block.appendChild(el('p', 'note', 'Chưa có vé nào được chấm.'));
+    return block;
+  }
+  const pct = (v) => `${(v * 100).toFixed(2)}%`;
+  const table = el('table', 'stack-sm');
+  table.innerHTML = `<tbody>
+    <tr><th>vé đã chấm</th><td class="num">${ve.tickets.toLocaleString('vi-VN')}</td></tr>
+    <tr><th>vé trúng gì đó</th><td class="num">${ve.winning_tickets.toLocaleString('vi-VN')}</td></tr>
+    <tr><th>tiền vé (giấy)</th><td class="num">${ve.paper_burned_vnd.toLocaleString('vi-VN')}đ</td></tr>
+    <tr><th>tiền trúng (giấy)</th><td class="num">${ve.paper_won_vnd.toLocaleString('vi-VN')}đ</td></tr>
+    <tr><th>ROI</th><td class="num">${pct(ve.roi)}</td></tr>
+    <tr><th>ROI lý thuyết</th><td class="num">${pct(ve.theoretical_roi)}</td></tr>
+    <tr><th>ROI bỏ ĐB &amp; phụ ĐB</th><td class="num">${pct(ve.roi_excluding_headline)}</td></tr>
+    <tr><th>— lý thuyết</th><td class="num">${pct(ve.theoretical_roi_excluding_headline)}</td></tr>
+  </tbody>`;
+  block.appendChild(table);
+  if (ve.best && ve.best.payout_vnd) {
+    block.appendChild(el('p', 'note',
+      `Vé đẹp nhất: ${ve.best.ve} · ${ve.best.display} ${ve.best.draw_date} · `
+      + `ĐB ${ve.best.special} · ${ve.best.prizes} · ${ve.best.payout_vnd.toLocaleString('vi-VN')}đ`));
+  }
+  block.appendChild(el('p', 'note',
+    'Cơ cấu giải trả về đúng 5 tỷ trên 10 tỷ doanh thu mỗi đài mỗi kỳ. '
+    + 'Thầy phán hay con tự bốc thì con số vẫn thế.'));
+  return block;
+}
+
+/**
  * Tappable heatmap. `title` tooltips do not exist on touch, so every cell is a button
  * that writes into a live readout — otherwise the frequency data is desktop-only.
  */
@@ -511,19 +548,21 @@ function stageSuThat(data) {
     section.appendChild(recent);
   });
 
-  if (data.xsmb) {
-    const x = data.xsmb;
+  // Xổ số kiến thiết: three regions, same 00–99 tail space, same 10×10 heatmap the
+  // Miền Bắc block used to have to itself.
+  (data.kienthiet || []).forEach((k) => {
     const row = el('div', 'row');
-    row.appendChild(chiSquareTable(x.chi_square,
-      `XSMB Miền Bắc · ${x.draw_count.toLocaleString('vi-VN')} kỳ · ${x.first_date} → ${x.last_date}`));
+    row.appendChild(chiSquareTable(k.chi_square,
+      `${k.display} · ${k.draw_count.toLocaleString('vi-VN')} bảng · ${k.provinces} đài · ${k.first_date} → ${k.last_date}`));
     const heat = el('div', 'block');
-    heat.appendChild(el('h3', 'block__head', 'Tần suất 00–99'));
-    heat.appendChild(heatmap(x.frequency, 100, 0));
+    heat.appendChild(el('h3', 'block__head', 'Tần suất 00–99 (hai số cuối mỗi giải)'));
+    heat.appendChild(heatmap(k.frequency, 100, 0));
     heat.appendChild(el('p', 'note',
-      `21 năm, ${x.chi_square.observations.toLocaleString('vi-VN')} lượt số. Vẫn đều tăm tắp.`));
+      `${k.chi_square.observations.toLocaleString('vi-VN')} lượt số. Vẫn đều tăm tắp.`));
     row.appendChild(heat);
+    if (k.ve) row.appendChild(veBlock(k.ve));
     section.appendChild(row);
-  }
+  });
 
   section.appendChild(el('div', 'disclaim', data.disclaimer));
   return section;

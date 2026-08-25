@@ -16,6 +16,8 @@ from typing import TYPE_CHECKING
 from .models import Draw, Prophecy
 
 if TYPE_CHECKING:  # pragma: no cover
+    from .kienthiet_oracle import VeProphecy
+    from .sources.kienthiet import Board
     from .sources.vietlott_prizes import DrawPrizes
     from .sources.xsmb import XsmbDraw
 
@@ -38,8 +40,20 @@ def draws_path(game: str) -> Path:
     return data_dir() / "draws" / f"{game}.jsonl"
 
 
+def boards_path(region: str) -> Path:
+    return data_dir() / "boards" / f"{region}.jsonl"
+
+
 def predictions_path() -> Path:
     return data_dir() / "predictions.jsonl"
+
+
+def ve_path() -> Path:
+    return data_dir() / "ve.jsonl"
+
+
+def ve_scoreboard_path() -> Path:
+    return data_dir() / "ve_scoreboard.json"
 
 
 def scoreboard_path() -> Path:
@@ -165,6 +179,17 @@ def write_scoreboard(payload: dict) -> bool:
     return write_json_if_changed(scoreboard_path(), payload)
 
 
+def write_ve_scoreboard(payload: dict) -> bool:
+    return write_json_if_changed(ve_scoreboard_path(), payload)
+
+
+def read_ve_scoreboard() -> dict | None:
+    path = ve_scoreboard_path()
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def read_scoreboard() -> dict | None:
     path = scoreboard_path()
     if not path.exists():
@@ -198,14 +223,102 @@ def read_prizes(game: str) -> dict | None:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def read_boards(region: str) -> tuple[Board, ...]:
+    """Stored kiến thiết boards for one region, oldest first, then by đài."""
+    from .sources.kienthiet import Board
+
+    boards = tuple(Board.from_dict(row) for row in _read_jsonl(boards_path(region)))
+    return tuple(sorted(boards, key=lambda b: b.key))
+
+
+def write_boards(region: str, boards: Sequence[Board]) -> int:
+    """Replace one region's boards. Identity is (date, đài), so duplicates are a bug."""
+    wrong = {b.region for b in boards} - {region}
+    if wrong:
+        raise ValueError(f"refusing to write {sorted(wrong)} boards into {region}.jsonl")
+    ordered = sorted(boards, key=lambda b: b.key)
+    keys = [b.key for b in ordered]
+    if len(set(keys)) != len(keys):
+        duplicate = next(k for k in keys if keys.count(k) > 1)
+        raise ValueError(f"duplicate board {duplicate[1]} {duplicate[0]}: cannot write")
+    body = "".join(json.dumps(b.to_dict(), ensure_ascii=False) + "\n" for b in ordered)
+    _write_atomic(boards_path(region), body)
+    return len(ordered)
+
+
+def merge_boards(region: str, incoming: Iterable[Board]) -> tuple[int, int]:
+    """Merge boards into storage without disturbing existing rows.
+
+    Returns (added, total). Existing boards win, for the same reason merge_draws works
+    that way: a rewritten past result silently rewrites the scoreboard with it.
+    """
+    existing = {b.key: b for b in read_boards(region)}
+    added = 0
+    for board in incoming:
+        if board.region != region:
+            raise ValueError(f"board {board.province} is {board.region}, expected {region}")
+        if board.key not in existing:
+            existing[board.key] = board
+            added += 1
+    total = write_boards(region, tuple(existing.values()))
+    return added, total
+
+
+def read_ve(province: str | None = None) -> tuple[VeProphecy, ...]:
+    """Committed kiến thiết tickets, oldest first, optionally for one đài."""
+    from .kienthiet_oracle import VeProphecy
+
+    rows = (VeProphecy.from_dict(row) for row in _read_jsonl(ve_path()))
+    items = tuple(v for v in rows if province is None or v.province == province)
+    return tuple(sorted(items, key=lambda v: v.key))
+
+
+def append_ve(prophecy: VeProphecy) -> None:
+    """Append a ticket, refusing anything that would compromise the audit trail.
+
+    Same two rules as append_prophecy: never overwrite, never predict a draw that has
+    already happened. Here 'already happened' means a board is on file for that đài and
+    day - which is why ingest and oracle must not be reordered.
+    """
+    for existing in read_ve(prophecy.province):
+        if existing.draw_date == prophecy.draw_date:
+            raise ProphecyConflict(
+                f"đã có vé cho {prophecy.province} ngày {prophecy.draw_date} "
+                f"(seed {existing.seed[:12]}...). Vé là append-only."
+            )
+
+    settled = {b.key for b in read_boards(prophecy.region)}
+    if prophecy.key in settled:
+        raise ProphecyConflict(
+            f"{prophecy.province} ngày {prophecy.draw_date} đã quay rồi. "
+            "Phán một kỳ đã quay là ăn gian."
+        )
+
+    path = ve_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(prophecy.to_dict(), ensure_ascii=False) + "\n")
+
+
 def xsmb_path() -> Path:
     return data_dir() / "xsmb.jsonl"
 
 
 def read_xsmb() -> tuple[XsmbDraw, ...]:
-    """Stored XSMB draws, oldest first."""
+    """Stored XSMB draws, oldest first.
+
+    Derived from the Miền Bắc boards once those exist, because a board holds the full
+    printed number and this record only ever wanted its last two digits. The legacy
+    `xsmb.jsonl` remains the fallback so a checkout without boards still works - and
+    tests/test_kienthiet_migration.py pins that the two agree, row for row.
+    """
     from .sources.xsmb import XsmbDraw
 
+    if boards_path("mb").exists():
+        return tuple(
+            XsmbDraw(date=board.date, special=board.tails[0], prizes=board.tails)
+            for board in read_boards("mb")
+        )
     draws = tuple(XsmbDraw.from_dict(row) for row in _read_jsonl(xsmb_path()))
     return tuple(sorted(draws, key=lambda d: d.date))
 

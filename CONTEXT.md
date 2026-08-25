@@ -71,9 +71,34 @@ Thật chỉ ra rằng xổ số Mỹ cũng ngẫu nhiên y như Vietlott. Khôn
 phép trùng** số chính. Powerball (đỏ 1–26) và Mega Millions (vàng 1–25) là vậy: có 99 và 68
 kỳ thật trùng như thế. Khác hẳn số phụ Power 6/55, quay cùng dải và không được trùng.
 
-**XSMB** — Xổ số kiến thiết Miền Bắc. **Không** dùng kiểu `Kỳ quay` vì nó phá mọi bất biến
-của `Draw`: 27 giải mỗi ngày, không gian 00–99 (**có số 0**), và **cho phép trùng lặp**
-trong cùng một kỳ. Có kiểu `XsmbDraw` riêng. Không bao giờ sinh tiên tri.
+**Bảng giải** (Board) — Một đài xổ số kiến thiết, một ngày, **toàn bộ số in trên bảng**,
+giữ nguyên dạng chuỗi và nguyên bề rộng chữ số. 18 giải cho Miền Nam / Miền Trung, 27 cho
+Miền Bắc. Định danh là cặp `(ngày, đài)`. Không dùng `Draw` vì bảng giải không phải pick-N;
+không dùng `XsmbDraw` vì kiểu đó vứt hết chỉ giữ hai chữ số cuối, nên **không chấm được vé**.
+
+**Đuôi** (tail) — Hai chữ số cuối của một số trên bảng. `Board.tails` suy ra khi cần và cho
+ra đúng không gian 00–99 mà Tầng Thật vẫn dùng — nên heatmap 10×10 của trang không phải sửa
+một dòng nào khi thêm kiến thiết.
+
+**XSMB** — Xổ số kiến thiết Miền Bắc. Từ nay là **view suy ra** từ `data/boards/mb.jsonl`
+qua `Board.tails`; `data/xsmb.jsonl` ở lại làm **nhân chứng đối chiếu** độc lập chứ không
+còn là nguồn. Kiểu `XsmbDraw` giữ nguyên chữ ký nên mọi nơi dùng nó không phải sửa: 27 giải
+mỗi ngày, không gian 00–99 (**có số 0**), **cho phép trùng lặp** trong cùng một kỳ. Miền Bắc
+không bao giờ sinh tiên tri và **không được phán vé** — vé có ký hiệu, cơ cấu giải đổi 2017
+rồi đổi tiếp 01/04/2025, không có ROI trung thực nào trải được 21 năm.
+
+**Vé** (VeProphecy) — Một tấm 6 chữ số, cho một đài, cho một kỳ, ghi vào `data/ve.jsonl`
+**trước** khi đài quay. Có `KIENTHIET_ORACLE_VERSION` **riêng** và **không** đụng vào
+`CosmicSignals` hay `ORACLE_VERSION`: thêm một tín hiệu vào oracle chung sẽ đổi mọi tiên tri
+tương lai của mega645 và power655 để đổi lấy một tính năng không liên quan tới chúng.
+
+**Ngày đài không quay** (NoDraw) — Ngày Tết, minhngoc in chữ `Tết` vào ô giải đặc biệt và
+số `0` vào **mọi** ô còn lại. Parser bắt buộc phải bỏ nguyên ngày đó: nuốt 27 số `0` vào
+bảng tần suất là lỗi tệ hơn một lỗ hổng, vì nó im lặng.
+
+**Kỷ nguyên 6 chữ số** — Giải đặc biệt Miền Trung chỉ có 6 chữ số từ 01/04/2017 (Miền Nam
+đã đổi trước đó). 205 bảng Miền Trung quý I/2017 vẫn nằm trong Tầng Thật nhưng **bị bỏ qua**
+khi chấm vé — vé 6 số không chấm được với bảng 5 số, và đoán bừa là bịa ra một ROI.
 
 **Upstream lag đã vá** (patched lag) — Kỳ mà mirror bỏ sót, được lấy bù từ `vietlott.vn`.
 Trang chính thức **chỉ** cho kỳ mới nhất, nên chỉ vá được đúng ca lag phổ biến nhất.

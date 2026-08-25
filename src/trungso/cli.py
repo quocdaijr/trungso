@@ -11,12 +11,22 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from . import notify, pulse, scoreboard, site, stats, store, wheel
+from . import (
+    kienthiet_commands,
+    kienthiet_report,
+    notify,
+    pulse,
+    scoreboard,
+    site,
+    stats,
+    store,
+    wheel,
+)
 from .games import GAMES, PROPHECY_GAMES, GameSpec, get_game
 from .models import Draw, Prophecy
 from .oracle import prophesy
 from .schedule import VN_TZ, draw_has_happened, next_target, now_vn, today_vn
-from .sources import us_lottery, vietlott_live, vietlott_prizes, xsmb
+from .sources import kienthiet, us_lottery, vietlott_live, vietlott_prizes, xsmb
 from .sources import vietlott_mirror as mirror
 from .sources.vibes import gather
 from .sources.vietlott_live import LiveFetchError
@@ -47,6 +57,17 @@ def _specs(game: str | None, *, prophecy_only: bool = False) -> tuple[GameSpec, 
             )
         return (spec,)
     return tuple(available.values())
+
+
+def _games_for(args: argparse.Namespace, *, prophecy_only: bool = False) -> tuple[GameSpec, ...]:
+    """The Vietlott/US games a command acts on.
+
+    `--region` names a kiến thiết miền, so it means that miền and nothing else - asking
+    for `--region mn` must not also drag four ball-draw games through the command.
+    """
+    if getattr(args, "region", None):
+        return ()
+    return _specs(args.game, prophecy_only=prophecy_only)
 
 
 def _fetch_for(spec: GameSpec) -> tuple[Draw, ...]:
@@ -118,7 +139,9 @@ def _money(value: float) -> str:
 def cmd_ingest(args: argparse.Namespace) -> int:
     today = today_vn()
     problems = 0
-    for spec in _specs(args.game):
+    # --region asks for kiến thiết alone; --game asks for one Vietlott/US game alone;
+    # neither flag means everything.
+    for spec in _games_for(args):
         console.print(f"[bold]{spec.display}[/bold] — tải từ mirror…")
         draws = _fetch_for(spec)
         added, total = store.merge_draws(spec.key, draws)
@@ -155,15 +178,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
                 console.print("  [green]không gap, không lag[/green]")
 
     if args.game is None:
-        console.print("[bold]XSMB (Miền Bắc)[/bold] — tải từ mirror…")
-        xsmb_draws = xsmb.fetch_draws()
-        written = store.write_xsmb(xsmb_draws)
-        report = xsmb.summarise(xsmb_draws)
-        console.print(
-            f"  tổng: [bold]{written:,}[/bold] kỳ · "
-            f"{report['first_date']} → {report['last_date']} · "
-            f"{report['observations']:,} lượt số"
-        )
+        problems += kienthiet_commands.run_ingest(console, args)
 
     console.print(DISCLAIMER)
     return 1 if problems else 0
@@ -171,7 +186,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
 
 def cmd_stats(args: argparse.Namespace) -> int:
     missing_data = False
-    for spec in _specs(args.game):
+    for spec in _games_for(args):
         draws = store.read_draws(spec.key)
         if not draws:
             console.print(f"[red]chưa có data {spec.key} — chạy `trungso ingest`[/red]")
@@ -196,6 +211,10 @@ def cmd_stats(args: argparse.Namespace) -> int:
 
     if args.game is None:
         missing_data |= _render_xsmb_stats()
+        for region in kienthiet_commands.regions(args.region):
+            missing_data |= kienthiet_report.render_stats(
+                console, region, store.read_boards(region)
+            )
 
     console.print(DISCLAIMER)
     return 1 if missing_data else 0
@@ -252,7 +271,7 @@ def _render_prophecy(spec: GameSpec, prophecy: Prophecy) -> None:
 
 def cmd_oracle(args: argparse.Namespace) -> int:
     xsmb_special = store.latest_xsmb_special()
-    for spec in _specs(args.game, prophecy_only=True):
+    for spec in _games_for(args, prophecy_only=True):
         draws = store.read_draws(spec.key)
         try:
             draw_id, draw_date = next_target(spec, draws)
@@ -279,6 +298,10 @@ def cmd_oracle(args: argparse.Namespace) -> int:
                 console.print("  [green]đã ghi vào predictions.jsonl[/green]")
             except ProphecyConflict as exc:
                 console.print(f"  [yellow]bỏ qua:[/yellow] {exc}")
+
+    if args.game is None:
+        kienthiet_commands.run_oracle(console, args, offline=args.offline)
+
     console.print(DISCLAIMER)
     return 0
 
@@ -331,21 +354,26 @@ def cmd_score(args: argparse.Namespace) -> int:
     prophecies = store.read_prophecies()
     draws_by_game = {
         spec.key: store.read_draws(spec.key)
-        for spec in _specs(args.game, prophecy_only=True)
+        for spec in _games_for(args, prophecy_only=True)
     }
     scores = scoreboard.build_all(prophecies, draws_by_game)
 
     for score in scores.values():
         _render_score(score)
-    store.write_scoreboard(scoreboard.as_json(scores))
-    console.print(f"[dim]đã ghi {store.scoreboard_path()}[/dim]")
+    if scores:
+        store.write_scoreboard(scoreboard.as_json(scores))
+        console.print(f"[dim]đã ghi {store.scoreboard_path()}[/dim]")
+
+    if args.game is None:
+        kienthiet_commands.run_score(console, args)
+
     console.print(DISCLAIMER)
     return 0
 
 
 def cmd_backtest(args: argparse.Namespace) -> int:
     """Replay the oracle over history. Counterfactual - never written to disk."""
-    for spec in _specs(args.game, prophecy_only=True):
+    for spec in _games_for(args, prophecy_only=True):
         draws = store.read_draws(spec.key)
         if not draws:
             console.print(f"[red]chưa có data {spec.key} — chạy `trungso ingest`[/red]")
@@ -373,6 +401,9 @@ def cmd_backtest(args: argparse.Namespace) -> int:
             f"  [dim]ROI kỳ vọng lý thuyết: {wheel.expected_roi(spec) * 100:.2f}% "
             f"(bỏ jackpot: {wheel.expected_roi(spec, include_jackpot=False) * 100:.2f}%)[/dim]"
         )
+    if args.game is None:
+        kienthiet_commands.run_backtest(console, args)
+
     console.print("[dim]Backtest là phản thực — không phải tiên tri đã cam kết.[/dim]")
     console.print(DISCLAIMER)
     return 0
@@ -382,7 +413,7 @@ def cmd_today(args: argparse.Namespace) -> int:
     now = now_vn()
     console.print(f"[bold]Hôm nay {now.date()} ({now.strftime('%H:%M')} giờ VN)[/bold]\n")
 
-    for spec in _specs(args.game, prophecy_only=True):
+    for spec in _games_for(args, prophecy_only=True):
         draws = store.read_draws(spec.key)
         if not draws:
             console.print(f"[dim]{spec.display}: chưa có data[/dim]")
@@ -402,6 +433,14 @@ def cmd_today(args: argparse.Namespace) -> int:
             console.print(f"  đã tiên tri: [bold cyan]{picks}[/bold cyan]")
         else:
             console.print("  [dim]chưa tiên tri — chạy `trungso oracle`[/dim]")
+
+    if args.game is None:
+        console.print()
+        committed = store.read_ve()
+        for region in kienthiet_commands.regions(args.region):
+            kienthiet_report.render_today(
+                console, region, store.read_boards(region), now.date(), committed
+            )
     console.print()
     console.print(DISCLAIMER)
     return 0
@@ -412,8 +451,10 @@ def cmd_site(args: argparse.Namespace) -> int:
     bundle = site.build_bundle()
     target = site.write_bundle(bundle)
     games = ", ".join(g["display"] for g in bundle["games"])
+    kien_thiet = ", ".join(k["display"] for k in bundle["kienthiet"])
     console.print(f"[green]đã ghi[/green] {target}")
-    console.print(f"  game: {games}" + ("  · kèm XSMB" if bundle["xsmb"] else ""))
+    console.print(f"  game: {games}")
+    console.print(f"  kiến thiết: {kien_thiet or '—'}")
     console.print(f"  [dim]xem thử: python3 -m http.server -d {target.parent} 8000[/dim]")
     console.print(DISCLAIMER)
     return 0
@@ -434,7 +475,7 @@ def cmd_notify(args: argparse.Namespace) -> int:
     prophecies = store.read_prophecies()
     sent = failed = 0
 
-    for spec in _specs(args.game, prophecy_only=True):
+    for spec in _games_for(args, prophecy_only=True):
         draws = store.read_draws(spec.key)
         score = scoreboard.build(spec, prophecies, draws)
 
@@ -461,6 +502,11 @@ def cmd_notify(args: argparse.Namespace) -> int:
         else:
             failed += 1
             console.print(f"[red]{spec.display}: gửi Telegram thất bại[/red]")
+
+    if args.game is None:
+        ok, bad = kienthiet_commands.run_notify(console, args)
+        sent += ok
+        failed += bad
 
     console.print(f"[dim]gửi được {sent}, thất bại {failed}[/dim]")
     console.print(DISCLAIMER)
@@ -513,7 +559,7 @@ def cmd_pulse(args: argparse.Namespace) -> int:
         console.print(f"[yellow]bỏ qua lá số:[/yellow] {exc}")
 
     cards = pulse.build_cards(
-        _specs(args.game, prophecy_only=False),
+        _games_for(args),
         now=now,
         fortune=fortune,
         allow_network=not args.offline,
@@ -555,11 +601,20 @@ def build_parser() -> argparse.ArgumentParser:
     def add(name: str, help_text: str, handler) -> argparse.ArgumentParser:
         p = sub.add_parser(name, help=help_text)
         p.add_argument("--game", choices=sorted(GAMES), help="chỉ một game (mặc định: cả hai)")
+        p.add_argument(
+            "--region",
+            choices=sorted(kienthiet.REGIONS),
+            help="chỉ một miền kiến thiết (mặc định: cả ba)",
+        )
         p.set_defaults(handler=handler)
         return p
 
     ingest = add("ingest", "tải kết quả từ mirror về data/draws/", cmd_ingest)
     ingest.add_argument("--check-gaps", action="store_true", help="báo gap và lag upstream")
+    ingest.add_argument(
+        "--backfill", action="store_true", help="kéo toàn bộ lịch sử kiến thiết (chậm)"
+    )
+    ingest.add_argument("--since", help="kiến thiết: ngày bắt đầu (YYYY-MM-DD)")
 
     add("stats", "Tầng Thật: tần suất, chi-square, phán quyết", cmd_stats)
 

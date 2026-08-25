@@ -13,8 +13,12 @@ from collections.abc import Sequence
 import requests
 
 from .games import GameSpec
+from .kienthiet_oracle import VeProphecy
+from .kienthiet_prizes import TICKET_PRICE_VND, describe
+from .kienthiet_scoreboard import VeScore, VeScoreRow
 from .models import Draw, Prophecy
 from .scoreboard import GameScore, ScoreRow
+from .sources.kienthiet import PROVINCES
 
 API_TEMPLATE = "https://api.telegram.org/bot{token}/sendMessage"
 ENV_TOKEN = "TELEGRAM_BOT_TOKEN"
@@ -134,6 +138,58 @@ def format_result(
             f"bỏ jackpot {score.roi_excluding_jackpot * 100:.1f}%",
         ]
 
+    lines += ["", f"<i>{DISCLAIMER}</i>"]
+    return "\n".join(lines)
+
+
+def format_ve_prophecy(prophecies: Sequence[VeProphecy], score: VeScore | None = None) -> str:
+    """The pre-draw message for kiến thiết: one vé per đài drawing today."""
+    if not prophecies:
+        raise ValueError("cannot announce an empty list of vé")
+    day = prophecies[0].draw_date
+    lines = [
+        f"🎟️ <b>Thầy phán vé số kiến thiết</b> — {day.strftime('%d/%m/%Y')}",
+        f"Mỗi đài một vé, {TICKET_PRICE_VND:,}đ.",
+        "",
+    ]
+    for prophecy in prophecies:
+        lines.append(f"• <b>{prophecy.display}</b> — <b>{prophecy.ve}</b>")
+    lines += ["", f"<i>{prophecies[0].sermon}</i>"]
+
+    if score and score.tickets:
+        lines += [
+            "",
+            f"📉 Thành tích: {score.tickets:,} vé · ROI {score.roi * 100:.1f}% "
+            f"(lý thuyết {score.theoretical_roi * 100:.1f}%)",
+        ]
+    lines += ["", f"<i>{DISCLAIMER}</i>"]
+    return "\n".join(lines)
+
+
+def format_ve_result(rows: Sequence[VeScoreRow], score: VeScore | None = None) -> str:
+    """The post-draw message: what the đài printed, and what the vé was worth."""
+    if not rows:
+        raise ValueError("cannot report an empty list of results")
+    day = rows[0].draw_date
+    lines = [f"🎲 <b>Kết quả kiến thiết</b> — {day.strftime('%d/%m/%Y')}", ""]
+    for row in rows:
+        prizes = describe(row.prize_counts)
+        outcome = (
+            f"trúng {prizes} — <b>{row.payout_vnd:,}đ</b>" if row.payout_vnd else "trượt"
+        )
+        lines.append(
+            f"• <b>{PROVINCES[row.province].display}</b> · ĐB <b>{row.special}</b> · "
+            f"vé {row.ve} — {outcome}"
+        )
+
+    if score and score.tickets:
+        lines += [
+            "",
+            f"📉 Cộng dồn: {score.tickets:,} vé · ROI {score.roi * 100:.1f}% · "
+            f"bỏ ĐB &amp; phụ ĐB {score.roi_excluding_headline * 100:.1f}%",
+            f"<i>Cơ cấu giải trả về đúng 50% doanh thu — ROI lý thuyết "
+            f"{score.theoretical_roi * 100:.1f}%.</i>",
+        ]
     lines += ["", f"<i>{DISCLAIMER}</i>"]
     return "\n".join(lines)
 
