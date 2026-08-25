@@ -526,7 +526,11 @@ def cmd_pulse(args: argparse.Namespace) -> int:
         console.print(DISCLAIMER)
         return 0
 
-    console.print(f"[dim]{len(cards)} thẻ dựng được · chọn[/dim] [bold]{card.key}[/bold]")
+    # List the kinds, not just the count. A price source that answers a laptop with 200
+    # and a datacenter IP with 403 - which is what vietlott.vn does - shows up here as a
+    # missing kind, and there is no other way to see it from an Actions log.
+    kinds = " ".join(sorted({c.key for c in cards}))
+    console.print(f"[dim]{len(cards)} thẻ ({kinds}) · chọn[/dim] [bold]{card.key}[/bold]")
     if args.dry_run:
         console.print(Panel(pulse.format_card(card, now=now), border_style="cyan"))
         console.print(DISCLAIMER)

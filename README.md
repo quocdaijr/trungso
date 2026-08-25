@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-636%20passing-brightgreen.svg)](tests/)
+[![tests](https://img.shields.io/badge/tests-682%20passing-brightgreen.svg)](tests/)
 [![draws analysed](https://img.shields.io/badge/draws%20analysed-12%2C578-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![chi-square](https://img.shields.io/badge/chi²%20p--value-0.53%20→%20random-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
@@ -94,7 +94,22 @@ Thiếu biến thì `notify` báo lỗi rõ ràng, còn pipeline dữ liệu **k
 
 Ngoài hai mốc cố định (10h: 12 số, 18h45: kết quả), `pulse` gửi **2–3 tin/ngày vào giờ bất
 kỳ trong 8h–22h VN**, mỗi tin một thẻ: nóng/lạnh, chi-square, số lâu chưa ra, lịch + jackpot +
-giá bao 12, Bảng Phong Thần, một lời sấm, XSMB, tín hiệu vũ trụ, và lá số cá nhân.
+giá bao 12, Bảng Phong Thần, một lời sấm, XSMB, tín hiệu vũ trụ, **giá vàng**, **giá crypto**,
+và lá số cá nhân.
+
+#### Giá vàng: đơn vị là chỗ dễ sai nhất
+
+PNJ công bố **nghìn đồng mỗi chỉ**; người ta nói chuyện bằng **đồng mỗi lượng**; một lượng là
+mười chỉ. Nghĩa là câu trả lời sai nằm đúng một số 0 cạnh câu trả lời đúng, mà 15 triệu/lượng
+trông không kém hợp lý hơn 150 triệu với ai không cầm miếng vàng trong tay. Phép đổi nằm ở
+đúng một chỗ (`sources/markets.py`), và `tests/test_markets.py` chốt nó từ **hai đầu**: khớp
+với con số webgia.com công bố bằng đồng, và khớp bậc độ lớn với giá vàng thế giới quy đổi độc
+lập.
+
+Thẻ vàng nói thêm hai con số ít ai để ý: **chênh mua–bán** (~2%, mất ngay lúc mua) và
+**premium nội địa** so với vàng thế giới quy đổi (~3%). Tỷ giá dùng để quy đổi là tỷ giá do
+chính nguồn giá ngụ ý, không phải tỷ giá ngân hàng, và được ghi rõ như vậy — thiếu tỷ giá thì
+**bỏ hẳn dòng premium** chứ không đoán.
 
 Giờ gửi là random nhưng **không phải bất định**: kế hoạch của một ngày sinh ra từ seed
 `sha256(ngày)`, nên `pulse.yml` chạy mỗi giờ mà không cần state file — 12 lần thức dậy còn lại

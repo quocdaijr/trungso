@@ -33,6 +33,7 @@ from .notify import DISCLAIMER, MAX_MESSAGE_CHARS, send_message
 from .schedule import VN_TZ, next_target
 from .scoreboard import GameScore
 from .scoreboard import build as build_score
+from .sources import markets
 from .sources import xsmb as xsmb_source
 from .sources.vibes import CosmicSignals, gather
 
@@ -47,6 +48,12 @@ TOP_N = 5
 ENV_BIRTH_DATE = "TRUNGSO_BIRTH_DATE"
 ENV_GENDER = "TRUNGSO_GENDER"
 ENV_NAME = "TRUNGSO_NAME"
+
+MARKET_DISCLAIMER = (
+    "Giá tham khảo, đọc từ nguồn công khai đúng lúc gửi tin. Không phải tư vấn đầu tư."
+)
+"""The lottery disclaimer says nothing true about a gold board, so the market cards carry
+their own. A disclaimer that does not fit what it is attached to is decoration."""
 
 MIN_BIRTH_YEAR = 1900
 """Anything earlier is a typo, not a person. The env var is untrusted input."""
@@ -129,6 +136,8 @@ class Card:
     key: str
     title: str
     lines: tuple[str, ...]
+    disclaimer: str | None = None
+    """Overrides the lottery disclaimer for cards that are not about the lottery."""
 
 
 def _safe(value: str) -> str:
@@ -255,10 +264,20 @@ def card_schedule(
     ]
     if prizes and prizes.get("top_jackpot_vnd"):
         state = "cộng dồn sang kỳ sau" if prizes.get("rolled_over") else "đã có người trúng"
+        quoted = str(prizes.get("draw_id"))
         lines.append(
-            f"Jackpot kỳ #{prizes.get('draw_id')}: "
+            f"Jackpot kỳ #{quoted}: "
             f"<b>{_billions(float(prizes['top_jackpot_vnd']))}</b> — {state}"
         )
+        # vietlott.vn answers a GitHub runner with 403, so this figure can freeze while
+        # the results keep arriving from the mirror. A stale number that does not say it
+        # is stale would be exactly the failure this project exists to refuse.
+        latest = max(draws, key=lambda d: d.draw_id).draw_id
+        if quoted != latest:
+            lines.append(
+                f"<i>⚠️ Số jackpot trên là của kỳ cũ (#{quoted}), "
+                f"kết quả đã tới kỳ #{latest} — nguồn giải thưởng chưa cập nhật được.</i>"
+            )
     lines += [
         "",
         f"<i>ROI kỳ vọng của cái bao đó: {wheel.expected_roi(spec) * 100:.1f}%. "
@@ -287,6 +306,88 @@ def card_xsmb(draws: Sequence[xsmb_source.XsmbDraw]) -> Card | None:
             f"ra nhiều nhất: {_numbers(ranked[:TOP_N])}",
             f"ra ít nhất: {_numbers(ranked[-TOP_N:])}",
         ),
+    )
+
+
+def card_gold(
+    board: markets.GoldBoard | None,
+    *,
+    world_usd_per_oz: float | None = None,
+    usd_vnd: float | None = None,
+) -> Card | None:
+    """The dealer's board, quoted per lượng - the unit people actually buy in.
+
+    `markets` stores dong per chỉ because that is what PNJ publishes; every figure here
+    is the per-lượng property, so the ×10 conversion happens in exactly one place and is
+    pinned by `tests/test_markets.py` against two independent sources.
+
+    The premium line appears only when an exchange rate is known. A premium computed off
+    a guessed rate would be a plausible wrong number, which is the one thing this repo is
+    not allowed to print.
+    """
+    if board is None or not board.quotes:
+        return None
+
+    lines = []
+    for quote in board.quotes[:3]:
+        lines.append(
+            f"<b>{_safe(quote.label)}</b>\n"
+            f"  mua {_money(quote.buy_vnd_per_luong)} · bán "
+            f"<b>{_money(quote.sell_vnd_per_luong)}</b> /lượng"
+        )
+    top = board.quotes[0]
+    lines += [
+        "",
+        f"Chênh mua–bán: <b>{_money(top.spread_vnd_per_luong)}</b>/lượng "
+        f"(<b>{top.spread_pct:.2f}%</b>) — mất ngay lúc mua.",
+    ]
+
+    if world_usd_per_oz and usd_vnd:
+        world = markets.world_gold_vnd_per_luong(world_usd_per_oz, usd_vnd=usd_vnd)
+        premium = top.sell_vnd_per_luong - world
+        lines.append(
+            f"Vàng thế giới quy đổi: {_money(world)}/lượng — "
+            f"trong nước đắt hơn <b>{_money(premium)}</b> "
+            f"(<b>{premium / world * 100:+.1f}%</b>)."
+        )
+
+    if board.updated_at:
+        lines.append(f"<i>Bảng giá lúc {_safe(board.updated_at)}"
+                     + (f" · {_safe(board.branch)}" if board.branch else "")
+                     + "</i>")
+    return Card(
+        key="gold",
+        title="🪙 Giá vàng",
+        lines=tuple(lines),
+        disclaimer=MARKET_DISCLAIMER,
+    )
+
+
+def card_crypto(coins: Sequence[markets.CoinQuote]) -> Card | None:
+    """Spot prices in both currencies. No opinion offered, because there isn't one."""
+    if not coins:
+        return None
+    lines = []
+    for coin in coins:
+        move = (
+            f" · 24h <b>{coin.change_24h_pct:+.2f}%</b>"
+            if coin.change_24h_pct is not None
+            else " · 24h chưa rõ"
+        )
+        lines.append(
+            f"<b>{_safe(coin.symbol)}</b> ${coin.usd:,.2f} "
+            f"({_money(coin.vnd)}){move}"
+        )
+    lines += [
+        "",
+        "<i>Giá spot, đọc lúc gửi tin. Cũng như mọi con số khác trong bot này: "
+        "không nói gì về giá phút sau.</i>",
+    ]
+    return Card(
+        key="crypto",
+        title="₿ Giá crypto",
+        lines=tuple(lines),
+        disclaimer=MARKET_DISCLAIMER,
     )
 
 
@@ -450,9 +551,14 @@ def build_cards(
         allow_network=allow_network,
         xsmb_special=xsmb_source.latest_special(xsmb_draws),
     )
+    board = markets.fetch_gold_board() if allow_network else None
+    coins = markets.fetch_coins() if allow_network else ()
+    world = markets.fetch_world_gold_usd_per_oz() if allow_network else None
     cards += [
         card_xsmb(xsmb_draws),
         card_vibes(signals, day=day),
+        card_gold(board, world_usd_per_oz=world, usd_vnd=markets.implied_usd_vnd(coins)),
+        card_crypto(coins),
         card_fortune(fortune, day=day),
     ]
     return tuple(card for card in cards if card is not None)
@@ -496,7 +602,7 @@ def format_card(card: Card, *, now: datetime) -> str:
             "",
             *card.lines,
             "",
-            f"<i>{DISCLAIMER}</i>",
+            f"<i>{card.disclaimer or DISCLAIMER}</i>",
         )
     )
     return body[:MAX_MESSAGE_CHARS]
