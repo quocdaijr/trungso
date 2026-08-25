@@ -7,11 +7,12 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-682%20passing-brightgreen.svg)](tests/)
-[![draws analysed](https://img.shields.io/badge/draws%20analysed-12%2C578-informational.svg)](#what-the-honest-layer-found)
-[![chi-square](https://img.shields.io/badge/chi²%20p--value-0.53%20→%20random-informational.svg)](#what-the-honest-layer-found)
+[![tests](https://img.shields.io/badge/tests-854%20passing-brightgreen.svg)](tests/)
+[![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#what-the-honest-layer-found)
+[![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#what-the-honest-layer-found)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
 [![expected ROI](https://img.shields.io/badge/expected%20ROI-−86%25-critical.svg)](DISCLAIMER.md)
+[![kien thiet ROI](https://img.shields.io/badge/kiến%20thiết%20ticket%20ROI-−50%25%20(exact)-critical.svg)](#the-one-number-here-that-is-not-an-estimate)
 [![status](https://img.shields.io/badge/status-satire-ff69b4.svg)](DISCLAIMER.md)
 
 **🇻🇳 Tiếng Việt → [README.md](README.md)**
@@ -23,7 +24,7 @@
 > ### This site cannot predict lottery numbers. No software can.
 >
 > It is an **AI-token-burning experiment**. Every number here is random, and the site
-> publishes the proof against itself — a chi-square test over 12,578 real draws.
+> publishes the proof against itself — a chi-square test over 31,470 real draws.
 >
 > - **Nothing is for sale** — no payments, no accounts, no ads
 > - **Not affiliated with Vietlott** — not sponsored, not endorsed, not authorised
@@ -43,8 +44,8 @@ This is a by-product of an AI-coding experiment. Rather than let millions of tok
 they turned into something that runs, has tests, and makes fun of itself.
 
 The only genuine value here is **The Honest Layer** — the statistics showing that lotteries are
-random, measured on real data from five lotteries across two countries. Everything else is a
-pavement fortune-teller implemented in code.
+random, measured on real data from seven sources, 36 provincial đài, across two countries.
+Everything else is a pavement fortune-teller implemented in code.
 
 If you came looking for numbers to play, the fortune-teller will tell you straight: the numbers
 here are **exactly** as random as numbers you pick yourself. The only difference is that this
@@ -69,10 +70,10 @@ uniform distribution. The incomplete gamma function is hand-rolled so the projec
 scipy. The expected result is `p >> 0.05`, meaning *nothing to see here* — and the site prints
 exactly that.
 
-**The Cursed Layer** — an oracle that produces twelve numbers from "cosmic signals": numerology
-of the draw date, the Bitcoin price, the temperature in Hanoi, the lunar date and its zodiac
-animal, and the karma of the previous draw's bonus ball. Predictive value: zero. Entertainment
-value: the entire point.
+**The Cursed Layer** — an oracle that produces twelve Vietlott numbers, and **one six-digit
+ticket per kiến thiết đài**, from "cosmic signals": numerology of the draw date, the Bitcoin
+price, the temperature in Hanoi, the lunar date and its zodiac animal, and the karma of the
+previous draw. Predictive value: zero. Entertainment value: the entire point.
 
 ## What makes this project honest
 
@@ -94,15 +95,29 @@ uv sync
 
 uv run trungso ingest --check-gaps      # fetch results; patches from vietlott.vn when the mirror lags
 uv run trungso stats                    # The Honest Layer: chi-square + verdict, every source
-uv run trungso oracle                   # The Cursed Layer: twelve numbers + the fortune-teller's lines
+uv run trungso oracle                   # The Cursed Layer: twelve numbers, plus one vé per đài
 uv run trungso score                    # rebuild the Hall of Shame
 uv run trungso backtest --game mega645  # replay the oracle over all of history → ROI
 uv run trungso today                    # dashboard for the next draw
 uv run trungso site                     # emit site/data.json for the static page
-uv run trungso notify --kind prophecy   # push the twelve numbers to Telegram
+uv run trungso notify --kind prophecy   # push the twelve numbers and the vé to Telegram
 uv run trungso pulse --plan             # which hours today get a random pulse
 uv run trungso pulse --force --dry-run  # preview one card without sending it
 ```
+
+Xổ số kiến thiết rides along with every command above. `--region {mb,mn,mt}` narrows to one
+region, and **only** that region — it does not drag the four ball games along with it:
+
+```bash
+uv run trungso ingest --region mn --since 2026-08-01   # a narrow window
+uv run trungso ingest --backfill                       # all three regions, resumable
+uv run trungso stats --region mt                       # chi-square for the centre alone
+uv run trungso backtest --region mn                    # replay 10,654 vé → ROI
+```
+
+`--backfill` walks minhngoc's **weekly** pages: one request returns a whole week of a region
+(22 boards for the south), roughly thirty times cheaper than asking each đài for each day.
+A week already covered is skipped without a request, so an interrupted run just resumes.
 
 View the static site:
 
@@ -118,8 +133,9 @@ Telegram needs `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` (GitHub Secrets in CI
 Beyond the two fixed slots (10:00 for the numbers, 18:45 for the result), `pulse` sends
 **two or three messages a day at arbitrary hours between 08:00 and 22:00 VN**, one card each:
 hot and cold numbers, chi-square, longest absences, the next draw with the jackpot and the
-price of a wheel, the Hall of Shame, one line of the pending prophecy, XSMB, the cosmic
-signals, **gold prices**, **crypto prices**, and a personal fortune.
+price of a wheel, the Hall of Shame, one line of the pending prophecy, all three kiến
+thiết regions, the committed vé, the cosmic signals, **gold prices**, **crypto prices**,
+and a personal fortune.
 
 #### Gold: the unit is where this goes wrong
 
@@ -134,6 +150,7 @@ The card also reports two numbers people rarely look at: the **dealer spread** (
 instant you buy) and the **domestic premium** over converted world spot (~3%). The rate used
 for that conversion is the one the price source itself implies, not a bank rate, and is
 labelled as such — with no rate available the premium line is **dropped rather than guessed**.
+
 
 The hours are random but not unpredictable-to-themselves: a day's plan comes from a
 `sha256(date)` seed, so `pulse.yml` can run hourly with no state file to keep — the other
@@ -224,7 +241,8 @@ Python.
 | [`thanhnhu/vietlott`](https://github.com/thanhnhu/vietlott) (MIT) | primary — Power 6/55 & Mega 6/45 | 1,386 + 1,353 draws since 2017 |
 | `vietlott.vn` | fallback when the mirror lags (latest draw only) | — |
 | `vietlott.vn` (same page) | Jackpot value and prize tiers per draw | 2 games |
-| [`khiemdoan/vietnam-lottery-xsmb-analysis`](https://github.com/khiemdoan/vietnam-lottery-xsmb-analysis) (MIT) | XSMB — honest layer + a cosmic signal | 7,526 draws since 2005 |
+| [`minhngoc.net.vn`](https://www.minhngoc.net.vn) | full prize boards for all three kiến thiết regions — honest layer, vé, cosmic signal | 26,409 boards, 36 đài; north since 2005, south/centre since 2017 |
+| [`khiemdoan/vietnam-lottery-xsmb-analysis`](https://github.com/khiemdoan/vietnam-lottery-xsmb-analysis) (MIT) | **cross-check witness** for XSMB — no longer the ingest source | 7,526 draws since 2005 |
 | [`jbaranski/jeffs-lottery-utils`](https://github.com/jbaranski/jeffs-lottery-utils) (MIT) | Powerball & Mega Millions — statistics only | 1,395 + 918 draws |
 | CoinGecko / Open-Meteo | cosmic signals (BTC, weather) | — |
 
@@ -337,22 +355,78 @@ exist is correct.
 
 Chi-square test, H₀ = "every number is equally likely":
 
-| Source | Draws | Observations | χ² | df | p-value | Rejects H₀? |
+| Source | Draws / boards | Observations | χ² | df | p-value | Rejects H₀? |
 |---|---:|---:|---:|---:|---:|---|
-| Power 6/55 | 1,386 | 8,316 | 52.45 | 54 | **0.5343** | no |
-| Mega 6/45 | 1,353 | 8,118 | 32.57 | 44 | **0.8982** | no |
-| Powerball (US) | 1,395 | 6,975 | 78.86 | 68 | **0.1731** | no |
-| Mega Millions (US) | 918 | 4,590 | 60.17 | 69 | **0.7671** | no |
-| XSMB (Northern Vietnam) | 7,526 | **203,202** | 104.26 | 99 | **0.3391** | no |
+| Power 6/55 | 1,388 | 8,328 | 52.66 | 54 | **0.5263** | no |
+| Mega 6/45 | 1,356 | 8,136 | 31.96 | 44 | **0.9115** | no |
+| Powerball (US) | 1,397 | 6,985 | 78.93 | 68 | **0.1716** | no |
+| Mega Millions (US) | 920 | 4,600 | 60.33 | 69 | **0.7625** | no |
+| Kiến thiết South (21 đài) | 10,654 | **191,772** | 117.39 | 99 | **0.1002** | no |
+| Kiến thiết Centre (14 đài) | 8,220 | **147,960** | 92.07 | 99 | **0.6760** | no |
+| Kiến thiết North (1 đài) | 7,535 | **203,445** | 106.13 | 99 | **0.2938** | no |
 
-Five independent lotteries, two countries, **231,201 number observations**, 21 years of data —
-and **not one source** rejects the randomness hypothesis. Any number that looks "hot" is noise.
+Seven independent sources, **36 đài**, two countries, **571,226 number observations**, 21 years
+of data — and **not one source** rejects the randomness hypothesis. Any number that looks
+"hot" is noise.
+
+For the kiến thiết boards the value space is **the last two digits of all 18 (or 27) prizes** —
+the same 00–99 space Vietnamese lô players stare at every evening.
+
+## The one number here that is not an estimate
+
+Every other figure in this repository is a sample: a p-value that wobbles, a paper-trading ROI
+that moves with luck. **The southern and central kiến thiết prize table is not.**
+
+One đài issues **1,000,000 tickets × 10,000₫ = 10 billion in revenue**. The table pays out:
+
+| Prize | Match | Winners per million | Value | Total |
+|---|---|---:|---:|---:|
+| Đặc biệt (special) | 6 digits | 1 | 2,000,000,000 | 2,000,000,000 |
+| Phụ đặc biệt | wrong **first** digit | 9 | 50,000,000 | 450,000,000 |
+| Khuyến khích | wrong 1 of the other **5** | 45 | 6,000,000 | 270,000,000 |
+| 1st | last 5 | 10 | 30,000,000 | 300,000,000 |
+| 2nd | last 5 | 10 | 15,000,000 | 150,000,000 |
+| 3rd (×2) | last 5 | 20 | 10,000,000 | 200,000,000 |
+| 4th (×7) | last 5 | 70 | 3,000,000 | 210,000,000 |
+| 5th | last 4 | 100 | 1,000,000 | 100,000,000 |
+| 6th (×3) | last 4 | 300 | 400,000 | 120,000,000 |
+| 7th | last 3 | 1,000 | 200,000 | 200,000,000 |
+| 8th | last 2 | 10,000 | 100,000 | 1,000,000,000 |
+| | | | **Total** | **5,000,000,000** |
+
+Five billion out of ten. **The expected ROI on one ticket is −50.00%**, and that is not an
+estimate — it is addition. [`test_kienthiet_prizes.py`](tests/test_kienthiet_prizes.py) settles
+all **1,000,000 tickets** against a real board and requires the payout to come to exactly five
+billion.
+
+The fortune-teller commits one ticket per đài to `data/ve.jsonl` **before** that đài draws.
+Replayed over the whole archive:
+
+| Region | Tickets settled | Tickets that won anything | Realised ROI | Theoretical ROI |
+|---|---:|---:|---:|---:|
+| South | 10,654 | 116 | **−86.77%** | −50.00% |
+| Centre | 8,015 | 97 | **−81.53%** | −50.00% |
+
+The gap is not a bug: **the special prize is 40% of the pool** and lands about once per million
+tickets, so nineteen thousand tickets is nowhere near enough to see one. Excluding the special
+and its runner-up, the figure a normal run converges to is **−74.50%** — which the repo prints
+next to the realised number rather than hiding.
+
+> The north gets **no ticket**. XSMB tickets carry a ký hiệu (series symbol), the prize table
+> changed in 2017 and again on 2025-04-01, and the special prize splits across several winners
+> — no single honest ROI spans twenty-one years of that. The north stays in the honest layer,
+> and the repo says so out loud.
 
 ## Draw schedule
 
 - **Power 6/55** — 18:00 Tue / Thu / Sat
 - **Mega 6/45** — 18:00 Wed / Fri / Sun
 - **XSMB** — 18:15 daily
+- **Kiến thiết South** — 16:15 daily, 3 đài (4 on Saturdays)
+- **Kiến thiết Centre** — 17:15 daily, 2–3 đài
+
+The per-đài calendar is **not hardcoded**: `kienthiet.schedule_from()` derives it from the last
+eight weeks of the archive, so a province that moves its day is followed automatically.
 
 ## Image assets
 

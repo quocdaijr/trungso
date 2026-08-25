@@ -7,11 +7,12 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
-[![tests](https://img.shields.io/badge/tests-682%20passing-brightgreen.svg)](tests/)
-[![draws analysed](https://img.shields.io/badge/draws%20analysed-12%2C578-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
-[![chi-square](https://img.shields.io/badge/chi²%20p--value-0.53%20→%20random-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
+[![tests](https://img.shields.io/badge/tests-854%20passing-brightgreen.svg)](tests/)
+[![draws analysed](https://img.shields.io/badge/draws%20analysed-31%2C470-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
+[![chi-square](https://img.shields.io/badge/chi²%20p--value-0.10%20→%20random-informational.svg)](#kết-quả-tầng-thật-trên-dữ-liệu-thật)
 [![prediction accuracy](https://img.shields.io/badge/prediction%20accuracy-0%25-critical.svg)](DISCLAIMER.md)
 [![expected ROI](https://img.shields.io/badge/expected%20ROI-−86%25-critical.svg)](DISCLAIMER.md)
+[![kien thiet ROI](https://img.shields.io/badge/vé%20kiến%20thiết%20ROI-−50%25%20(chính%20xác)-critical.svg)](#vé-số-kiến-thiết--con-số-duy-nhất-không-phải-ước-lượng)
 [![status](https://img.shields.io/badge/status-satire-ff69b4.svg)](DISCLAIMER.md)
 
 **🇬🇧 English → [README.en.md](README.en.md)**
@@ -23,7 +24,7 @@
 > ### Trang này không dự đoán được xổ số. Không phần mềm nào làm được.
 >
 > Đây là một **thí nghiệm đốt token AI**. Mọi con số ở đây là ngẫu nhiên, và trang tự công
-> khai chứng minh điều đó bằng chi-square trên 12.578 kỳ quay.
+> khai chứng minh điều đó bằng chi-square trên 31.470 kỳ quay.
 >
 > - **Không bán gì** — không thu tiền, không tài khoản, không quảng cáo
 > - **Không liên quan Vietlott** — không liên kết, không tài trợ, không uỷ quyền
@@ -43,8 +44,8 @@ Nói thật: **để số token AI đã đốt không đi đâu mất.**
 vào hư không, chúng biến thành một thứ chạy được, có test, và tự giễu chính nó.
 
 Giá trị thật duy nhất của repo nằm ở **Tầng Thật** — phần thống kê chứng minh xổ số là ngẫu
-nhiên, trên dữ liệu thật của 5 xổ số và 2 quốc gia. Phần còn lại là một ông thầy bói vỉa hè
-bằng code.
+nhiên, trên dữ liệu thật của 7 nguồn xổ số, 36 đài và 2 quốc gia. Phần còn lại là một ông
+thầy bói vỉa hè bằng code.
 
 Con vào đây tìm số để đánh thì thầy nói luôn: số ở đây ngẫu nhiên **đúng bằng** số con tự
 bốc. Khác biệt duy nhất là trang này **thừa nhận điều đó**.
@@ -54,9 +55,9 @@ bốc. Khác biệt duy nhất là trang này **thừa nhận điều đó**.
 **Tầng Thật** — thống kê tử tế: tần suất, khoảng cách (gap), kiểm định chi-square so với
 phân phối đều. Kết quả dự kiến: `p >> 0.05`, tức là *chả có gì cả*. Và nó in ra đúng như thế.
 
-**Tầng Tà Đạo** — oracle sinh 12 số từ "tín hiệu vũ trụ": thần số học ngày quay, giá BTC,
-nhiệt độ Hà Nội, ngày âm lịch, con giáp, và nghiệp báo của số phụ kỳ trước. Zero giá trị
-dự báo. 100% giá trị giải trí.
+**Tầng Tà Đạo** — oracle sinh 12 số Vietlott, và **một tấm vé 6 chữ số cho mỗi đài kiến
+thiết**, từ "tín hiệu vũ trụ": thần số học ngày quay, giá BTC, nhiệt độ Hà Nội, ngày âm
+lịch, con giáp, và nghiệp báo của kỳ trước. Zero giá trị dự báo. 100% giá trị giải trí.
 
 ## Thứ làm project này trung thực
 
@@ -71,15 +72,29 @@ uv sync
 
 uv run trungso ingest --check-gaps      # tải kết quả; tự vá từ vietlott.vn khi mirror lag
 uv run trungso stats                    # Tầng Thật: chi-square + phán quyết (mọi nguồn)
-uv run trungso oracle                   # Tầng Tà Đạo: 12 số + lời sấm
+uv run trungso oracle                   # Tầng Tà Đạo: 12 số Vietlott + mỗi đài một vé
 uv run trungso score                    # dựng lại Bảng Phong Thần
 uv run trungso backtest --game mega645  # tiên tri lại toàn bộ lịch sử → ROI
 uv run trungso today                    # dashboard kỳ quay tới
 uv run trungso site                     # sinh site/data.json cho trang tĩnh
-uv run trungso notify --kind prophecy   # đẩy 12 số lên Telegram
+uv run trungso notify --kind prophecy   # đẩy 12 số + vé lên Telegram
 uv run trungso pulse --plan             # giờ nào hôm nay sẽ có tin random
 uv run trungso pulse --force --dry-run  # xem thử một thẻ, không gửi gì
 ```
+
+Xổ số kiến thiết đi chung mọi lệnh trên. `--region {mb,mn,mt}` thu hẹp về một miền, và
+**chỉ** miền đó — không kéo theo bốn game bóng:
+
+```bash
+uv run trungso ingest --region mn --since 2026-08-01   # kéo hẹp một khoảng
+uv run trungso ingest --backfill                       # toàn bộ lịch sử 3 miền, resume được
+uv run trungso stats --region mt                       # chi-square riêng miền Trung
+uv run trungso backtest --region mn                    # phán lại 10.654 vé → ROI
+```
+
+`--backfill` đi theo **trang tuần** của minhngoc: một request trả về cả tuần của một miền
+(22 bảng cho miền Nam), rẻ hơn khoảng ba mươi lần so với hỏi từng đài từng ngày. Tuần nào
+đã đủ dữ liệu thì bỏ qua, không gửi request — chạy lại giữa chừng là an toàn.
 
 Xem trang tĩnh:
 
@@ -94,8 +109,8 @@ Thiếu biến thì `notify` báo lỗi rõ ràng, còn pipeline dữ liệu **k
 
 Ngoài hai mốc cố định (10h: 12 số, 18h45: kết quả), `pulse` gửi **2–3 tin/ngày vào giờ bất
 kỳ trong 8h–22h VN**, mỗi tin một thẻ: nóng/lạnh, chi-square, số lâu chưa ra, lịch + jackpot +
-giá bao 12, Bảng Phong Thần, một lời sấm, XSMB, tín hiệu vũ trụ, **giá vàng**, **giá crypto**,
-và lá số cá nhân.
+giá bao 12, Bảng Phong Thần, một lời sấm, kiến thiết cả ba miền, vé thầy phán,
+tín hiệu vũ trụ, **giá vàng**, **giá crypto**, và lá số cá nhân.
 
 #### Giá vàng: đơn vị là chỗ dễ sai nhất
 
@@ -110,6 +125,7 @@ Thẻ vàng nói thêm hai con số ít ai để ý: **chênh mua–bán** (~2%,
 **premium nội địa** so với vàng thế giới quy đổi (~3%). Tỷ giá dùng để quy đổi là tỷ giá do
 chính nguồn giá ngụ ý, không phải tỷ giá ngân hàng, và được ghi rõ như vậy — thiếu tỷ giá thì
 **bỏ hẳn dòng premium** chứ không đoán.
+
 
 Giờ gửi là random nhưng **không phải bất định**: kế hoạch của một ngày sinh ra từ seed
 `sha256(ngày)`, nên `pulse.yml` chạy mỗi giờ mà không cần state file — 12 lần thức dậy còn lại
@@ -173,7 +189,8 @@ chi, nạp âm mỗi năm 1929–2035) nhúng vào `site/data.json`. Có test đ
 | [`thanhnhu/vietlott`](https://github.com/thanhnhu/vietlott) (MIT) | Nguồn chính — Power 6/55 & Mega 6/45 | 1386 + 1353 kỳ, từ 2017 |
 | `vietlott.vn` | Dự phòng khi mirror lag (chỉ lấy được kỳ mới nhất) | — |
 | `vietlott.vn` (cùng trang đó) | Giá trị nồi + các hạng giải theo từng kỳ | 2 game |
-| [`khiemdoan/vietnam-lottery-xsmb-analysis`](https://github.com/khiemdoan/vietnam-lottery-xsmb-analysis) (MIT) | XSMB — Tầng Thật + tín hiệu vũ trụ | 7526 kỳ, từ 2005 |
+| [`minhngoc.net.vn`](https://www.minhngoc.net.vn) | Bảng giải xổ số kiến thiết cả 3 miền — Tầng Thật, phán vé, tín hiệu vũ trụ | 26.409 bảng, 36 đài, MB từ 2005 · MN/MT từ 2017 |
+| [`khiemdoan/vietnam-lottery-xsmb-analysis`](https://github.com/khiemdoan/vietnam-lottery-xsmb-analysis) (MIT) | **Nhân chứng đối chiếu** cho XSMB — không còn là nguồn ingest | 7526 kỳ, từ 2005 |
 | [`jbaranski/jeffs-lottery-utils`](https://github.com/jbaranski/jeffs-lottery-utils) (MIT) | Powerball & Mega Millions — chỉ để thống kê | 1395 + 918 kỳ |
 | CoinGecko / Open-Meteo | Tín hiệu vũ trụ (BTC, thời tiết) | — |
 
@@ -279,22 +296,75 @@ Nói rằng nó không tồn tại thì đúng.
 
 Kiểm định chi-square, H₀ = "mọi số đồng xác suất":
 
-| Nguồn | Kỳ | Lượt số | χ² | df | p-value | Bác bỏ H₀? |
+| Nguồn | Kỳ / bảng | Lượt số | χ² | df | p-value | Bác bỏ H₀? |
 |---|---:|---:|---:|---:|---:|---|
-| Power 6/55 | 1.386 | 8.316 | 52,45 | 54 | **0,5343** | không |
-| Mega 6/45 | 1.353 | 8.118 | 32,57 | 44 | **0,8982** | không |
-| Powerball (US) | 1.395 | 6.975 | 78,86 | 68 | **0,1731** | không |
-| Mega Millions (US) | 918 | 4.590 | 60,17 | 69 | **0,7671** | không |
-| XSMB Miền Bắc | 7.526 | **203.202** | 104,26 | 99 | **0,3391** | không |
+| Power 6/55 | 1.388 | 8.328 | 52,66 | 54 | **0,5263** | không |
+| Mega 6/45 | 1.356 | 8.136 | 31,96 | 44 | **0,9115** | không |
+| Powerball (US) | 1.397 | 6.985 | 78,93 | 68 | **0,1716** | không |
+| Mega Millions (US) | 920 | 4.600 | 60,33 | 69 | **0,7625** | không |
+| Kiến thiết Miền Nam (21 đài) | 10.654 | **191.772** | 117,39 | 99 | **0,1002** | không |
+| Kiến thiết Miền Trung (14 đài) | 8.220 | **147.960** | 92,07 | 99 | **0,6760** | không |
+| Kiến thiết Miền Bắc (1 đài) | 7.535 | **203.445** | 106,13 | 99 | **0,2938** | không |
 
-Năm xổ số độc lập, hai quốc gia, **231.201 lượt số**, 21 năm dữ liệu — và **không một
-nguồn nào** bác bỏ được giả thuyết ngẫu nhiên. Con số nào trông "nóng" cũng chỉ là nhiễu.
+Bảy nguồn độc lập, **36 đài**, hai quốc gia, **571.226 lượt số**, 21 năm dữ liệu — và
+**không một nguồn nào** bác bỏ được giả thuyết ngẫu nhiên. Con số nào trông "nóng" cũng chỉ
+là nhiễu.
+
+Với kiến thiết, không gian số là **hai chữ số cuối của cả 18 (hoặc 27) giải trên bảng** —
+đúng cái không gian 00–99 mà dân đánh lô soi hàng ngày.
+
+## Vé số kiến thiết — con số duy nhất không phải ước lượng
+
+Mọi con số khác trong repo này là một mẫu: một p-value dao động, một ROI paper-trading nhảy
+theo may rủi. **Cơ cấu giải xổ số kiến thiết miền Nam / miền Trung thì không.**
+
+Một đài phát hành **1.000.000 vé × 10.000đ = 10 tỷ doanh thu**. Bảng giải trả ra:
+
+| Giải | Trùng | Số vé trúng / 1tr | Giá trị | Tổng |
+|---|---|---:|---:|---:|
+| Đặc biệt | 6 số | 1 | 2.000.000.000 | 2.000.000.000 |
+| Phụ đặc biệt | sai chữ số **đầu** | 9 | 50.000.000 | 450.000.000 |
+| Khuyến khích | sai 1 trong **5** số còn lại | 45 | 6.000.000 | 270.000.000 |
+| Nhất | 5 số cuối | 10 | 30.000.000 | 300.000.000 |
+| Nhì | 5 số cuối | 10 | 15.000.000 | 150.000.000 |
+| Ba (×2) | 5 số cuối | 20 | 10.000.000 | 200.000.000 |
+| Tư (×7) | 5 số cuối | 70 | 3.000.000 | 210.000.000 |
+| Năm | 4 số cuối | 100 | 1.000.000 | 100.000.000 |
+| Sáu (×3) | 4 số cuối | 300 | 400.000 | 120.000.000 |
+| Bảy | 3 số cuối | 1.000 | 200.000 | 200.000.000 |
+| Tám | 2 số cuối | 10.000 | 100.000 | 1.000.000.000 |
+| | | | **Tổng** | **5.000.000.000** |
+
+5 tỷ trên 10 tỷ. **ROI kỳ vọng của một tấm vé là −50,00%**, và đó không phải ước lượng —
+đó là phép cộng. Test [`test_kienthiet_prizes.py`](tests/test_kienthiet_prizes.py) chấm cả
+**1.000.000 vé** trên một bảng thật và bắt tổng chi trả phải bằng đúng 5 tỷ.
+
+Thầy phán mỗi đài một vé, ghi vào `data/ve.jsonl` **trước** khi đài quay. Backtest lại toàn
+bộ lịch sử:
+
+| Miền | Vé đã chấm | Vé trúng gì đó | ROI thực tế | ROI lý thuyết |
+|---|---:|---:|---:|---:|
+| Miền Nam | 10.654 | 116 | **−86,77%** | −50,00% |
+| Miền Trung | 8.015 | 97 | **−81,53%** | −50,00% |
+
+Lệch khỏi −50% không phải lỗi: **giải đặc biệt chiếm 40% quỹ giải** và về một lần trên một
+triệu vé, nên gần hai vạn vé vẫn chưa đủ để nó xuất hiện. Bỏ ĐB và phụ ĐB ra, mức hội tụ
+đúng là **−74,50%** — và đó là con số repo in ra cạnh con số thực tế, thay vì giấu đi.
+
+> Miền Bắc **không** được phán vé. Vé XSMB có ký hiệu, cơ cấu giải đổi năm 2017 rồi đổi
+> tiếp 01/04/2025, và giải đặc biệt chia cho nhiều vé — không có một ROI trung thực nào
+> trải được suốt 21 năm. Miền Bắc ở lại Tầng Thật, và repo nói thẳng ra điều đó.
 
 ## Lịch quay
 
 - **Power 6/55** — 18h thứ 3, thứ 5, thứ 7
 - **Mega 6/45** — 18h thứ 4, thứ 6, chủ nhật
 - **XSMB** — 18h15 hàng ngày
+- **Kiến thiết Miền Nam** — 16h15 hàng ngày, 3 đài (thứ Bảy 4 đài)
+- **Kiến thiết Miền Trung** — 17h15 hàng ngày, 2–3 đài
+
+Lịch từng đài **không hardcode**: `kienthiet.schedule_from()` suy ra từ 8 tuần gần nhất
+trong chính kho dữ liệu, nên đài đổi ngày thì code tự theo.
 
 ## Tài nguyên hình ảnh
 

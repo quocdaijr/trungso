@@ -12,10 +12,11 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from . import astrology, scoreboard, stats, store, tax, wheel
+from . import astrology, kienthiet_scoreboard, scoreboard, stats, store, tax, wheel
 from .games import PROPHECY_GAMES, GameSpec
+from .kienthiet_oracle import VeProphecy
 from .models import Draw, Prophecy, utc_now
-from .sources import xsmb
+from .sources import kienthiet
 
 SITE_DIR = Path(__file__).resolve().parents[2] / "site"
 BUNDLE_NAME = "data.json"
@@ -183,28 +184,49 @@ def _game_payload(
     }
 
 
-def _xsmb_payload() -> dict[str, Any] | None:
-    draws = store.read_xsmb()
-    if not draws:
-        return None
-    chi = xsmb.chi_square_uniform(draws)
-    frequencies = xsmb.frequency(draws)
-    report = xsmb.summarise(draws)
+def _chi_payload(chi: stats.ChiSquareResult) -> dict[str, Any]:
     return {
-        "display": "XSMB Miền Bắc",
-        "draw_count": len(draws),
+        "statistic": round(chi.statistic, 3),
+        "degrees_of_freedom": chi.degrees_of_freedom,
+        "p_value": round(chi.p_value, 4),
+        "observations": chi.observations,
+        "rejects_uniform": chi.rejects_uniform,
+        "verdict": stats.verdict(chi),
+    }
+
+
+def _kienthiet_payload(
+    region: str, boards: Sequence[kienthiet.Board], tickets: Sequence[VeProphecy]
+) -> dict[str, Any] | None:
+    """One region of xổ số kiến thiết: the honest layer, plus its vé if it has one.
+
+    The value space is the 00-99 tail of every prize slot, exactly as XSMB's was, so the
+    page's existing 10x10 heatmap renders this unchanged.
+    """
+    if not boards:
+        return None
+    spec = kienthiet.REGIONS[region]
+    report = kienthiet.summarise(boards)
+    latest = max(boards, key=lambda b: b.date)
+    payload: dict[str, Any] = {
+        "region": region,
+        "display": f"Kiến thiết {spec.display}",
+        "draw_count": len(boards),
+        "provinces": report["provinces"],
         "first_date": report["first_date"],
         "last_date": report["last_date"],
-        "frequency": {f"{n:02d}": c for n, c in frequencies.items()},
-        "chi_square": {
-            "statistic": round(chi.statistic, 3),
-            "degrees_of_freedom": chi.degrees_of_freedom,
-            "p_value": round(chi.p_value, 4),
-            "observations": chi.observations,
-            "rejects_uniform": chi.rejects_uniform,
-            "verdict": stats.verdict(chi),
+        "prophesiable": spec.prophesiable,
+        "latest": {
+            "date": latest.date.isoformat(),
+            "province": kienthiet.PROVINCES[latest.province].display,
+            "special": latest.special,
         },
+        "frequency": {f"{n:02d}": c for n, c in kienthiet.frequency(boards).items()},
+        "chi_square": _chi_payload(kienthiet.chi_square_uniform(boards)),
     }
+    if spec.prophesiable:
+        payload["ve"] = kienthiet_scoreboard.build(tickets, boards, region=region).to_dict()
+    return payload
 
 
 def _astrology_payload() -> dict[str, Any]:
@@ -243,11 +265,18 @@ def build_bundle() -> dict[str, Any]:
         score = scoreboard.build(spec, prophecies, draws)
         games.append(_game_payload(spec, draws, prophecies, score))
 
+    tickets = store.read_ve()
+    kien_thiet = [
+        payload
+        for region in kienthiet.REGIONS
+        if (payload := _kienthiet_payload(region, store.read_boards(region), tickets))
+    ]
+
     return {
         "generated_at": utc_now().isoformat(),
         "disclaimer": DISCLAIMER,
         "games": games,
-        "xsmb": _xsmb_payload(),
+        "kienthiet": kien_thiet,
         "top_n": TOP_N,
         "astrology": _astrology_payload(),
         "privacy": (

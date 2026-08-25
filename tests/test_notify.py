@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 import pytest
 
 from conftest import make_draw, make_prophecy
-from trungso import notify, scoreboard
+from trungso import kienthiet_oracle, kienthiet_scoreboard, notify, scoreboard
 from trungso.games import MEGA645, POWER655
+from trungso.models import utc_now
+from trungso.sources import kienthiet
 
 
 @pytest.fixture(autouse=True)
@@ -143,3 +147,83 @@ def test_pending_prophecies_excludes_settled_draws():
 
     pending = notify.pending_prophecies(prophecies, draws)
     assert [p.draw_id for p in pending] == ["00003"]
+
+
+# ------------------------------------------------------------------- xổ số kiến thiết
+
+KT_TIERS = (
+    ("db", ("510332",)),
+    ("g1", ("89516",)),
+    ("g2", ("44895",)),
+    ("g3", ("52640", "02439")),
+    ("g4", ("90111", "32541", "20491", "71417", "32217", "57371", "15096")),
+    ("g5", ("1635",)),
+    ("g6", ("9670", "9023", "3404")),
+    ("g7", ("516",)),
+    ("g8", ("54",)),
+)
+KT_DAY = date(2026, 8, 20)
+
+
+def a_board(province: str = "an-giang") -> kienthiet.Board:
+    return kienthiet.Board(date=KT_DAY, region="mn", province=province, tiers=KT_TIERS)
+
+
+def a_ve(ve: str, province: str = "an-giang") -> kienthiet_oracle.VeProphecy:
+    return kienthiet_oracle.VeProphecy(
+        province=province,
+        region="mn",
+        draw_date=KT_DAY,
+        ve=ve,
+        seed="0" * 64,
+        signals={},
+        sermon="Một vé thôi. Tham là mất lộc.",
+        reasons=(),
+        karma=None,
+        oracle_version=kienthiet_oracle.KIENTHIET_ORACLE_VERSION,
+        created_at=utc_now(),
+    )
+
+
+def test_ve_prophecy_message_lists_every_dai_of_the_day():
+    message = notify.format_ve_prophecy([a_ve("111111"), a_ve("222222", "tay-ninh")])
+
+    assert "An Giang" in message
+    assert "Tây Ninh" in message
+    assert "111111" in message and "222222" in message
+    assert "10.000" in message or "10,000" in message
+
+
+def test_ve_prophecy_message_carries_the_disclaimer():
+    assert notify.DISCLAIMER in notify.format_ve_prophecy([a_ve("111111")])
+
+
+def test_ve_prophecy_message_refuses_an_empty_list():
+    with pytest.raises(ValueError, match="empty"):
+        notify.format_ve_prophecy([])
+
+
+def test_ve_result_message_reports_the_special_and_the_payout():
+    rows = kienthiet_scoreboard.score_rows([a_ve("510332")], [a_board()])
+    score = kienthiet_scoreboard.build([a_ve("510332")], [a_board()])
+    message = notify.format_ve_result(rows, score)
+
+    assert "510332" in message
+    assert "2.000.000.000" in message or "2,000,000,000" in message
+
+
+def test_ve_result_message_says_truot_when_nothing_won():
+    rows = kienthiet_scoreboard.score_rows([a_ve("777777")], [a_board()])
+    message = notify.format_ve_result(rows)
+
+    assert "trượt" in message
+
+
+def test_ve_result_message_states_the_exact_theoretical_roi():
+    """The one number on the page that is arithmetic rather than a sample."""
+    tickets, boards = [a_ve("777777")], [a_board()]
+    message = notify.format_ve_result(
+        kienthiet_scoreboard.score_rows(tickets, boards),
+        kienthiet_scoreboard.build(tickets, boards),
+    )
+    assert "-50.0%" in message

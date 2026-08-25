@@ -29,7 +29,7 @@ silent for one stage of cold arithmetic. Same skins, same tokens, same stage fra
 | `01 · TƯỚNG` | the fortune: can chi, nạp âm, cung, số chủ đạo, sao, tam hợp / tứ hành xung |
 | `02 · PHÁN` | twelve numbers for the wheel and six for a plain ticket, house oracle and personal oracle side by side, then the pot |
 | `03 · SỔ NỢ` | scoreboard, ROI, ROI-excluding-jackpot, head-to-head, "cạn phước" |
-| `04 · SỰ THẬT` | chi-square across five lotteries, heatmaps, recent draws, XSMB |
+| `04 · SỰ THẬT` | chi-square across seven sources, heatmaps, recent draws, kiến thiết 3 miền |
 
 `site/tai-chinh.html` — the money page. Three stages rather than five, because there is no
 birth date to take and no scoreboard to keep; the reading is generated from the prices

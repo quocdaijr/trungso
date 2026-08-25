@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import json
+from datetime import date
 
 from conftest import make_draw, make_prophecy, random_draw
 from trungso import site, store
 from trungso.games import MEGA645, POWER655
-from trungso.sources import xsmb
+from trungso.sources import kienthiet, xsmb
 
 
 def _seed_history(count: int = 30) -> None:
@@ -81,23 +82,83 @@ def test_no_pending_prophecy_is_null_not_an_error():
     assert game["pending_prophecy"] is None
 
 
-def test_xsmb_is_null_when_absent():
+def _southern_board(day: date, province: str = "an-giang") -> kienthiet.Board:
+    return kienthiet.Board(
+        date=day,
+        region="mn",
+        province=province,
+        tiers=(
+            ("db", ("510332",)),
+            ("g1", ("89516",)),
+            ("g2", ("44895",)),
+            ("g3", ("52640", "02439")),
+            ("g4", ("90111", "32541", "20491", "71417", "32217", "57371", "15096")),
+            ("g5", ("1635",)),
+            ("g6", ("9670", "9023", "3404")),
+            ("g7", ("516",)),
+            ("g8", ("54",)),
+        ),
+    )
+
+
+def test_kienthiet_is_an_empty_list_when_absent():
+    """A list, not a nullable key: three regions had to fit where XSMB alone used to."""
     _seed_history()
-    assert site.build_bundle()["xsmb"] is None
+    assert site.build_bundle()["kienthiet"] == []
 
 
-def test_xsmb_section_is_included_when_present():
-    header_free = [
-        xsmb.XsmbDraw(date=d, special=7, prizes=(7,) + tuple(range(26)))
-        for d in (__import__("datetime").date(2026, 8, 17),)
-    ]
-    store.write_xsmb(header_free)
+def test_kienthiet_section_is_included_when_present():
+    store.write_boards("mn", [_southern_board(date(2026, 8, 20))])
     _seed_history()
 
-    payload = site.build_bundle()["xsmb"]
+    (payload,) = site.build_bundle()["kienthiet"]
+    assert payload["region"] == "mn"
     assert payload["draw_count"] == 1
+    assert payload["provinces"] == 1
     assert len(payload["frequency"]) == 100
     assert payload["chi_square"]["degrees_of_freedom"] == 99
+    assert payload["latest"]["special"] == "510332"
+
+
+def test_only_prophesiable_regions_carry_a_ve_score():
+    store.write_boards("mn", [_southern_board(date(2026, 8, 20))])
+    store.write_xsmb(
+        [xsmb.XsmbDraw(date=date(2026, 8, 17), special=7, prizes=(7,) + tuple(range(26)))]
+    )
+    _seed_history()
+
+    by_region = {p["region"]: p for p in site.build_bundle()["kienthiet"]}
+    assert "ve" in by_region["mn"]
+    assert by_region["mn"]["ve"]["theoretical_roi"] == -0.5
+    assert "mb" not in by_region  # no Miền Bắc boards stored in this test
+
+
+def test_mien_bac_appears_without_a_ve_score():
+    store.write_boards(
+        "mb",
+        [
+            kienthiet.Board(
+                date=date(2026, 8, 20),
+                region="mb",
+                province="mien-bac",
+                tiers=(
+                    ("db", ("07523",)),
+                    ("g1", ("29580",)),
+                    ("g2", ("34885", "65037")),
+                    ("g3", ("44442", "95464", "14795", "94080", "18983", "22006")),
+                    ("g4", ("4979", "4293", "2502", "4395")),
+                    ("g5", ("4240", "3439", "3988", "5912", "3636", "5423")),
+                    ("g6", ("729", "272", "278")),
+                    ("g7", ("12", "25", "78", "70")),
+                ),
+            )
+        ],
+    )
+    _seed_history()
+
+    (payload,) = site.build_bundle()["kienthiet"]
+    assert payload["prophesiable"] is False
+    assert "ve" not in payload
 
 
 def test_bundle_is_json_serialisable(tmp_path):

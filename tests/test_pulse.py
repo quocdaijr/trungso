@@ -14,13 +14,13 @@ from datetime import date, datetime, timedelta
 import pytest
 
 from conftest import make_draw, make_prophecy
-from trungso import notify, pulse, scoreboard, store
+from trungso import kienthiet_oracle, kienthiet_scoreboard, notify, pulse, scoreboard, store
 from trungso.astrology import read_fortune
 from trungso.cli import VN_TZ, build_parser
 from trungso.games import MEGA645, MEGAMILLIONS, POWER655
 from trungso.models import Prophecy, utc_now
 from trungso.oracle import ORACLE_VERSION
-from trungso.sources import markets
+from trungso.sources import kienthiet, markets
 from trungso.sources.vibes import CosmicSignals
 from trungso.sources.xsmb import PRIZE_SLOTS, XsmbDraw
 
@@ -207,6 +207,8 @@ EMPTY_CASES = (
     ("chi_square", lambda: pulse.card_chi_square(MEGA645, ())),
     ("gap", lambda: pulse.card_gap(MEGA645, ())),
     ("xsmb", lambda: pulse.card_xsmb(())),
+    ("kienthiet", lambda: pulse.card_kienthiet("mn", ())),
+    ("ve", lambda: pulse.card_ve(kienthiet_scoreboard.build((), ()))),
     (
         "scoreboard",
         lambda: pulse.card_scoreboard(MEGA645, scoreboard.build(MEGA645, (), ())),
@@ -299,6 +301,68 @@ def test_xsmb_card_reports_the_latest_special():
     assert "40" in "\n".join(card.lines)
 
 
+def a_southern_board(day: date, province: str = "an-giang") -> kienthiet.Board:
+    return kienthiet.Board(
+        date=day,
+        region="mn",
+        province=province,
+        tiers=(
+            ("db", ("510332",)),
+            ("g1", ("89516",)),
+            ("g2", ("44895",)),
+            ("g3", ("52640", "02439")),
+            ("g4", ("90111", "32541", "20491", "71417", "32217", "57371", "15096")),
+            ("g5", ("1635",)),
+            ("g6", ("9670", "9023", "3404")),
+            ("g7", ("516",)),
+            ("g8", ("54",)),
+        ),
+    )
+
+
+def test_kienthiet_card_names_the_dai_and_its_special():
+    card = pulse.card_kienthiet("mn", [a_southern_board(A_DAY)])
+    assert card is not None
+    body = card.title + "\n".join(card.lines)
+    assert "An Giang" in body
+    assert "510332" in body
+
+
+def test_each_region_gets_its_own_card_key():
+    """A shared key would make the daily dedupe drop two regions out of three."""
+    keys = {
+        pulse.card_kienthiet(region, [a_southern_board(A_DAY)]).key
+        if region == "mn"
+        else f"kienthiet_{region}"
+        for region in ("mb", "mn", "mt")
+    }
+    assert keys == {"kienthiet_mb", "kienthiet_mn", "kienthiet_mt"}
+
+
+def test_ve_card_prints_both_the_realised_and_the_exact_roi():
+    day = A_DAY
+    board = a_southern_board(day)
+    ticket = kienthiet_oracle.VeProphecy(
+        province="an-giang",
+        region="mn",
+        draw_date=day,
+        ve="777777",
+        seed="0" * 64,
+        signals={},
+        sermon="",
+        reasons=(),
+        karma=None,
+        oracle_version=kienthiet_oracle.KIENTHIET_ORACLE_VERSION,
+        created_at=utc_now(),
+    )
+    card = pulse.card_ve(kienthiet_scoreboard.build([ticket], [board]))
+
+    assert card is not None
+    body = "\n".join(card.lines)
+    assert "-100.00%" in body
+    assert "-50.00%" in body
+
+
 def test_sermon_card_quotes_one_line_from_the_pending_prophecy():
     card = pulse.card_sermon(MEGA645, a_prophecy_with_sermons(), pulse.day_rng(A_DAY))
     assert card is not None
@@ -331,7 +395,17 @@ def a_realistic_deck() -> tuple[pulse.Card, ...]:
         for game in ("power655", "mega645", "powerball", "megamillions")
     ) + tuple(
         pulse.Card(key=key, title=key, lines=("x",))
-        for key in ("scoreboard", "sermon", "xsmb", "vibes", "fortune")
+        for key in (
+            "scoreboard",
+            "sermon",
+            "xsmb",
+            "kienthiet_mb",
+            "kienthiet_mn",
+            "kienthiet_mt",
+            "ve",
+            "vibes",
+            "fortune",
+        )
     )
 
 
