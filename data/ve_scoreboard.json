@@ -1,51 +1,81 @@
 {
-  "generated_at": "2026-08-25T04:14:35+00:00",
+  "generated_at": "2026-08-25T12:04:26+00:00",
   "disclaimer": "Paper trading, moi ky mot ve. Co cau giai tra ve dung 50% doanh thu, nen ROI ky vong la -50%. Con so thuc te lech nhieu vi giai dac biet chiem 40% quy giai va rat lau moi ve mot lan.",
   "per_region": {
     "all": {
       "region": null,
       "display": "Kiến thiết",
-      "tickets": 0,
-      "paper_burned_vnd": 0,
+      "tickets": 5,
+      "paper_burned_vnd": 50000,
       "paper_won_vnd": 0,
-      "roi": 0.0,
+      "roi": -1.0,
       "paper_won_excluding_headline_vnd": 0,
-      "roi_excluding_headline": 0.0,
+      "roi_excluding_headline": -1.0,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {},
       "winning_tickets": 0,
-      "best": null
+      "best": {
+        "draw_date": "2026-08-25",
+        "province": "bac-lieu",
+        "display": "Bạc Liêu",
+        "ve": "403647",
+        "special": "234370",
+        "prize_counts": {},
+        "prizes": "",
+        "payout_vnd": 0,
+        "cost_vnd": 10000
+      }
     },
     "mn": {
       "region": "mn",
       "display": "Miền Nam",
-      "tickets": 0,
-      "paper_burned_vnd": 0,
+      "tickets": 3,
+      "paper_burned_vnd": 30000,
       "paper_won_vnd": 0,
-      "roi": 0.0,
+      "roi": -1.0,
       "paper_won_excluding_headline_vnd": 0,
-      "roi_excluding_headline": 0.0,
+      "roi_excluding_headline": -1.0,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {},
       "winning_tickets": 0,
-      "best": null
+      "best": {
+        "draw_date": "2026-08-25",
+        "province": "bac-lieu",
+        "display": "Bạc Liêu",
+        "ve": "403647",
+        "special": "234370",
+        "prize_counts": {},
+        "prizes": "",
+        "payout_vnd": 0,
+        "cost_vnd": 10000
+      }
     },
     "mt": {
       "region": "mt",
       "display": "Miền Trung",
-      "tickets": 0,
-      "paper_burned_vnd": 0,
+      "tickets": 2,
+      "paper_burned_vnd": 20000,
       "paper_won_vnd": 0,
-      "roi": 0.0,
+      "roi": -1.0,
       "paper_won_excluding_headline_vnd": 0,
-      "roi_excluding_headline": 0.0,
+      "roi_excluding_headline": -1.0,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
       "prize_counts_total": {},
       "winning_tickets": 0,
-      "best": null
+      "best": {
+        "draw_date": "2026-08-25",
+        "province": "dak-lak",
+        "display": "Đắk Lắk",
+        "ve": "046323",
+        "special": "601875",
+        "prize_counts": {},
+        "prizes": "",
+        "payout_vnd": 0,
+        "cost_vnd": 10000
+      }
     }
   }
 }
