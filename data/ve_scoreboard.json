@@ -1,37 +1,41 @@
 {
-  "generated_at": "2026-08-29T15:45:45+00:00",
+  "generated_at": "2026-08-30T15:28:42+00:00",
   "disclaimer": "Paper trading, moi ky mot ve. Co cau giai tra ve dung 50% doanh thu, nen ROI ky vong la -50%. Con so thuc te lech nhieu vi giai dac biet chiem 40% quy giai va rat lau moi ve mot lan.",
   "per_region": {
     "all": {
       "region": null,
       "display": "Kiến thiết",
-      "tickets": 22,
-      "paper_burned_vnd": 220000,
-      "paper_won_vnd": 0,
-      "roi": -1.0,
-      "paper_won_excluding_headline_vnd": 0,
-      "roi_excluding_headline": -1.0,
+      "tickets": 28,
+      "paper_burned_vnd": 280000,
+      "paper_won_vnd": 100000,
+      "roi": -0.6428571428571428,
+      "paper_won_excluding_headline_vnd": 100000,
+      "roi_excluding_headline": -0.6428571428571428,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
-      "prize_counts_total": {},
-      "winning_tickets": 0,
+      "prize_counts_total": {
+        "g8": 1
+      },
+      "winning_tickets": 1,
       "best": {
-        "draw_date": "2026-08-29",
-        "province": "binh-phuoc",
-        "display": "Bình Phước",
-        "ve": "208777",
-        "special": "606990",
-        "prize_counts": {},
-        "prizes": "",
-        "payout_vnd": 0,
+        "draw_date": "2026-08-30",
+        "province": "thua-thien-hue",
+        "display": "Huế",
+        "ve": "016839",
+        "special": "036995",
+        "prize_counts": {
+          "g8": 1
+        },
+        "prizes": "Giải tám",
+        "payout_vnd": 100000,
         "cost_vnd": 10000
       }
     },
     "mn": {
       "region": "mn",
       "display": "Miền Nam",
-      "tickets": 13,
-      "paper_burned_vnd": 130000,
+      "tickets": 16,
+      "paper_burned_vnd": 160000,
       "paper_won_vnd": 0,
       "roi": -1.0,
       "paper_won_excluding_headline_vnd": 0,
@@ -41,11 +45,11 @@
       "prize_counts_total": {},
       "winning_tickets": 0,
       "best": {
-        "draw_date": "2026-08-29",
-        "province": "binh-phuoc",
-        "display": "Bình Phước",
-        "ve": "208777",
-        "special": "606990",
+        "draw_date": "2026-08-30",
+        "province": "da-lat",
+        "display": "Đà Lạt",
+        "ve": "033989",
+        "special": "145077",
         "prize_counts": {},
         "prizes": "",
         "payout_vnd": 0,
@@ -55,25 +59,29 @@
     "mt": {
       "region": "mt",
       "display": "Miền Trung",
-      "tickets": 9,
-      "paper_burned_vnd": 90000,
-      "paper_won_vnd": 0,
-      "roi": -1.0,
-      "paper_won_excluding_headline_vnd": 0,
-      "roi_excluding_headline": -1.0,
+      "tickets": 12,
+      "paper_burned_vnd": 120000,
+      "paper_won_vnd": 100000,
+      "roi": -0.16666666666666663,
+      "paper_won_excluding_headline_vnd": 100000,
+      "roi_excluding_headline": -0.16666666666666663,
       "theoretical_roi": -0.5,
       "theoretical_roi_excluding_headline": -0.745,
-      "prize_counts_total": {},
-      "winning_tickets": 0,
+      "prize_counts_total": {
+        "g8": 1
+      },
+      "winning_tickets": 1,
       "best": {
-        "draw_date": "2026-08-29",
-        "province": "da-nang",
-        "display": "Đà Nẵng",
-        "ve": "379140",
-        "special": "718134",
-        "prize_counts": {},
-        "prizes": "",
-        "payout_vnd": 0,
+        "draw_date": "2026-08-30",
+        "province": "thua-thien-hue",
+        "display": "Huế",
+        "ve": "016839",
+        "special": "036995",
+        "prize_counts": {
+          "g8": 1
+        },
+        "prizes": "Giải tám",
+        "payout_vnd": 100000,
         "cost_vnd": 10000
       }
     }
