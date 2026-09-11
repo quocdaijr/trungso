@@ -15,6 +15,7 @@ from . import (
     kienthiet_commands,
     kienthiet_report,
     notify,
+    prize_health,
     pulse,
     scoreboard,
     site,
@@ -109,19 +110,30 @@ def _try_live_fallback(spec: GameSpec, missing: Sequence[str]) -> bool:
     return bool(remaining)
 
 
-def _refresh_prizes(spec: GameSpec, latest_draw_id: str) -> None:
-    """Read the jackpot for the newest draw and store it.
+def _refresh_prizes(spec: GameSpec, latest_draw_id: str) -> bool:
+    """Read the jackpot for the newest draw and store it. Returns whether it is stuck.
 
     Never fatal. The prize figures are commentary on the draw, not part of it, so a
     layout change on vietlott.vn must not take the whole ingest down - it reports, keeps
     whatever was stored last, and the site labels that figure with the draw it belongs to
     so a stale number can never pass itself off as the current one.
+
+    But not fatal is not the same as not worth mentioning, and that distinction cost
+    eighteen days. From 2026-08-25 vietlott.vn answered the GitHub Actions runner with a
+    Cloudflare managed challenge; this function caught the 403 exactly as designed,
+    printed one yellow line and returned - and every run stayed green while the figure
+    sat still. So a failed fetch now asks how far behind the stored number actually is,
+    and a real gap comes back as a problem the caller must account for.
     """
     try:
         prizes = vietlott_prizes.fetch_prizes(spec, latest_draw_id)
     except (PrizeParseError, LiveFetchError, requests.RequestException) as exc:
         console.print(f"  [yellow]không đọc được giải thưởng:[/yellow] {exc}")
-        return
+        fresh = prize_health.freshness(store.read_prizes(spec.key), latest_draw_id)
+        if not fresh.is_stale:
+            return False
+        console.print(f"  [red]{prize_health.describe(fresh)}[/red]")
+        return True
 
     changed = store.write_prizes(prizes)
     billions = prizes.top_jackpot_vnd / 1_000_000_000
@@ -130,6 +142,7 @@ def _refresh_prizes(spec: GameSpec, latest_draw_id: str) -> None:
         f"  jackpot kỳ #{prizes.draw_id}: [bold]{billions:,.2f} tỷ[/bold] — {state}"
         + ("" if changed else " [dim](không đổi)[/dim]")
     )
+    return False
 
 
 def _money(value: float) -> str:
@@ -154,7 +167,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
         # Jackpot lives on the same vietlott.vn page as the draw, and only for Vietlott
         # games - the US files carry no prize pool we can read.
         if spec.wheel_playable and report["last_id"]:
-            _refresh_prizes(spec, report["last_id"])
+            problems += _refresh_prizes(spec, report["last_id"])
 
         # Gap and lag checks assume a Vietlott draw calendar and a real draw number.
         # The US files carry neither, so applying them there would invent problems.
@@ -434,6 +447,14 @@ def cmd_today(args: argparse.Namespace) -> int:
         else:
             console.print("  [dim]chưa tiên tri — chạy `trungso oracle`[/dim]")
 
+        # The Oracle workflow pipes this command into its step summary, which is the one
+        # place a frozen jackpot becomes visible in CI without dropping the `|| true`
+        # that deliberately tolerates a lagging mirror.
+        if spec.wheel_playable:
+            fresh = prize_health.freshness(store.read_prizes(spec.key), last.draw_id)
+            if fresh.is_stale:
+                console.print(f"  [red]{prize_health.describe(fresh)}[/red]")
+
     if args.game is None:
         console.print()
         committed = store.read_ve()
@@ -458,6 +479,26 @@ def cmd_site(args: argparse.Namespace) -> int:
     console.print(f"  [dim]xem thử: python3 -m http.server -d {target.parent} 8000[/dim]")
     console.print(DISCLAIMER)
     return 0
+
+
+def _stale_prizes(
+    args: argparse.Namespace,
+) -> tuple[tuple[GameSpec, prize_health.PrizeFreshness], ...]:
+    """The Vietlott games whose stored jackpot has stopped tracking the newest draw.
+
+    Computed independently of whether there was a prophecy or a result to announce: the
+    2026-08-25 outage would have gone unheard on any day with nothing else to send.
+    """
+    stale = []
+    for spec in _games_for(args, prophecy_only=True):
+        if not spec.wheel_playable:
+            continue
+        draws = store.read_draws(spec.key)
+        latest_id = draws[-1].draw_id if draws else None
+        fresh = prize_health.freshness(store.read_prizes(spec.key), latest_id)
+        if fresh.is_stale:
+            stale.append((spec, fresh))
+    return tuple(stale)
 
 
 def cmd_notify(args: argparse.Namespace) -> int:
@@ -502,6 +543,17 @@ def cmd_notify(args: argparse.Namespace) -> int:
         else:
             failed += 1
             console.print(f"[red]{spec.display}: gửi Telegram thất bại[/red]")
+
+    # One alert per run, not one per game: the point is to break the silence, not to
+    # fill it. It goes out even on a day with no prophecy and no result to announce.
+    stale = _stale_prizes(args)
+    if stale:
+        if notify.send_message(notify.format_prize_alert(stale)):
+            sent += 1
+            console.print("[yellow]đã báo Telegram: jackpot đứng im[/yellow]")
+        else:
+            failed += 1
+            console.print("[red]gửi cảnh báo jackpot thất bại[/red]")
 
     if args.game is None:
         ok, bad = kienthiet_commands.run_notify(console, args)

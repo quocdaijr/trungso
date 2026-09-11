@@ -227,3 +227,46 @@ def test_ve_result_message_states_the_exact_theoretical_roi():
         kienthiet_scoreboard.build(tickets, boards),
     )
     assert "-50.0%" in message
+
+
+# -------------------------------------------------------- the jackpot went quiet alert
+
+
+def test_prize_alert_names_the_game_the_gap_and_the_cause():
+    """Written for the 2026-08-25 outage. An alert that says only "stale" sends its
+    reader digging; this one has to carry the draw ids and the number that is being
+    shown in the meantime."""
+    from trungso import prize_health
+    from trungso.games import MEGA645, POWER655
+
+    message = notify.format_prize_alert(
+        (
+            (POWER655, prize_health.freshness({"draw_id": "01388"}, "01396")),
+            (MEGA645, prize_health.freshness({"draw_id": "01553"}, "01560")),
+        )
+    )
+
+    assert "Power 6/55" in message
+    assert "Mega 6/45" in message
+    assert "8 kỳ" in message
+    assert "7 kỳ" in message
+    assert "#01388" in message
+    assert "#01560" in message
+
+
+def test_prize_alert_says_when_nothing_was_ever_read():
+    from trungso import prize_health
+    from trungso.games import MEGA645
+
+    message = notify.format_prize_alert(((MEGA645, prize_health.freshness(None, "01560")),))
+
+    assert "chưa đọc được" in message
+
+
+def test_prize_alert_refuses_an_empty_list():
+    """No stale game means no message. Building one anyway would produce an alert about
+    nothing, which is how alerts get muted."""
+    import pytest
+
+    with pytest.raises(ValueError, match="không có game nào"):
+        notify.format_prize_alert(())

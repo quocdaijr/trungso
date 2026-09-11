@@ -12,6 +12,7 @@ from collections.abc import Sequence
 
 import requests
 
+from . import prize_health
 from .games import GameSpec
 from .kienthiet_oracle import VeProphecy
 from .kienthiet_prizes import TICKET_PRICE_VND, describe
@@ -191,6 +192,36 @@ def format_ve_result(rows: Sequence[VeScoreRow], score: VeScore | None = None) -
             f"{score.theoretical_roi * 100:.1f}%.</i>",
         ]
     lines += ["", f"<i>{DISCLAIMER}</i>"]
+    return "\n".join(lines)
+
+
+def format_prize_alert(
+    entries: Sequence[tuple[GameSpec, prize_health.PrizeFreshness]],
+) -> str:
+    """The one message that breaks the silence when the jackpot feed dies.
+
+    Every other function in this module announces a prophecy or a result. This one
+    announces that a number on the site has stopped moving, which is the failure the
+    2026-08-25 Cloudflare block taught us we had no way to hear: the fetch failed twice a
+    day for eighteen days, the run stayed green, and the site kept showing a figure from
+    draw #01553 while the mirror had reached #01560.
+
+    It names the draw ids rather than saying "stale", because "stale" sends the reader
+    digging and the ids say immediately how long this has been going on.
+    """
+    if not entries:
+        raise ValueError("format_prize_alert: không có game nào bị chậm, đừng gửi gì")
+
+    lines = ["⚠️ <b>Jackpot đứng im</b>", ""]
+    for spec, fresh in entries:
+        lines.append(f"<b>{spec.display}</b> — {prize_health.describe(fresh)}")
+    lines += [
+        "",
+        "Con số trên web vẫn ghi đúng kỳ nó thuộc về, nên không ai bị lừa. "
+        "Nhưng nó đã ngừng chạy, và đây là tin nhắn nói ra điều đó.",
+        "",
+        f"<i>{DISCLAIMER}</i>",
+    ]
     return "\n".join(lines)
 
 
