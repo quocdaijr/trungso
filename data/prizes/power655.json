@@ -1,39 +1,39 @@
 {
   "game": "power655",
-  "draw_id": "01388",
+  "draw_id": "01396",
   "jackpots": {
-    "Jackpot 1": 39124303050,
-    "Jackpot 2": 4013811450
+    "Jackpot 1": 61515559200,
+    "Jackpot 2": 4698054000
   },
   "tiers": [
     {
       "label": "Jackpot 1",
       "winners": 0,
-      "value_vnd": 39124303050
+      "value_vnd": 61515559200
     },
     {
       "label": "Jackpot 2",
       "winners": 0,
-      "value_vnd": 4013811450
+      "value_vnd": 4698054000
     },
     {
       "label": "Giải Nhất",
-      "winners": 17,
+      "winners": 19,
       "value_vnd": 40000000
     },
     {
       "label": "Giải Nhì",
-      "winners": 1067,
+      "winners": 805,
       "value_vnd": 500000
     },
     {
       "label": "Giải Ba",
-      "winners": 20504,
+      "winners": 17990,
       "value_vnd": 50000
     }
   ],
-  "top_jackpot_vnd": 39124303050,
+  "top_jackpot_vnd": 61515559200,
   "rolled_over": true,
-  "fetched_at": "2026-08-25T03:46:51+00:00",
+  "fetched_at": "2026-09-11T07:52:20+00:00",
   "source": "live:vietlott.vn"
 }
