@@ -395,3 +395,29 @@ def test_jackpot_odds_are_not_recomputed_from_a_rounded_probability():
     assert game["payout_summary"]["jackpot_one_in"] == exact
     # and the exact value is just the ratio of combination counts
     assert exact == round(comb(POWER655.pool, POWER655.pick) / comb(12, POWER655.pick))
+
+
+def test_bundle_states_how_many_draws_behind_the_jackpot_is():
+    """`matches_latest_draw` says the figure is old; it does not say how old. One draw
+    behind is a transient, eight is a dead source, and the page cannot word the
+    difference from a boolean."""
+    store.write_draws("power655", [make_draw(POWER655, n) for n in range(1388, 1397)])
+    _store_prizes("power655", "01388")
+
+    payload = site.build_bundle()
+    game = next(g for g in payload["games"] if g["key"] == "power655")
+
+    assert game["prizes"]["draws_behind"] == 8
+    assert game["prizes"]["is_stale"] is True
+    assert game["prizes"]["matches_latest_draw"] is False
+
+
+def test_one_draw_behind_is_not_flagged_stale_on_the_site():
+    store.write_draws("power655", [make_draw(POWER655, 1386), make_draw(POWER655, 1387)])
+    _store_prizes("power655", "01386")
+
+    payload = site.build_bundle()
+    game = next(g for g in payload["games"] if g["key"] == "power655")
+
+    assert game["prizes"]["draws_behind"] == 1
+    assert game["prizes"]["is_stale"] is False

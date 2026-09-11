@@ -333,3 +333,208 @@ def test_prize_refresh_stores_and_reports(monkeypatch, capsys):
     assert "34,90 tỷ" in out or "34.90 tỷ" in out
     assert "cộng dồn sang kỳ sau" in out
     assert store.read_prizes("power655")["top_jackpot_vnd"] == 34_897_731_150
+
+
+# ------------------------------------------- ...but it must stop being silent about it
+
+
+def _explode_prizes(monkeypatch):
+    from trungso.sources import vietlott_prizes
+
+    def explode(*_args, **_kwargs):
+        raise vietlott_prizes.PrizeParseError("power655: no gt_jackpot block")
+
+    monkeypatch.setattr(cli.vietlott_prizes, "fetch_prizes", explode)
+
+
+def _store_stale_prize(game: str, draw_id: str):
+    from trungso.sources.vietlott_prizes import DrawPrizes, PrizeTier
+
+    store.write_prizes(
+        DrawPrizes(
+            game=game,
+            draw_id=draw_id,
+            jackpots={"Jackpot 1": 34_897_731_150},
+            tiers=(PrizeTier("Jackpot 1", 0, 34_897_731_150),),
+            fetched_at="2026-08-25T03:46:51+00:00",
+        )
+    )
+
+
+def test_one_draw_behind_is_reported_but_not_a_problem(monkeypatch, capsys):
+    """A single failed fetch between two draws is a transient, and an alert that fires
+    on transients is an alert nobody reads."""
+    _store_stale_prize("power655", "01385")
+    _explode_prizes(monkeypatch)
+
+    stale = cli._refresh_prizes(POWER655, "01386")
+
+    assert stale is False
+    assert "không đọc được giải thưởng" in capsys.readouterr().out
+
+
+def test_prizes_stuck_for_several_draws_is_reported_as_a_problem(monkeypatch, capsys):
+    """The 2026-08-25 outage: the figure sat eight draws behind for eighteen days while
+    every run stayed green. `_refresh_prizes` must now say so out loud."""
+    _store_stale_prize("power655", "01388")
+    _explode_prizes(monkeypatch)
+
+    stale = cli._refresh_prizes(POWER655, "01396")
+
+    out = capsys.readouterr().out
+    assert stale is True
+    assert "8 kỳ" in out
+
+
+def test_never_fetched_prize_is_a_problem(monkeypatch, capsys):
+    _explode_prizes(monkeypatch)
+
+    stale = cli._refresh_prizes(POWER655, "01396")
+
+    assert stale is True
+    assert "chưa đọc được" in capsys.readouterr().out
+
+
+def test_ingest_exits_non_zero_when_the_jackpot_is_stuck(monkeypatch, capsys):
+    """The exit code is the part CI can act on, so staleness has to reach it."""
+    from trungso.models import Draw
+
+    _store_stale_prize("power655", "01388")
+    _explode_prizes(monkeypatch)
+    monkeypatch.setattr(
+        cli,
+        "_fetch_for",
+        lambda spec: (
+            Draw(
+                game=spec.key,
+                draw_id="01396",
+                date=date(2026, 9, 10),
+                main=(2, 5, 28, 32, 51, 53),
+                bonus=50 if spec.has_bonus else None,
+                source="test",
+            ),
+        ),
+    )
+
+    args = cli.build_parser().parse_args(["ingest", "--game", "power655"])
+
+    assert cli.cmd_ingest(args) == 1
+    assert "8 kỳ" in capsys.readouterr().out
+
+
+def test_notify_sends_one_alert_when_the_jackpot_is_stuck(monkeypatch, capsys):
+    """The exit code reaches CI; this reaches a phone. Both were missing during the
+    eighteen-day silence."""
+    from trungso import notify
+    from trungso.models import Draw
+
+    monkeypatch.setenv(notify.ENV_TOKEN, "tok")
+    monkeypatch.setenv(notify.ENV_CHAT_ID, "42")
+
+    _store_stale_prize("power655", "01388")
+    store.write_draws(
+        "power655",
+        [
+            Draw(
+                game="power655",
+                draw_id=f"0{n}",
+                date=date(2026, 9, 1),
+                main=(2, 5, 28, 32, 51, 53),
+                bonus=50,
+                source="test",
+            )
+            for n in range(1388, 1397)
+        ],
+    )
+
+    sent: list[str] = []
+    monkeypatch.setattr(notify, "send_message", lambda text, **_k: sent.append(text) or True)
+    monkeypatch.setattr(cli.notify, "send_message", lambda text, **_k: sent.append(text) or True)
+
+    args = cli.build_parser().parse_args(["notify", "--kind", "result", "--game", "power655"])
+    cli.cmd_notify(args)
+
+    alerts = [m for m in sent if "Jackpot đứng im" in m]
+    assert len(alerts) == 1
+    assert "8 kỳ" in alerts[0]
+
+
+def test_notify_stays_quiet_when_the_jackpot_is_current(monkeypatch):
+    from trungso import notify
+    from trungso.models import Draw
+
+    monkeypatch.setenv(notify.ENV_TOKEN, "tok")
+    monkeypatch.setenv(notify.ENV_CHAT_ID, "42")
+
+    _store_stale_prize("power655", "01396")
+    store.write_draws(
+        "power655",
+        [
+            Draw(
+                game="power655",
+                draw_id="01396",
+                date=date(2026, 9, 10),
+                main=(2, 5, 28, 32, 51, 53),
+                bonus=50,
+                source="test",
+            )
+        ],
+    )
+
+    sent: list[str] = []
+    monkeypatch.setattr(cli.notify, "send_message", lambda text, **_k: sent.append(text) or True)
+
+    args = cli.build_parser().parse_args(["notify", "--kind", "result", "--game", "power655"])
+    cli.cmd_notify(args)
+
+    assert not [m for m in sent if "Jackpot đứng im" in m]
+
+
+def test_today_names_a_stuck_jackpot(capsys):
+    """`trungso today` is what the Oracle workflow pipes into its step summary, so this
+    is the line that makes an eighteen-day freeze visible in CI without having to drop
+    the `|| true` that deliberately tolerates a lagging mirror."""
+    from trungso.models import Draw
+
+    _store_stale_prize("power655", "01388")
+    store.write_draws(
+        "power655",
+        [
+            Draw(
+                game="power655",
+                draw_id=f"0{n}",
+                date=date(2026, 9, 1),
+                main=(2, 5, 28, 32, 51, 53),
+                bonus=50,
+                source="test",
+            )
+            for n in range(1388, 1397)
+        ],
+    )
+
+    cli.cmd_today(cli.build_parser().parse_args(["today", "--game", "power655"]))
+
+    assert "8 kỳ" in capsys.readouterr().out
+
+
+def test_today_says_nothing_when_the_jackpot_is_current(capsys):
+    from trungso.models import Draw
+
+    _store_stale_prize("power655", "01396")
+    store.write_draws(
+        "power655",
+        [
+            Draw(
+                game="power655",
+                draw_id="01396",
+                date=date(2026, 9, 10),
+                main=(2, 5, 28, 32, 51, 53),
+                bonus=50,
+                source="test",
+            )
+        ],
+    )
+
+    cli.cmd_today(cli.build_parser().parse_args(["today", "--game", "power655"]))
+
+    assert "đang chậm" not in capsys.readouterr().out

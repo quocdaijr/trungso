@@ -12,7 +12,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from . import astrology, kienthiet_scoreboard, scoreboard, stats, store, tax, wheel
+from . import astrology, kienthiet_scoreboard, prize_health, scoreboard, stats, store, tax, wheel
 from .games import PROPHECY_GAMES, GameSpec
 from .kienthiet_oracle import VeProphecy
 from .models import Draw, Prophecy, utc_now
@@ -42,15 +42,23 @@ def _prizes_payload(spec: GameSpec, draws: Sequence[Draw]) -> dict[str, Any] | N
     on the last run, the stored figure belongs to an older draw - and a jackpot labelled
     as current when it is not would be exactly the kind of number this project refuses to
     print. The renderer must read this flag before it words anything.
+
+    `draws_behind` is the part a boolean cannot carry. One draw behind is a single failed
+    run; eight is what the 2026-08-25 Cloudflare block actually produced. The freshness
+    judgement comes from `prize_health` rather than being recomputed here, so the page and
+    the ingest log can never disagree about whether the number has gone stale.
     """
     stored = store.read_prizes(spec.key)
     if not stored:
         return None
     latest_id = draws[-1].draw_id if draws else None
+    fresh = prize_health.freshness(stored, latest_id)
     top = int(stored.get("top_jackpot_vnd") or 0)
     return {
         **stored,
-        "matches_latest_draw": bool(latest_id and stored.get("draw_id") == latest_id),
+        "matches_latest_draw": fresh.matches_latest_draw,
+        "draws_behind": fresh.draws_behind,
+        "is_stale": fresh.is_stale,
         "latest_draw_id": latest_id,
         # The announced figure is not what a winner receives. Printing one without the
         # other is the shape of an advert, and this page is not one.
